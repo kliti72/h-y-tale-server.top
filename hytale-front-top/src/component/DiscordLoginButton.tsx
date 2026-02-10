@@ -47,7 +47,7 @@ export default function DiscordLoginButton() {
         },
         body: new URLSearchParams({
           client_id: CLIENT_ID,
-          client_secret: "1470838972711436401",  
+          client_secret: "mJGmROWtCGArCuHgtZxQMBBytxs4qZik",  
           grant_type: "authorization_code",
           code: authCode,
           redirect_uri: REDIRECT_URI,
