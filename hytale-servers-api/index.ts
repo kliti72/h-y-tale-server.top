@@ -18,7 +18,7 @@ const app = new Elysia()
      cors({
         origin: 'http://localhost:5173',          // esatto origin del tuo frontend (Vite)
         methods: ['GET', 'POST', 'OPTIONS'],
-        allowedHeaders: ['Content-Type'],
+        allowedHeaders: ['Content-Type', "Authorization"],
         credentials: true,                        // se userai cookie/auth dopo
         maxAge: 86400                             // cache preflight
       })
