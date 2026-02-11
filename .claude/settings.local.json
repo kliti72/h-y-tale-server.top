@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sqlite3:*)",
+      "Bash(bun add:*)",
+      "Bash(node -e:*)"
+    ]
+  }
+}

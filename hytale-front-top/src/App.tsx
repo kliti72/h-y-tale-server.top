@@ -3,9 +3,11 @@ import { Component } from "solid-js";
 import Header from "./component/header";
 import ServerBoard from "./component/Board";
 import Footer from './component/Footer';
+import { AuthProvider } from './context/AuthContext';
 
 const App: Component = () => {
   return (
+    <AuthProvider>
     <div
       class="
         min-h-screen 
@@ -53,6 +55,7 @@ const App: Component = () => {
         }}
       />
     </div>
+    </AuthProvider>
   );
 };
 

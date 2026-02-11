@@ -2,8 +2,9 @@
 import { Component, createSignal, For, Show } from "solid-js";
 import AddServerModal from "./AddServerModal";
 import { createResource } from "solid-js";
+import { useAuth } from "../context/AuthContext";
 
-const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "https://your-api-domain.com";
+const API_URL = "http://localhost:3000"
 
 const fetchServers = async () => {
   const res = await fetch(`${API_URL}/api/servers`);
@@ -12,6 +13,7 @@ const fetchServers = async () => {
 };
 
 const ServerBoard: Component = () => {
+  const { getAuthHeaders, isLoggedIn } = useAuth();
   const [isModalOpen, setIsModalOpen] = createSignal(false);
   const [servers, { refetch }] = createResource(fetchServers);
 
@@ -19,7 +21,8 @@ const ServerBoard: Component = () => {
     try {
       const response = await fetch(`${API_URL}/api/servers`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+        credentials: "include",
         body: JSON.stringify(data),
       });
 
@@ -55,24 +58,26 @@ const ServerBoard: Component = () => {
           Classifica Hytale Servers
         </h2>
 
-        {/* Pulsante Aggiungi - stile coerente */}
-        <div class="text-center mb-10">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            class="
-              flex items-center justify-center gap-2 mx-auto
-              px-7 py-3.5 rounded-xl text-base sm:text-lg font-semibold
-              text-emerald-50 bg-gradient-to-r from-emerald-700/80 to-teal-700/70
-              border border-emerald-600/60
-              hover:from-emerald-600/90 hover:to-teal-600/80
-              hover:border-emerald-400/70 hover:shadow-lg hover:shadow-emerald-900/40
-              active:scale-[0.98] transition-all duration-200
-            "
-          >
-            <span class="text-xl leading-none">⊕</span>
-            Aggiungi il tuo Server
-          </button>
-        </div>
+        {/* Pulsante Aggiungi - visibile solo se autenticato */}
+        <Show when={isLoggedIn()}>
+          <div class="text-center mb-10">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              class="
+                flex items-center justify-center gap-2 mx-auto
+                px-7 py-3.5 rounded-xl text-base sm:text-lg font-semibold
+                text-emerald-50 bg-gradient-to-r from-emerald-700/80 to-teal-700/70
+                border border-emerald-600/60
+                hover:from-emerald-600/90 hover:to-teal-600/80
+                hover:border-emerald-400/70 hover:shadow-lg hover:shadow-emerald-900/40
+                active:scale-[0.98] transition-all duration-200
+              "
+            >
+              <span class="text-xl leading-none">⊕</span>
+              Aggiungi il tuo Server
+            </button>
+          </div>
+        </Show>
 
         {/* Loading / Error / Lista */}
         <Show when={!servers.loading} fallback={<p class="text-center text-zinc-400">Caricamento server...</p>}>
