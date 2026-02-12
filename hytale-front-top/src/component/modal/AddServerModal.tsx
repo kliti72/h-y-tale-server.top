@@ -1,6 +1,6 @@
 // AddServerModal.tsx (versione aggiornata)
 import { Component, createSignal, For, from, Show } from "solid-js";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
 
 type AddServerModalProps = {
   isOpen: boolean;

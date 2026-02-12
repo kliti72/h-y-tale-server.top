@@ -1,6 +1,6 @@
 // Header.tsx
 import { Component } from "solid-js";
-import DiscordLoginButton from "./DiscordLoginButton";
+import DiscordLoginButton from "../DiscordLoginButton";
 
 const Header: Component = () => {
   return (

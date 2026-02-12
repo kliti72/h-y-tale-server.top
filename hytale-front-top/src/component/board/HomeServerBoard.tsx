@@ -1,8 +1,8 @@
 // ServerBoard.tsx
 import { Component, createSignal, For, Show } from "solid-js";
-import AddServerModal from "./AddServerModal";
+import AddServerModal from "../modal/AddServerModal";
 import { createResource } from "solid-js";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
 
 const API_URL = "http://localhost:3000";
 
@@ -37,14 +37,13 @@ const ServerBoard: Component = () => {
       alert("Server aggiunto con successo! 🎉");
     } catch (err) {
       console.error("Errore aggiunta:", err);
-      alert("Impossibile aggiungere il server.\n" + (err.message || "Errore sconosciuto"));
     }
   };
 
   // Calcola rank dinamico (1 = più recente o più visualizzato in futuro)
   const rankedServers = () => {
     const list = servers() || [];
-    return list.map((s, i) => ({
+    return list.map((s: { created_at: string | number | Date; }, i: number) => ({
       ...s,
       rank: i + 1,
       isNew: new Date(s.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // ultimi 7 giorni

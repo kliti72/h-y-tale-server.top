@@ -1,9 +1,10 @@
 import { Router, Route } from '@solidjs/router';
-import NotFound from './component/NotFound';
-import ServerBoard from './component/ServerBoard';
+import NotFound from './component/template/NotFound';
+import ServerBoard from './component/board/HomeServerBoard';
 import { AuthProvider } from './auth/AuthContext';
-import Header from './component/Header';
-import Footer from './component/Footer';
+import Header from './component/template/Header';
+import Footer from './component/template/Footer';
+import MyServerBoard from './component/board/MyServerBoard';
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
       )}
     >
       <Route path="/" component={ServerBoard} />
-      <Route path="/owner" component={ServerBoard} />
+      <Route path="/owner" component={MyServerBoard} />
       <Route path="*" component={NotFound} />
     </Router>
   );
