@@ -17,3 +17,10 @@ Prepare & Run
 - ''' npm install . '''
 - ''' powershell -c "irm bun.sh/install.ps1|iex" '''
 - ''' bun index.ts . ''' 
+
+
+12/02/2026
+- OAuth Standard With PKCE 
+
+12/02/2026
+- AuthProviderContext in Frontend
