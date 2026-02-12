@@ -1,13 +1,13 @@
-// src/components/MyServersBoard.tsx
 import { 
   createResource, 
+  createSignal, 
   For, 
   Show, 
   Suspense 
 } from 'solid-js';
 import { useAuth } from '../../auth/AuthContext';
+import AddServerModal from "../modal/AddServerModal";
 
-// Tipi (opzionale ma consigliato)
 type Server = {
   id: number;
   name: string;
@@ -35,10 +35,9 @@ type ApiResponse = {
 
 const fetchMyServers = async (): Promise<ApiResponse> => {
   const response = await fetch('http://localhost:3000/api/servers/mine', {
-    credentials: 'include', // se usi cookie/session/auth
+    credentials: 'include', // obbligatorio
     headers: {
       'Accept': 'application/json',
-      // 'Authorization': `Bearer ${token}` // se usi token
     },
   });
 
@@ -49,11 +48,39 @@ const fetchMyServers = async (): Promise<ApiResponse> => {
   return response.json();
 };
 
-export default function MyServersBoard() {
-  const { user } = useAuth(); // ← opzionale, se lo usi già nel layout
+const API_URL = "http://localhost:3000";
 
+export default function MyServersBoard() {
+  const { isAuthenticated } = useAuth(); 
+  const [isModalOpen, setIsModalOpen] = createSignal(false);
+  
+  
+  const handleSubmit = async (data: { name: string; ip: string; port: string; tags: string[] }) => {
+    try {
+      const response = await fetch(`${API_URL}/api/servers`, {
+        method: "POST",
+        credentials: 'include',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Errore ${response.status}: ${errorText}`);
+      }
+
+      await response.json();
+      setIsModalOpen(false);
+      location.href = '/';
+      alert("Server aggiunto con successo! 🎉");
+    } catch (err) {
+      console.error("Errore aggiunta:", err);
+    }
+  };
+
+  
   // Oppure prendi tutto dall'API (come nel tuo JSON)
-  const [data, { refetch, mutate }] = createResource<ApiResponse>(fetchMyServers);
+  const [data] = createResource<ApiResponse>(fetchMyServers);
 
   const handleEdit = (serverId: number) => {
     // Opzioni possibili:
@@ -138,13 +165,36 @@ export default function MyServersBoard() {
         </Show>
       </Suspense>
 
-      {/* Pulsante refresh manuale (utile per debug) */}
-      <button
-        onClick={() => refetch()}
-        class="mt-6 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-      >
-        Ricarica dati
-      </button>
+ <Show when={isAuthenticated()}>
+        {/* Pulsante Aggiungi - stile coerente */}
+        <div class="text-center mb-10 flex">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            class="
+              flex items-center justify-center gap-2 mx-auto
+              px-7 py-3.5 rounded-xl text-base sm:text-lg font-semibold
+              text-emerald-50 bg-gradient-to-r from-emerald-700/80 to-teal-700/70
+              border border-emerald-600/60
+              hover:from-emerald-600/90 hover:to-teal-600/80
+              hover:border-emerald-400/70 hover:shadow-lg hover:shadow-emerald-900/40
+              active:scale-[0.98] transition-all duration-200
+            "
+          >
+            <span class="text-xl leading-none">⊕</span>
+            Aggiungi il tuo Server
+          </button>
+
+        </div>
+        
+        </Show>
+
+        <AddServerModal
+          isOpen={isModalOpen()}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleSubmit}
+        />
     </div>
+
+    
   );
 }
