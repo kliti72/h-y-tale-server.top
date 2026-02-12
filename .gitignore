@@ -1,1 +1,6 @@
 hytale-servers-api/server.db
+hytale-servers-api/*.db
+hytale-servers-api/*.sqlite
+hytale-servers-api/*.db-journal
+hytale-servers-api/*.db-shm
+hytale-servers-api/*.db-wal
