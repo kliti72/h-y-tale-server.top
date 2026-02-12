@@ -2,8 +2,9 @@
 import { Component, createSignal, For, Show } from "solid-js";
 import AddServerModal from "./AddServerModal";
 import { createResource } from "solid-js";
+import { useAuth } from "../auth/AuthContext";
 
-const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "https://your-api-domain.com";
+const API_URL = "http://localhost:3000";
 
 const fetchServers = async () => {
   const res = await fetch(`${API_URL}/api/servers`);
@@ -14,6 +15,7 @@ const fetchServers = async () => {
 const ServerBoard: Component = () => {
   const [isModalOpen, setIsModalOpen] = createSignal(false);
   const [servers, { refetch }] = createResource(fetchServers);
+  const { user, isAuthenticated, loading, login, logout } = useAuth();
 
   const handleSubmit = async (data: { name: string; ip: string; port: string; tags: string[] }) => {
     try {
@@ -55,6 +57,7 @@ const ServerBoard: Component = () => {
           Classifica Hytale Servers
         </h2>
 
+        <Show when={isAuthenticated}>
         {/* Pulsante Aggiungi - stile coerente */}
         <div class="text-center mb-10">
           <button
@@ -73,6 +76,7 @@ const ServerBoard: Component = () => {
             Aggiungi il tuo Server
           </button>
         </div>
+        </Show>
 
         {/* Loading / Error / Lista */}
         <Show when={!servers.loading} fallback={<p class="text-center text-zinc-400">Caricamento server...</p>}>

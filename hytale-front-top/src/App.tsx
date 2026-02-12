@@ -1,11 +1,13 @@
 // App.tsx
 import { Component } from "solid-js";
-import Header from "./component/header";
 import ServerBoard from "./component/Board";
 import Footer from './component/Footer';
+import { AuthProvider } from "./auth/AuthContext";
+import Header from "./component/Header";
 
 const App: Component = () => {
   return (
+    
     <div
       class="
         min-h-screen 
@@ -20,7 +22,8 @@ const App: Component = () => {
     "color" : "white"
       }}
     >
-      {/* Contenitore principale con leggero glass overlay */}
+      <AuthProvider >
+  
       <div
         class="
           relative z-10
@@ -52,6 +55,7 @@ const App: Component = () => {
           "mix-blend-mode": "screen",
         }}
       />
+      </AuthProvider>
     </div>
   );
 };

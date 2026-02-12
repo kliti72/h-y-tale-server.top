@@ -19,6 +19,7 @@ const AddServerModal: Component<AddServerModalProps> = (props) => {
   const [tags, setTags] = createSignal<string[]>([]);
   const [newTag, setNewTag] = createSignal("");
 
+
   const addTag = () => {
     const trimmed = newTag().trim();
     if (trimmed && !tags().includes(trimmed)) {
