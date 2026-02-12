@@ -1,5 +1,6 @@
 // AddServerModal.tsx (versione aggiornata)
-import { Component, createSignal, For, Show } from "solid-js";
+import { Component, createSignal, For, from, Show } from "solid-js";
+import { useAuth } from "../auth/AuthContext";
 
 type AddServerModalProps = {
   isOpen: boolean;
@@ -18,7 +19,7 @@ const AddServerModal: Component<AddServerModalProps> = (props) => {
   const [port, setPort] = createSignal("");
   const [tags, setTags] = createSignal<string[]>([]);
   const [newTag, setNewTag] = createSignal("");
-
+  const auth = useAuth();
 
   const addTag = () => {
     const trimmed = newTag().trim();
@@ -53,7 +54,7 @@ const AddServerModal: Component<AddServerModalProps> = (props) => {
   };
 
   return (
-    <Show when={props.isOpen}>
+    <Show when={props.isOpen && auth.isAuthenticated()}>
       <div
         class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 backdrop-blur-sm overflow-y-auto"
         onClick={props.onClose}

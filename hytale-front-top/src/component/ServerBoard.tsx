@@ -15,12 +15,13 @@ const fetchServers = async () => {
 const ServerBoard: Component = () => {
   const [isModalOpen, setIsModalOpen] = createSignal(false);
   const [servers, { refetch }] = createResource(fetchServers);
-  const { user, isAuthenticated, loading, login, logout } = useAuth();
+  const auth = useAuth();
 
   const handleSubmit = async (data: { name: string; ip: string; port: string; tags: string[] }) => {
     try {
       const response = await fetch(`${API_URL}/api/servers`, {
         method: "POST",
+        credentials: 'include',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
@@ -51,15 +52,15 @@ const ServerBoard: Component = () => {
   };
 
   return (
-    <section class="w-full py-10 px-5">
+    <section class="w-full py-10 px-5" style={{"background-color": "black"}}>
       <div class="max-w-4xl mx-auto">
         <h2 class="text-3xl md:text-4xl font-bold text-center mb-8 text-white">
           Classifica Hytale Servers
         </h2>
 
-        <Show when={isAuthenticated}>
+        <Show when={auth.isAuthenticated()}>
         {/* Pulsante Aggiungi - stile coerente */}
-        <div class="text-center mb-10">
+        <div class="text-center mb-10 flex">
           <button
             onClick={() => setIsModalOpen(true)}
             class="
@@ -75,7 +76,24 @@ const ServerBoard: Component = () => {
             <span class="text-xl leading-none">⊕</span>
             Aggiungi il tuo Server
           </button>
+
+        <button
+            onClick={() => location.href = '/owner'}
+            class="
+              flex items-center justify-center gap-2 mx-auto
+              px-7 py-3.5 rounded-xl text-base sm:text-lg font-semibold
+              text-emerald-50 bg-gradient-to-r from-emerald-700/80 to-teal-700/70
+              border border-emerald-600/60
+              hover:from-emerald-600/90 hover:to-teal-600/80
+              hover:border-emerald-400/70 hover:shadow-lg hover:shadow-emerald-900/40
+              active:scale-[0.98] transition-all duration-200
+            "
+          >
+            <span class="text-xl leading-none">⊕</span>
+            I tuoi server
+          </button>
         </div>
+        
         </Show>
 
         {/* Loading / Error / Lista */}

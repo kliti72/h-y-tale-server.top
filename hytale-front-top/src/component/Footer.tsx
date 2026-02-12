@@ -5,7 +5,7 @@ const Footer: Component = () => {
 
   return (
     <>
-      <footer class="py-8 text-center text-zinc-500 text-sm border-t border-zinc-800/50 mt-auto">
+      <footer class="py-8 text-center text-zinc-500 text-sm border-t border-zinc-800/50 mt-auto"  style={{"background-color": "black"}}>
         <p class="mb-2">Etherwood • Floating Realms of Hytale</p>
         
         <p class="max-w-2xl mx-auto leading-relaxed">

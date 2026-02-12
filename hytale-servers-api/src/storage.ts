@@ -1,7 +1,7 @@
 import { Database } from 'bun:sqlite'
 
 
-export function __init__database__(db : Database) {
+export function __init__database__(db: Database) {
 
 
     // Crea tabella se non esiste
@@ -15,6 +15,7 @@ export function __init__database__(db : Database) {
         created_at TEXT DEFAULT (datetime('now'))
     )
     `)
+
 
     db.run(`
     CREATE TABLE IF NOT EXISTS discord_users (
@@ -40,27 +41,18 @@ export function __init__database__(db : Database) {
     )
     `);
 
-    // Popola con dati di esempio SOLO se la tabella è vuota
-    const count = db.query('SELECT COUNT(*) as cnt FROM servers').get() as { cnt: number }
-    if (count.cnt === 0) {
-    const examples = [
-        { name: "Ethereal Grove",     ip: "play.ethereal.it",      port: "25565", tags: ["Survival", "ITA", "PvE"] },
-        { name: "Ancient Canopy",      ip: "canopy.hytale.net",    port: "25566", tags: ["PvP", "Economy", "New"] },
-        { name: "Luminwood Haven",     ip: "luminwood.fun",        port: "19132", tags: ["Creative", "Community"] },
-        { name: "Mistveil Enclave",    ip: "mistveil.org",         port: "25565", tags: ["Roleplay", "Whitelist"] },
-        { name: "Starroot Sanctuary",  ip: "starroot.hytale.gg",   port: "25565", tags: ["Minigames", "Family-Friendly"] },
-    ]
-
-    const insert = db.prepare(
-        'INSERT INTO servers (name, ip, port, tags) VALUES (?, ?, ?, ?)'
-    )
-
-    for (const ex of examples) {
-        insert.run(ex.name, ex.ip, ex.port, ex.tags.join(','))
-    }
-
-    console.log(`Inseriti ${examples.length} server di esempio`)
-    }
+    db.run(`
+        CREATE TABLE IF NOT EXISTS server_owners (
+            server_id       INTEGER NOT NULL,
+            discord_user_id TEXT    NOT NULL,
+            role            TEXT    DEFAULT 'owner',  
+            joined_at       TEXT    DEFAULT (datetime('now')),
+            
+            PRIMARY KEY (server_id, discord_user_id),
+            FOREIGN KEY (server_id)       REFERENCES servers(id)       ON DELETE CASCADE,
+            FOREIGN KEY (discord_user_id) REFERENCES discord_users(id) ON DELETE CASCADE
+        );
+    `);
 
 
 

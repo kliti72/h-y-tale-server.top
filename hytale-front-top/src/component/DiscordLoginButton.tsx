@@ -61,6 +61,7 @@ const DiscordLoginButton: Component = () => {
         />
       </button>
     </Show>
+    
   );
 };
 
