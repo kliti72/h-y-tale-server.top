@@ -1,5 +1,7 @@
-# h-y-tale-server.top
-h-y-tale-server.top
+WebApp for publish and vote hytale servers.
+
+
+Try: h-y-tale-server.top
 
 
 Stack Frontned
