@@ -1,3 +1,4 @@
+import { useNavigate } from "@solidjs/router";
 import { Component, For, Show } from "solid-js";
 import { createResource } from "solid-js";
 
@@ -11,6 +12,7 @@ const fetchServers = async () => {
 
 const ServerBoard: Component = () => {
   const [servers, ] = createResource(fetchServers);
+  const navigate = useNavigate();
 
   // Calcola rank dinamico (1 = più recente o più visualizzato in futuro) // Implementa server più votati
   const rankedServers = () => {
@@ -49,6 +51,7 @@ const ServerBoard: Component = () => {
 
                   return (
                     <div
+                    onClick={() => navigate(`/server/${server.name}`)}
                       class={`
                         rounded-xl bg-zinc-900/70 border border-zinc-700/60
                         p-5 transition-all duration-200

@@ -151,6 +151,18 @@ export function registerServerRoutes(
 
   // Aggiungila dentro la funzione registerServerRoutes
 
+    // GET /api/servers
+  app.get('/servers/:name', (body) => {
+    const name = body.params.name;
+
+    const rows = db.query(
+          'SELECT * FROM servers WHERE name = ?'
+        ).get(name);
+
+    return rows;
+  });
+
+  
 app.get(
   '/servers/mine',
   async ({ cookie, set }) => {

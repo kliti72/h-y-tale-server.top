@@ -5,6 +5,8 @@ import { AuthProvider } from './auth/AuthContext';
 import Header from './component/template/Header';
 import Footer from './component/template/Footer';
 import MyServerBoard from './component/board/MyServerBoard';
+import ServerDetail from './component/server/ServerDetail';
+
 
 function App() {
   return (
@@ -19,6 +21,7 @@ function App() {
     >
       <Route path="/" component={ServerBoard} />
       <Route path="/owner" component={MyServerBoard} />
+      <Route path="/server/:name" component={ServerDetail} />
       <Route path="*" component={NotFound} />
     </Router>
   );
