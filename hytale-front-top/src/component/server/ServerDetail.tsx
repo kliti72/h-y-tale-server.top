@@ -1,12 +1,20 @@
 // src/components/ServerDetail.tsx
-import { Component, createResource, For, Show, Suspense } from 'solid-js';
+import { Component, createResource, createSignal, For, Show, Suspense } from 'solid-js';
 import { useParams } from '@solidjs/router';
 import { ServerService } from '../../services/server.service';
 import { ServerResponse } from '../../types/ServerResponse';
+import PlayersVoteModal from '../modal/PlayersVoteModal';
+import Notifications, { notify } from '../template/Notification';
+import { useAuth } from '../../auth/AuthContext';
 
 const ServerDetail: Component = () => {
   const params = useParams();
   const serverName = () => decodeURIComponent(params.name || '');
+  const [isModalOpen, setIsModalOpen] = createSignal(false);
+  const user = useAuth();
+  const handleSubmit = () => {
+    return;
+  }
 
   const [server] = createResource<ServerResponse | undefined, string>(
     serverName,
@@ -41,14 +49,48 @@ const ServerDetail: Component = () => {
     <div class="min-h-screen bg-zinc-950 text-zinc-100">
       <div class="max-w-5xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
         {/* Header / Titolo principale */}
-        <div class="mb-10 text-center sm:text-left">
-          <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-white">
-            {server()?.name || serverName() || 'Server'}
-          </h1>
-          <p class="mt-3 text-xl text-zinc-400">
-            Dettagli completi del server
-          </p>
+
+        <div class="mb-10 flex flex-row items-center sm:items-end gap-4 sm:gap-6 justify-between">
+          <div class="text-center sm:text-left">
+            <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-white">
+              {server()?.name || serverName() || 'Server'}
+            </h1>
+            <p class="mt-3 text-xl text-zinc-400">
+              Dettagli completi del server
+            </p>
+          </div>
+
+   
+          <div class='flex justify-content right'>
+                  {/* Bottone grande a destra su schermi ≥ sm */}
+                  <button
+                    onClick={() => {
+                      if (user.isAuthenticated()) {
+                        setIsModalOpen(true);
+                      } else {
+                        notify("Devi essere loggato con Discord per votare.");
+                      }
+                    }}
+                    class={`
+                        flex items-center justify-center gap-3
+                        px-8 py-4 sm:px-10 sm:py-5
+                        rounded-xl text-lg sm:text-xl font-semibold
+                        text-white
+                        bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600
+                        hover:from-indigo-500 hover:via-purple-500 hover:to-purple-600
+                        shadow-lg shadow-indigo-900/30 hover:shadow-xl hover:shadow-purple-900/40
+                        border border-indigo-400/40 hover:border-purple-400/50
+                        active:scale-95
+                        transition-all duration-300 ease-out
+                        w-full sm:w-auto sm:self-end
+                      `} >
+                    <span class="text-2xl sm:text-3xl leading-none">♡</span>
+                    Vota questo server
+                  </button>
+          </div>
+
         </div>
+
 
         <Suspense fallback={
           <div class="flex flex-col items-center justify-center py-20">
@@ -170,6 +212,17 @@ const ServerDetail: Component = () => {
             )}
           </Show>
         </Suspense>
+
+        <Notifications />
+
+        <PlayersVoteModal
+          serverVoted={serverName()}
+          serverIp={server()?.ip}
+          isOpen={isModalOpen()}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleSubmit}
+        />
+
       </div>
     </div>
   );

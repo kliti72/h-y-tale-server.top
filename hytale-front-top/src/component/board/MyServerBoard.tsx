@@ -91,6 +91,7 @@ export default function MyServersBoard() {
 
   return (
     <div class="max-w-4xl mx-auto p-6" style={{"background-color": 'white'}}>
+
       <h1 class="text-3xl font-bold mb-6">I Miei Server</h1>
 
       {/* Profilo utente */}
