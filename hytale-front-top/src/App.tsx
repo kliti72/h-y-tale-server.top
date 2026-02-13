@@ -6,6 +6,7 @@ import Footer from './component/template/Footer';
 import MyServerBoard from './component/board/MyServerBoard';
 import ServerDetail from './component/server/ServerDetail';
 import Hero from './component/board/Hero';
+import Board from './component/board/Board';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       )}
     >
       <Route path="/" component={Hero} />
+      <Route path="/board" component={Board} />
       <Route path="/owner" component={MyServerBoard} />
       <Route path="/server/:name" component={ServerDetail} />
       <Route path="*" component={NotFound} />

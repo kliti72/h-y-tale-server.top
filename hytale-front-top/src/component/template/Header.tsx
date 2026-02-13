@@ -12,7 +12,7 @@ const Header: Component = () => {
     <header class="
       w-full 
       py-4 px-5 sm:py-5 sm:px-6 
-      bg-zinc-950/90 
+      bg-black/95
       border-b border-zinc-800/70 
       backdrop-blur-sm 
       sticky top-0 z-50
@@ -24,27 +24,38 @@ const Header: Component = () => {
           <h1 class="
             text-2xl sm:text-3xl md:text-4xl 
             font-extrabold 
-            text-white 
+            text-indigo-400
             tracking-tight
             hover:text-indigo-400 transition-colors
           ">
-            Hytale • Classifica
+            H-Y-Tale.top
           </h1>
         </A>
 
         {/* Navigazione + Auth buttons */}
         <nav class="flex items-center gap-5 sm:gap-7">
           
+      {/* Link sempre visibile */}
+            <A
+              href="/"           // o "/my-servers" – quello che usi per MyServersBoard
+              class={`
+                text-indigo-400 hover:text-indigo-300 transition-colors font-medium
+                ${location.pathname === '/' ? 'underline underline-offset-4' : ''}
+              `}
+            >
+              Home
+            </A>
+
           {/* Link sempre visibile */}
-          <A
-            href="/"           // adatta il path reale che usi per la lista generale
-            class={`
-              text-zinc-300 hover:text-white transition-colors font-medium
-              ${location.pathname === '/servers' ? 'text-white underline underline-offset-4' : ''}
-            `}
-          >
-            Lista Server
-          </A>
+            <A
+              href="/board"           // o "/my-servers" – quello che usi per MyServersBoard
+              class={`
+                text-indigo-400 hover:text-indigo-300 transition-colors font-medium
+                ${location.pathname === '/board' ? 'underline underline-offset-4' : ''}
+              `}
+            >
+              Top Server (board)
+            </A>
 
           {/* Link visibile solo se autenticato */}
           <Show when={isAuthenticated()}>
@@ -75,7 +86,7 @@ const Header: Component = () => {
               class="
                 px-4 py-1.5 
                 text-sm font-medium 
-                bg-zinc-800 hover:bg-zinc-700 
+                bg-indigo-800 hover:bg-zinc-700 
                 border border-zinc-700 
                 rounded-md transition-colors
                 text-white

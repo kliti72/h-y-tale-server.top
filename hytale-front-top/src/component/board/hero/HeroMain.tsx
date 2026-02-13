@@ -19,12 +19,10 @@ const HeroMain: Component = () => {
 
   return (
     <section class="relative w-full min-h-[70vh] flex flex-col items-center justify-center py-16 px-6 bg-gradient-to-b from-black via-zinc-950 to-black overflow-hidden">
-      {/* Sfondo opzionale con particelle o texture leggera – puoi aggiungere con CSS */}
       <div class="absolute inset-0 opacity-10 pointer-events-none">
         <div class="w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(34,197,94,0.08),transparent_40%)]" />
       </div>
 
-      {/* Contenuto centrale */}
       <div class="relative z-10 max-w-5xl mx-auto text-center">
         <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight">
           Scopri i Migliori Server
@@ -35,9 +33,8 @@ const HeroMain: Component = () => {
           Esplora regni epici, unisciti a comunità attive, vota i tuoi preferiti e trova il tuo prossimo mondo da conquistare.
         </p>
 
-        {/* Pulsante principale */}
         <button
-          onClick={() => navigate("/servers")} // o "/board" o dove hai la ServerBoard
+          onClick={() => navigate("/board")}
           class={`
             inline-flex items-center gap-3 px-10 py-5 rounded-xl text-xl font-bold
             bg-gradient-to-r from-emerald-600 to-teal-600
@@ -52,7 +49,6 @@ const HeroMain: Component = () => {
         </button>
       </div>
 
-      {/* Sezione server in evidenza – scorrimento orizzontale */}
       <div class="relative z-10 w-full mt-16">
         <h3 class="text-2xl sm:text-3xl font-bold text-center text-zinc-200 mb-8">
           Server in Evidenza

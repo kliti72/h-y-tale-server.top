@@ -33,3 +33,24 @@
   display: flex;
   animation: marquee 60s linear infinite;
 }
+
+.background_1 {
+  background-image: url("bg_1.png");
+  background-size: 500px;
+}
+
+
+.background_2 {
+  background-image: url("bg_2.png");
+  background-size: 500px;
+}
+
+
+.background_3 {
+  background-image: url("bg_3.png");
+  background-size: 500px;
+}
+
+button {
+  cursor: pointer;
+}
