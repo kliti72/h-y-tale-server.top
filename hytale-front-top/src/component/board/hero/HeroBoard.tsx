@@ -6,7 +6,7 @@ const HeroBoard: Component = () => {
   const navigate = useNavigate();
 
   return (
-    <section class="relative w-full py-16 px-6 bg-black/80 overflow-hidden">
+    <section class="relative w-full py-8 px-6 bg-black/80 overflow-hidden">
       {/* Sfondo glass + gradient */}
       <div class="absolute inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-cyan-950/10 pointer-events-none" />
       <div class="absolute inset-0 backdrop-blur-[2px] opacity-40" />

@@ -6,6 +6,7 @@ import HeroSection from "./hero/HeroTieatryServer";
 import TertiaryHero from "./SecondaryHero";
 import HeroMain from "./hero/HeroMain";
 import HeroBoard from "./hero/HeroBoard";
+import Notifications from "../template/Notification";
 
 const API_URL = "http://localhost:3000";
 
@@ -19,9 +20,12 @@ const Board: Component = () => {
   const [servers] = createResource(fetchServers);
   const [isModalOpen, setIsModalOpen] = createSignal(false);
 
-  const handleVoteRequest = () => {
+  const [selectedServer, setSelectedServer] = createSignal<{ name: string; ip: string } | null>(null);
 
-  }
+  const handleVoteRequest = (serverName: string, serverIp: string) => {
+    setIsModalOpen(true);
+    setSelectedServer({ name: serverName, ip: serverIp });
+  };
 
   const rankedServers = () => {
     const list = servers() || [];
@@ -34,41 +38,45 @@ const Board: Component = () => {
 
   return (
     <section>
-        <HeroBoard />
-<section
-  class="w-full py-10 px-5 relative overflow-hidden background_2"
->
-      <div class="max-w-4xl mx-auto">
-        <Show when={!servers.loading} fallback={<p class="text-center text-zinc-400">Caricamento...</p>}>
-          <Show when={!servers.error} fallback={<p class="text-center text-red-400">Errore: {servers.error?.message}</p>}>
-            <Show when={servers()?.length > 0} fallback={<p class="text-center text-zinc-500 py-8">Nessun server ancora...</p>}>
-              <div class="flex flex-col gap-6">
-                <For each={rankedServers()}>
-                  {(server) => (
-                    <ServerCard
-                      server={server}
-                      onVoteRequest={handleVoteRequest}
-                    />
-                  )}
-                </For>
-              </div>
+      <HeroBoard />
+      <section
+        class="w-full py-10 px-5 relative overflow-hidden"
+        style={{
+          background: "linear-gradient(to bottom, #000000, #0f2f1f 40%, #001a14 80%, #000000)",
+        }}
+      >
+        <div class="max-w-4xl mx-auto">
+          <Show when={!servers.loading} fallback={<p class="text-center text-zinc-400">Caricamento...</p>}>
+            <Show when={!servers.error} fallback={<p class="text-center text-red-400">Errore: {servers.error?.message}</p>}>
+              <Show when={servers()?.length > 0} fallback={<p class="text-center text-zinc-500 py-8">Nessun server ancora...</p>}>
+                <div class="flex flex-col gap-6">
+                  <For each={servers()}>
+                    {(server) => (
+                      <ServerCard
+                        server={server}
+                        onVoteRequest={handleVoteRequest}
+                      />
+                    )}
+                  </For>
+                </div>
+              </Show>
             </Show>
           </Show>
-        </Show>
 
-        <PlayersVoteModal
-          serverVoted={servers()?.name || ""}
-          serverIp={servers()?.ip || ""}
-          isOpen={isModalOpen()}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={() => {
-            setIsModalOpen(false);
-          }}
-        />
-      </div>
 
-    </section>
-        <HeroSection />
+          <PlayersVoteModal
+            isOpen={isModalOpen()}
+            onClose={() => setIsModalOpen(false)}
+            serverVoted={selectedServer()?.name || ''}
+            serverIp={selectedServer()?.ip || ''}
+          />
+
+        </div>
+        <Notifications />
+
+
+      </section>
+      <HeroSection />
 
     </section>
   );

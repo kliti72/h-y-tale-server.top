@@ -4,6 +4,8 @@ export type ServerResponse = {
     ip?: string,
     name?: string,
     port?: string,
-    tags?: string,
+    tags: string,
+    logoUrl?: string
+
 }
 

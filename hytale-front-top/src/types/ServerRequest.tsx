@@ -5,4 +5,5 @@ export type ServerRequest = {
     name?: string,
     port?: string,
     tags?: string[],
+    logoUrl?: string
 }

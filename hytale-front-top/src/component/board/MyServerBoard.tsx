@@ -7,6 +7,7 @@ import {
 } from 'solid-js';
 import { useAuth } from '../../auth/AuthContext';
 import AddServerModal from "../modal/AddServerModal";
+import HeroTieatryServer from './hero/HeroTieatryServer';
 
 type Server = {
   id: number;
@@ -35,158 +36,178 @@ type ApiResponse = {
 
 const fetchMyServers = async (): Promise<ApiResponse> => {
   const response = await fetch('http://localhost:3000/api/servers/mine', {
-    credentials: 'include', // obbligatorio
-    headers: {
-      'Accept': 'application/json',
-    },
+    credentials: 'include',
+    headers: { 'Accept': 'application/json' },
   });
 
-  if (!response.ok) {
-    throw new Error(`Errore ${response.status}: ${response.statusText}`);
-  }
-
+  if (!response.ok) throw new Error(`Errore ${response.status}`);
   return response.json();
 };
 
 const API_URL = "http://localhost:3000";
 
 export default function MyServersBoard() {
-  const { isAuthenticated } = useAuth(); 
+  const { isAuthenticated } = useAuth();
   const [isModalOpen, setIsModalOpen] = createSignal(false);
-  
-  
-  const handleSubmit = async (data: { name: string; ip: string; port: string; tags: string[] }) => {
+  const user = useAuth();
+
+  const [data] = createResource<ApiResponse>(fetchMyServers);
+
+  const handleSubmit = async (formData: { name: string; ip: string; port: string; tags: string[] }) => {
     try {
-      const response = await fetch(`${API_URL}/api/servers`, {
+      const res = await fetch(`${API_URL}/api/servers`, {
         method: "POST",
         credentials: 'include',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Errore ${response.status}: ${errorText}`);
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || `Errore ${res.status}`);
       }
 
-      await response.json();
       setIsModalOpen(false);
-      location.href = '/';
+      // Ricarica la lista (o usa refetch di createResource se vuoi)
+      location.reload(); // semplice, oppure implementa refetch
       alert("Server aggiunto con successo! 🎉");
     } catch (err) {
-      console.error("Errore aggiunta:", err);
+      console.error("Errore aggiunta server:", err);
+      alert("Errore durante l'aggiunta del server.");
     }
   };
 
-  
-  // Oppure prendi tutto dall'API (come nel tuo JSON)
-  const [data] = createResource<ApiResponse>(fetchMyServers);
-
   const handleEdit = (serverId: number) => {
-    // Opzioni possibili:
-    // 1. navigate(`/servers/${serverId}/edit`) usando useNavigate da @solidjs/router
-    // 2. Apri un modal con createSignal<boolean>
-    alert(`Modifica server #${serverId} (da implementare)`);
+    alert(`Modifica server #${serverId} (implementa edit modal o pagina)`);
+    // Futuro: navigate(`/servers/${serverId}/edit`) o apri modal
+  };
+
+  const handleDelete = (serverId: number, serverName: string) => {
+    if (!confirm(`Sei sicuro di voler eliminare "${serverName}"?`)) return;
+    
+    alert(`Eliminazione server #${serverId} (da implementare con DELETE fetch)`);
+    // Futuro esempio:
+    // fetch(`${API_URL}/api/servers/${serverId}`, { method: 'DELETE', credentials: 'include' })
+    //   .then(() => location.reload());
   };
 
   return (
-    <div class="max-w-4xl mx-auto p-6" style={{"background-color": 'white'}}>
+    <div class="min-h-screen bg-gradient-to-b from-black via-violet-950/95 to-black text-white">
+      {/* Hero-like header */}
+      <div class="relative py-16 px-6 text-center border-b border-emerald-900/100 backdrop-blur-sm">
+        <div class="absolute inset-0 bg-gradient-to-br from-emerald-900/100 via-transparent to-cyan-900/5 pointer-events-none" />
+        
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
+          I <span class="text-emerald-400">Miei Server</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-zinc-300 max-w-3xl mx-auto">
+          Gestisci i tuoi regni Hytale, aggiungi nuovi mondi e mantieni il controllo.
+        </p>
 
-      <h1 class="text-3xl font-bold mb-6">I Miei Server</h1>
+           <div class="max-w-7xl mx-auto px-5 py-10">
+        {/* Profilo utente (glass card) */}
+        <Show when={!data.loading} fallback={<div class="text-center py-10 text-zinc-400">Caricamento profilo...</div>}>
+          <Show when={user.isAuthenticated}>
+              <div class="mb-12 backdrop-blur-md bg-black/40 border border-emerald-800/40 rounded-xl p-6 shadow-xl shadow-emerald-950/20">
+                <h2 class="text-2xl font-bold text-emerald-300 mb-2">
+                  {user.user.name || user.user.name}
+                </h2>
+                <p class="text-emerald-400/80">@{user.user.name}</p>
+                <p class="text-sm text-zinc-500 mt-1">
+                  ID: {user.user.name} • 1 server registrati
+                </p>
+              </div>
+          </Show>
+        </Show>
 
-      {/* Profilo utente */}
-      <Show when={data.state === 'ready'} fallback={<p>Caricamento profilo...</p>}>
-        <div class="bg-gray-100 p-4 rounded-lg mb-8">
-          <h2 class="text-xl font-semibold">
-            {data()?.user.displayName || data()?.user.username}
-          </h2>
-          <p class="text-gray-600">@{data()?.user.username}</p>
-          <p class="text-sm text-gray-500 mt-1">
-            ID: {data()?.user.id}
-          </p>
-        </div>
-      </Show>
+      </div>
 
-      {/* Lista server */}
-      <Suspense fallback={<div class="text-center py-10">Caricamento server...</div>}>
-        <Show
-          when={data()}
-          fallback={<p class="text-red-600">Nessun dato disponibile</p>}
-          keyed
-        >
-          {(loadedData) => (
-            <>
-              <p class="mb-4 text-lg">
-                Hai <strong>{loadedData.count}</strong> server registrati
-              </p>
+   
 
-              <div class="grid gap-6 md:grid-cols-2">
-                <For each={loadedData.servers} fallback={<p>Nessun server trovato</p>}>
-                  {(server) => (
-                    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                      <div class="flex justify-between items-start mb-3">
-                        <h3 class="text-xl font-bold">{server.name}</h3>
-                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                          {server.role.toUpperCase()}
-                        </span>
-                      </div>
+        {/* Lista server */}
+        <Suspense fallback={<div class="text-center py-20 text-zinc-400">Caricamento server...</div>}>
+          <Show when={data()?.servers?.length} fallback={
+            <div class="text-center py-16 text-zinc-500">
+              Non hai ancora aggiunto nessun server.<br/>
+              Clicca su "Aggiungi il tuo Server" per iniziare!
+            </div>
+          }>
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <For each={data()?.servers}>
+                {(server) => (
+                  <div class="
+                    backdrop-blur-md bg-black/30 border border-emerald-800/40 
+                    rounded-xl p-6 shadow-lg shadow-emerald-950/20
+                    hover:border-emerald-600/60 hover:shadow-emerald-900/30
+                    transition-all duration-300 group
+                  ">
+                    <div class="flex justify-between items-start mb-4">
+                      <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">
+                        {server.name}
+                      </h3>
+                      <span class="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-900/50 text-emerald-300 border border-emerald-700/40">
+                        {server.role.toUpperCase()}
+                      </span>
+                    </div>
 
-                      <p class="text-gray-700 mb-2">
-                        <strong>Indirizzo:</strong> {server.ip}:{server.port}
-                      </p>
+                    <p class="text-emerald-400 font-mono mb-2">
+                      {server.ip}:{server.port}
+                    </p>
 
-                      <Show when={server.tags?.length > 0}>
-                        <div class="flex flex-wrap gap-2 mb-3">
-                          <For each={server.tags}>
-                            {(tag) => (
-                              <span class="px-2 py-1 text-xs bg-gray-200 rounded">
-                                {tag}
-                              </span>
-                            )}
-                          </For>
-                        </div>
-                      </Show>
+                    <p class="text-sm text-zinc-400 mb-5">
+                      Creato il {new Date(server.created_at).toLocaleDateString('it-IT')}
+                    </p>
 
-                      <p class="text-sm text-gray-500 mb-4">
-                        Creato il: {new Date(server.created_at).toLocaleDateString('it-IT')}
-                      </p>
-
+                    <div class="flex gap-3">
                       <button
                         onClick={() => handleEdit(server.id)}
-                        class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
+                        class="
+                          flex-1 py-2.5 px-4 rounded-lg text-sm font-medium
+                          bg-emerald-800/70 hover:bg-emerald-700/80 text-white
+                          border border-emerald-700/50 hover:border-emerald-500/60
+                          transition-all active:scale-97
+                        "
                       >
                         Modifica
                       </button>
+
+                      <button
+                        onClick={() => handleDelete(server.id, server.name)}
+                        class="
+                          flex-1 py-2.5 px-4 rounded-lg text-sm font-medium
+                          bg-red-900/50 hover:bg-red-800/70 text-red-200
+                          border border-red-800/50 hover:border-red-600/60
+                          transition-all active:scale-97
+                        "
+                      >
+                        Elimina
+                      </button>
                     </div>
-                  )}
-                </For>
-              </div>
-            </>
-          )}
-        </Show>
-      </Suspense>
+                  </div>
+                )}
+              </For>
+            </div>
+          </Show>
+        </Suspense>
 
- <Show when={isAuthenticated()}>
-        {/* Pulsante Aggiungi - stile coerente */}
-        <div class="text-center mb-10 flex">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            class="
-              flex items-center justify-center gap-2 mx-auto
-              px-7 py-3.5 rounded-xl text-base sm:text-lg font-semibold
-              text-emerald-50 bg-gradient-to-r from-emerald-700/80 to-teal-700/70
-              border border-emerald-600/60
-              hover:from-emerald-600/90 hover:to-teal-600/80
-              hover:border-emerald-400/70 hover:shadow-lg hover:shadow-emerald-900/40
-              active:scale-[0.98] transition-all duration-200
-            "
-          >
-            <span class="text-xl leading-none">⊕</span>
-            Aggiungi il tuo Server
-          </button>
-
-        </div>
-        
+        {/* Pulsante Aggiungi - hero style */}
+        <Show when={isAuthenticated()}>
+          <div class="text-center mt-12">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              class="
+                inline-flex items-center gap-3 px-10 py-5 rounded-xl text-lg font-semibold
+                bg-gradient-to-r from-emerald-700 to-teal-700
+                hover:from-emerald-600 hover:to-teal-600
+                text-white shadow-xl shadow-emerald-900/40 hover:shadow-emerald-700/60
+                border border-emerald-600/50 hover:border-emerald-400/60
+                transition-all duration-300 active:scale-95
+              "
+            >
+              <span class="text-2xl">⊕</span>
+              Aggiungi il tuo Server
+            </button>
+          </div>
         </Show>
 
         <AddServerModal
@@ -194,8 +215,7 @@ export default function MyServersBoard() {
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
         />
+      </div>
     </div>
-
-    
   );
 }

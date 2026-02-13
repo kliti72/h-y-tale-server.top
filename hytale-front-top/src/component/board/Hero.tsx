@@ -17,10 +17,12 @@ const fetchServers = async () => {
 const Hero: Component = () => {
   const [servers] = createResource(fetchServers);
   const [isModalOpen, setIsModalOpen] = createSignal(false);
+  const [selectedServer, setSelectedServer] = createSignal<{ name: string; ip: string } | null>(null);
 
-  const handleVoteRequest = () => {
-
-  }
+  const handleVoteRequest = (serverName: string, serverIp: string) => {
+    setIsModalOpen(true);
+    setSelectedServer({ name: serverName, ip: serverIp });
+  };
 
   // Calcola rank dinamico (1 = più recente o più visualizzato in futuro) // Implementa server più votati
   const rankedServers = () => {
@@ -72,6 +74,14 @@ const Hero: Component = () => {
         />
       </div>
         <HeroSection />
+
+           <PlayersVoteModal
+            isOpen={isModalOpen()}
+            onClose={() => setIsModalOpen(false)}
+            serverVoted={selectedServer()?.name || ''}
+            serverIp={selectedServer()?.ip || ''}
+          />
+
 
     </section>
     </section>

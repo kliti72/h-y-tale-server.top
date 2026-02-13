@@ -1,51 +1,28 @@
 // src/components/ServerCard.tsx
 import { useNavigate } from "@solidjs/router";
-import { Component, createResource, For } from "solid-js";
-import { useAuth } from "../../auth/AuthContext";
+import { Component } from "solid-js";
 import { notify } from "../template/Notification";
+import { ServerResponse } from "../../types/ServerResponse";
 
-type Server = {
-  id?: string;
-  name: string;
-  ip: string;
-  port: string | number;
-  logoUrl?: string; // futuro
-  tags?: string[];
-};
 
 const API_URL = "http://localhost:3000";
 
-
 const fetchFeaturedServers = async () => {
-  // Potresti avere un endpoint dedicato tipo /api/servers/featured
-  // Oppure riutilizzare /api/servers e prendere i primi 8-10
   const res = await fetch(`${API_URL}/api/servers?limit=10&sort=created_at:desc`);
   if (!res.ok) throw new Error("Errore caricamento server in evidenza");
   return res.json();
 };
 
 type ServerCardProps = {
-  server: Server;
+  server: ServerResponse;
   onVoteRequest: (serverName: string, serverIp: string) => void;
 };
 
 const ServerCard: Component<ServerCardProps> = (props) => {
   const navigate = useNavigate();
-  const user = useAuth();
-  const [featured] = createResource(fetchFeaturedServers);
-
-  const handleVoteClick = (e: MouseEvent) => {
-    e.stopPropagation();
-    if (user.isAuthenticated()) {
-      props.onVoteRequest(props.server.name, `${props.server.ip}:${props.server.port}`);
-    } else {
-      notify("Devi essere loggato con Discord per votare.");
-    }
-  };
-
   const logoSrc = () =>
     props.server.logoUrl ||
-    "https://via.placeholder.com/80/0f2f1f/22ff99?text=" + encodeURIComponent(props.server.name.slice(0, 2).toUpperCase());
+    "https://via.placeholder.com/80/" + "Mario";
 
   return (
     <div
@@ -59,6 +36,7 @@ const ServerCard: Component<ServerCardProps> = (props) => {
         cursor-pointer
       `}
     >
+        
       <div class="absolute inset-0 bg-gradient-to-br from-emerald-900/10 via-transparent to-cyan-900/5 pointer-events-none" />
 
       <div class="relative p-5 flex items-center gap-5">
@@ -90,24 +68,20 @@ const ServerCard: Component<ServerCardProps> = (props) => {
               <span class="text-emerald-200/90">Online: 25/100</span>
             </div>
           </div>
-                      <div class="mt-4 flex flex-wrap gap-2">
-                      <For each={props.server.tags?.slice(0, 3)}>
-                          {(tag) => (
-                            <span class="px-2.5 py-1 text-xs rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
-                              {tag}
-                            </span>
-                          )}
-                        </For>
 
-
-                      </div>
                             
         </div>
 
         {/* Pulsanti – colonna compatta a destra */}
         <div class="flex flex-col gap-2.5 flex-shrink-0">
           <button
-            onClick={handleVoteClick}
+            onClick={(e) => {
+              e.stopPropagation()
+              props.onVoteRequest(
+                props.server.name || 'Sconosciuto',
+                props.server.ip || '0.0.0.0'
+              )
+            }}
             class={`
               px-6 py-2.5 rounded-lg text-sm font-semibold
               bg-gradient-to-r from-emerald-700 to-teal-700
@@ -134,7 +108,7 @@ const ServerCard: Component<ServerCardProps> = (props) => {
             `}
             title="Copia IP:porta"
           >
-            Entra
+            Copia Indirizzo
           </button>
         </div>
       </div>

@@ -63,7 +63,7 @@ const PlayersVoteModal = (props: VoteServerProps) => {
       >
         <div
           class={`
-            bg-zinc-900 border border-zinc-700 rounded-xl 
+            bg-zinc-900 border border-zinc-500 rounded-xl 
             w-full max-w-md sm:max-w-lg 
             p-6 sm:p-8 shadow-2xl shadow-black/50
             max-h-[90vh] overflow-y-auto
@@ -87,7 +87,7 @@ const PlayersVoteModal = (props: VoteServerProps) => {
 
         </div>
 
-            <div class=""> {auth.user()?.global_name} </div>
+            <div class="text-white"> {auth.user()?.global_name} </div>
 
 
         <h2 class="text-2xl font-bold text-white text-center">
