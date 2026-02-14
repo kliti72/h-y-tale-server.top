@@ -11,6 +11,17 @@ export interface Server {
   updated_at?: string;
 }
 
+export interface ServerAdmin {
+  id?: number;
+  name: string;
+  ip: string;
+  port: string;
+  tags?: string[];
+  secret_key?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 
 export class ServerRepository {
 
@@ -45,6 +56,7 @@ export class ServerRepository {
         data.updated_at ?? '',
       ) as Server | undefined;
 
+    console.log("Inserito", row);
     if (!row) {
       throw new Error('Impossibile creare il server');
     }
@@ -61,11 +73,43 @@ export class ServerRepository {
     return row ?? null;
   }
 
-  static async getAll(db: Database): Promise<Server | null> {
-    const row = db
-      .prepare('SELECT * FROM servers')
-      .get() as Server | undefined;
-    return row ?? null;
+  static getAll(db: Database): Server[] {
+    const rawRows = db.prepare('SELECT * FROM servers').all();
+    
+    return rawRows.map(row => {
+      // Qui potresti usare una funzione di validazione se vuoi
+      return row as Server;
+    });
+  }
+
+  static getByName(db: Database, serverName: string): Server {
+    const server = db.prepare('SELECT * FROM servers WHERE name = ?').get(serverName);
+    return server as Server;
+  }
+
+  
+  static getServersByUserID(userId : string, db : Database): Server[] {
+    const rawRows = db
+        .query(`
+        SELECT 
+          s.id,
+          s.name,
+          s.ip,
+          s.port,
+          s.tags,
+          s.secret_key,
+          s.created_at,
+          so.role
+        FROM servers s
+        INNER JOIN server_owners so ON so.server_id = s.id
+        WHERE so.discord_user_id = ?
+        ORDER BY s.created_at DESC
+      `)
+      .all(userId ?? 0);
+    
+    return rawRows.map(row => {
+      return row as Server;
+    });
   }
 
 

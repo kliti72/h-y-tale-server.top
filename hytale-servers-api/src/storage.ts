@@ -18,12 +18,9 @@ export function initDatabaseSchema(db: Database) {
 
     db.run(`
     CREATE TABLE IF NOT EXISTS server_stats (
-        server_name     TEXT PRIMARY KEY,
         players_online  INTEGER DEFAULT 0,
         max_players     INTEGER DEFAULT 0,
         status          TEXT DEFAULT 'offline',     
-        motd            TEXT,     
-        version         TEXT,
         tps             REAL,     
         last_updated    TEXT DEFAULT (datetime('now')),
         FOREIGN KEY (server_name) REFERENCES servers(name) ON DELETE CASCADE   

@@ -5,9 +5,7 @@ import { registerServerRoutes } from './src/api/server/server';
 import { initDatabaseSchema } from './src/storage';
 import { cors } from '@elysiajs/cors'
 import { registerAuthRoutes } from './src/api/auth/auth';
-import { drizzle } from 'drizzle-orm/bun-sqlite';
 
-const env = require('dotenv').config();
 const db = new Database('servers.db', { create: true })
 
 initDatabaseSchema(db);
@@ -25,6 +23,7 @@ const app = new Elysia()
   )
   .use(registerAuthRoutes(new Elysia({ prefix: '/auth' }), db))
   .use(registerServerRoutes(new Elysia({ prefix: '/api' }), db))
+  .use(registerVoteRoutes(new Elysia({ prefix: '/vote' }), db))
   .get('/', () => 'API Server operativo')
   .options("/*", () => new Response(null, {status: 204}))
   .listen(3000);
