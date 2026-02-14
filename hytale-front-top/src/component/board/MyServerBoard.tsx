@@ -7,7 +7,6 @@ import {
 } from 'solid-js';
 import { useAuth } from '../../auth/AuthContext';
 import AddServerModal from "../modal/AddServerModal";
-import HeroTieatryServer from './hero/HeroTieatryServer';
 
 type Server = {
   id: number;
@@ -15,6 +14,7 @@ type Server = {
   ip: string;
   port: string;
   tags: string[];
+  secret_key: string;
   created_at: string;
   role: string;
   owner: {
@@ -68,8 +68,7 @@ export default function MyServersBoard() {
       }
 
       setIsModalOpen(false);
-      // Ricarica la lista (o usa refetch di createResource se vuoi)
-      location.reload(); // semplice, oppure implementa refetch
+      location.reload(); 
       alert("Server aggiunto con successo! 🎉");
     } catch (err) {
       console.error("Errore aggiunta server:", err);
@@ -79,16 +78,11 @@ export default function MyServersBoard() {
 
   const handleEdit = (serverId: number) => {
     alert(`Modifica server #${serverId} (implementa edit modal o pagina)`);
-    // Futuro: navigate(`/servers/${serverId}/edit`) o apri modal
   };
 
   const handleDelete = (serverId: number, serverName: string) => {
     if (!confirm(`Sei sicuro di voler eliminare "${serverName}"?`)) return;
-    
     alert(`Eliminazione server #${serverId} (da implementare con DELETE fetch)`);
-    // Futuro esempio:
-    // fetch(`${API_URL}/api/servers/${serverId}`, { method: 'DELETE', credentials: 'include' })
-    //   .then(() => location.reload());
   };
 
   return (
@@ -144,6 +138,7 @@ export default function MyServersBoard() {
                     <div class="flex justify-between items-start mb-4">
                       <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">
                         {server.name}
+                        {server.secret_key}
                       </h3>
                       <span class="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-900/50 text-emerald-300 border border-emerald-700/40">
                         {server.role.toUpperCase()}

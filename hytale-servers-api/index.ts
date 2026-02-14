@@ -2,15 +2,15 @@
 import { Elysia, t } from 'elysia'
 import { Database } from 'bun:sqlite'
 import { registerServerRoutes } from './src/api/server/server';
-import { __init__database__ } from './src/storage';
+import { initDatabaseSchema } from './src/storage';
 import { cors } from '@elysiajs/cors'
 import { registerAuthRoutes } from './src/api/auth/auth';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
 
 const env = require('dotenv').config();
 const db = new Database('servers.db', { create: true })
 
-// Create database and prepare with mock data
-__init__database__(db);
+initDatabaseSchema(db);
 
 
 const app = new Elysia()

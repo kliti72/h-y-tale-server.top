@@ -1,0 +1,10 @@
+export interface ServerStats {
+  server_name: string;
+  players_online: number;
+  max_players: number;
+  status: 'online' | 'offline' | 'starting' | 'maintenance' | string;
+  motd?: string | null;
+  version?: string | null;
+  tps?: number | null;
+  last_updated: string;
+}

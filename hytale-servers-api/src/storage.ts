@@ -1,20 +1,34 @@
 import { Database } from 'bun:sqlite'
 
 
-export function __init__database__(db: Database) {
+export function initDatabaseSchema(db: Database) {
 
-
-    // Crea tabella se non esiste
     db.run(`
     CREATE TABLE IF NOT EXISTS servers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
+        name TEXT NOT NULL UNIQUE,
         ip TEXT NOT NULL,
         port TEXT NOT NULL,
         tags TEXT DEFAULT '',
-        created_at TEXT DEFAULT (datetime('now'))
+        secret_key  TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at  TEXT DEFAULT (datetime('now'))
     )
     `)
+
+    db.run(`
+    CREATE TABLE IF NOT EXISTS server_stats (
+        server_name     TEXT PRIMARY KEY,
+        players_online  INTEGER DEFAULT 0,
+        max_players     INTEGER DEFAULT 0,
+        status          TEXT DEFAULT 'offline',     
+        motd            TEXT,     
+        version         TEXT,
+        tps             REAL,     
+        last_updated    TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (server_name) REFERENCES servers(name) ON DELETE CASCADE   
+    )
+    `);
 
 
     db.run(`
@@ -53,7 +67,5 @@ export function __init__database__(db: Database) {
             FOREIGN KEY (discord_user_id) REFERENCES discord_users(id) ON DELETE CASCADE
         );
     `);
-
-
 
 }
