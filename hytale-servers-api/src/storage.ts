@@ -17,6 +17,18 @@ export function initDatabaseSchema(db: Database) {
     `)
 
     db.run(`
+    CREATE TABLE IF NOT EXISTS votes (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        server_id       INTEGER NOT NULL,
+        playerGameName  TEXT NOT NULL COLLATE NOCASE,
+        voted_at        TEXT NOT NULL DEFAULT (datetime('now')),
+        
+        FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE
+    );
+    `)
+
+
+    db.run(`
     CREATE TABLE IF NOT EXISTS server_stats (
         players_online  INTEGER DEFAULT 0,
         max_players     INTEGER DEFAULT 0,

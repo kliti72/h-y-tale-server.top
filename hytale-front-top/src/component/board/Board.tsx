@@ -3,8 +3,6 @@ import { createResource } from "solid-js";
 import ServerCard from "../card/ServerCard";
 import PlayersVoteModal from "../modal/PlayersVoteModal";
 import HeroSection from "./hero/HeroTieatryServer";
-import TertiaryHero from "./SecondaryHero";
-import HeroMain from "./hero/HeroMain";
 import HeroBoard from "./hero/HeroBoard";
 import Notifications from "../template/Notification";
 

@@ -47,14 +47,14 @@ export class ServerRepository {
     console.log("Inserimento di", data);
 
     const row = stmt.get(
-        data.name,
-        data.ip,
-        data.port,
-        tagsString,
-        data.secret_key ?? '',
-        data.created_at ?? '',
-        data.updated_at ?? '',
-      ) as Server | undefined;
+      data.name,
+      data.ip,
+      data.port,
+      tagsString,
+      data.secret_key ?? '',
+      data.created_at ?? '',
+      data.updated_at ?? '',
+    ) as Server | undefined;
 
     console.log("Inserito", row);
     if (!row) {
@@ -75,7 +75,7 @@ export class ServerRepository {
 
   static getAll(db: Database): Server[] {
     const rawRows = db.prepare('SELECT * FROM servers').all();
-    
+
     return rawRows.map(row => {
       // Qui potresti usare una funzione di validazione se vuoi
       return row as Server;
@@ -87,10 +87,10 @@ export class ServerRepository {
     return server as Server;
   }
 
-  
-  static getServersByUserID(userId : string, db : Database): Server[] {
+
+  static getServersByUserID(userId: string, db: Database): Server[] {
     const rawRows = db
-        .query(`
+      .query(`
         SELECT 
           s.id,
           s.name,
@@ -106,7 +106,7 @@ export class ServerRepository {
         ORDER BY s.created_at DESC
       `)
       .all(userId ?? 0);
-    
+
     return rawRows.map(row => {
       return row as Server;
     });
@@ -120,5 +120,16 @@ export class ServerRepository {
       .run(newSecret, name);
 
     return result.changes > 0;
+  }
+
+  public static getServerBySecret(secret_key: string, db: Database) {
+    const SEARCH_SERVER_BY_SECRET = `
+            SELECT * FROM servers WHERE secret_key = ?`
+
+    const stmt = db.prepare(SEARCH_SERVER_BY_SECRET);
+    const server = stmt.get(secret_key) as Server;
+
+    return server;
+
   }
 }

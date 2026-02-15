@@ -42,20 +42,16 @@ export const AuthProvider: ParentComponent = (props) => {
 
       const data = await res.json();
 
-      console.log("Utente catturato:", data);
 
       if (data.authenticated && data.user) {
         setUser(data.user);
       } else {
-        console.log("Utente non catturato");
         setUser(null);
       }
     } catch (err) {
-      console.error('Auth check failed:', err);
       setUser(null);
       setError('Impossibile verificare l\'autenticazione');
     } finally {
-      console.log("Arrivato a set loading..");
       setLoading(false);
     }
   };

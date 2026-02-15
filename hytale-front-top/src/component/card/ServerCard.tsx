@@ -5,17 +5,9 @@ import { notify } from "../template/Notification";
 import { ServerResponse } from "../../types/ServerResponse";
 
 
-const API_URL = "http://localhost:3000";
-
-const fetchFeaturedServers = async () => {
-  const res = await fetch(`${API_URL}/api/servers?limit=10&sort=created_at:desc`);
-  if (!res.ok) throw new Error("Errore caricamento server in evidenza");
-  return res.json();
-};
-
 type ServerCardProps = {
   server: ServerResponse;
-  onVoteRequest: (serverName: string, serverIp: string) => void;
+  onVoteRequest: (serverName: string, server_id: number, serverIp: string) => void;
 };
 
 const ServerCard: Component<ServerCardProps> = (props) => {
@@ -79,6 +71,7 @@ const ServerCard: Component<ServerCardProps> = (props) => {
               e.stopPropagation()
               props.onVoteRequest(
                 props.server.name || 'Sconosciuto',
+                props.server.id || 0,
                 props.server.ip || '0.0.0.0'
               )
             }}

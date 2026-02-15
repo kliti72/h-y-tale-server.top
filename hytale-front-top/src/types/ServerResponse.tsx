@@ -1,6 +1,6 @@
 export type ServerResponse = {
     created_at?: string,
-    id?: string,
+    id?: number,
     ip?: string,
     name?: string,
     port?: string,

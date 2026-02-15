@@ -138,12 +138,15 @@ export default function MyServersBoard() {
                     <div class="flex justify-between items-start mb-4">
                       <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">
                         {server.name}
-                        {server.secret_key}
                       </h3>
+                    
                       <span class="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-900/50 text-emerald-300 border border-emerald-700/40">
                         {server.role.toUpperCase()}
                       </span>
                     </div>
+                                      <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">
+                        {server.secret_key}
+                      </h3>    
 
                     <p class="text-emerald-400 font-mono mb-2">
                       {server.ip}:{server.port}

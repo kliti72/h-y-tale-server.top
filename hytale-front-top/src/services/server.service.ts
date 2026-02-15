@@ -44,5 +44,18 @@ export class ServerService {
     return response.json();
   }
 
-  // ... puoi aggiungere altre funzioni quando ti servono
+  static async getServers() {
+    try {
+      const res = await fetch(`${ServerService.baseUrl}/servers`)
+      
+      if(!res.ok) {
+        console.log(`[ServerService] errore durante la fetch ${res.status} : ${res.statusText}`)
+      }
+
+      return res.json();
+    } catch(err) {
+      console.log(`[ServerService] errore durante la chiamata del metodo getServers`)
+    }
+  }
+
 }

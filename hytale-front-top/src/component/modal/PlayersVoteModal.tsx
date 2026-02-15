@@ -1,15 +1,18 @@
 import { createSignal, Show } from "solid-js";
 import { useAuth } from "../../auth/AuthContext"; // presumo esista
 import Notifications, { notify } from "../template/Notification";
+import { VoteService } from "../../services/votes.service";
 
 type Vote = {
   playerName: string;
+  server_id: number;
   serverVoted: string;
 };
 
 type VoteServerProps = {
-  serverVoted: string;      // nome server già scelto
-  serverIp?: string;        // opzionale, se ti serve dopo
+  serverVoted: string;   
+  server_id: number, 
+  serverIp?: string;
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (data: Vote) => void | Promise<void>;
@@ -38,13 +41,15 @@ const PlayersVoteModal = (props: VoteServerProps) => {
 
     const voteData: Vote = {
       playerName: name,
-      serverVoted: props.serverVoted,
+      server_id: props.server_id,
+      serverVoted: ""
     };
 
     try {
-      // Se hai una funzione onSubmit dal genitore (es: invio al backend)
+
       if (props.onSubmit) {
-        await props.onSubmit(voteData);
+        const res = VoteService.addVote(voteData.server_id, voteData.playerName)
+        console.log(res);
       }
 
       notify(`Hai votato ${props.serverVoted} come ${name}! 🎮`);

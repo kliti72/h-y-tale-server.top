@@ -2,7 +2,8 @@ import { Elysia, t } from 'elysia';
 import { Database } from 'bun:sqlite';
 import { generateSecretKey } from '../../helper/generateSecretKey';
 import { SessioneRepository } from '../../repository/SessionRepository';
-
+import { VoteRepository } from '../../repository/VoteRepository';
+import { ServerRepository } from '../../repository/ServerRepository';
 
 export function registerVoteService(
   app = new Elysia({ prefix: '/vote' }),
@@ -19,43 +20,52 @@ export function registerVoteService(
     async ({ body, set, cookie }) => {
       const sessionId = await SessioneRepository.getSessionIdFromCookie(cookie);
       const user = await SessioneRepository.validateSession(sessionId, db);
-      console.log("Body arrivato", body);
 
-      const serverSecretKey = generateSecretKey();
+      const vote = VoteRepository.put({
+        server_id: body.server_id,
+        playerGameName:  body.server_id,
+        voted_at: new Date().toString()
+      }, db);
 
-      // Aggiunge voto al server 
-      // la tabella voti ha playerGameName, server_id (reference a server), data_votazione 
-      
-      // Per Capire quanti voti ha un server basta fare un sum di server_id e id_server
-
-      // Ritorna voto registrato
+      return vote;
+    
     }, {
     body: t.Object({
+      server_id: t.String(),
       playerGameName: t.String(),
-      server: t.String(),
     })
   });
 
   app.get(
-    '/check',
-    async ({ body, set, cookie }) => {
+    '/check/:secret/:playerGameName',
+    async ({ body, set, cookie, params }) => {
+
+    const secret_key = params.secret;
+    const playerGameName = params.playerGameName;
+
       const sessionId = await SessioneRepository.getSessionIdFromCookie(cookie);
       const user = await SessioneRepository.validateSession(sessionId, db);
       console.log("Body arrivato", body);
 
-      // Arrivano, secret_key, playerGameName, data:votazione
+      // Arriva la secret key e playerGameName
+      // Verifica se esiste un server con quella secret key
+      // Trova il server
+      
+      const server = ServerRepository.getServerBySecret(secret_key, db);
 
-      // Trovare il server con la secret_key
-      // Verificare che nella tabella voti esiste il voto di playerGameName e che la data votazione sia recente di almeno 24 ore.
-      // Ritornare booelena true (voto valido il plugin procedera con darli il premio)
-      const serverSecretKey = generateSecretKey();
+      // Verifica che esistono voti per quel server
+      if(server != null && server.id != undefined) {
+        // Verifica che esiste almeno un voto di quel server per quel playerGameName
+        const Votes = VoteRepository.getVotes(server.id, playerGameName, db);
 
+        return Votes;
+        // per ora ritornare voto per verificare se è tutto corretto
 
-    }, {
-    body: t.Object({
-      playerGameName: t.String(),
-      server: t.String(),
-    })
+        // Quel player ha un voto sul server che ha richiest
+        if(Votes != null) {
+          // Verificare la validità della data
+        }
+      } 
   });
 
   app.get(
