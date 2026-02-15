@@ -1,24 +1,22 @@
 import { createSignal, Show } from "solid-js";
-import { useAuth } from "../../auth/AuthContext"; // presumo esista
-import Notifications, { notify } from "../template/Notification";
-import { VoteService } from "../../services/votes.service";
+import { useAuth } from "../../auth/AuthContext";
 
-type Vote = {
-  playerName: string;
-  server_id: number;
-  serverVoted: string;
-};
 
 type VoteServerProps = {
-  serverVoted: string;   
-  server_id: number, 
-  serverIp?: string;
+  server_id: number,
+  discord_id_user: string,
+  server_ip: string,
+  server_name: string,
+  server_secret_key: string,
+  player_game_name: string,
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (data: Vote) => void | Promise<void>;
+  onPlayerVote: () => void;
+  onPlayerNameChange: (playerName: string) => void;
 };
 
 const PlayersVoteModal = (props: VoteServerProps) => {
+
   const auth = useAuth();
 
   const [playerName, setPlayerName] = createSignal("");
@@ -27,41 +25,19 @@ const PlayersVoteModal = (props: VoteServerProps) => {
   const handleSubmit = async () => {
     const name = playerName().trim();
 
-    if (!name) {
-      setError("Inserisci il tuo nickname!");
-      return;
-    }
-
-    if (name.length < 3) {
-      setError("Il nickname deve avere almeno 3 caratteri.");
-      return;
-    }
-
+    // Error handle
+    if (!name) { setError("Inserisci il tuo nickname!"); return; }
+    if (name.length < 3) { setError("Il nickname deve avere almeno 3 caratteri."); return; }
     setError(null);
 
-    const voteData: Vote = {
-      playerName: name,
-      server_id: props.server_id,
-      serverVoted: ""
-    };
+    props.onPlayerVote();
 
-    try {
-
-      if (props.onSubmit) {
-        const res = VoteService.addVote(voteData.server_id, voteData.playerName)
-        console.log(res);
-      }
-
-      notify(`Hai votato ${props.serverVoted} come ${name}! 🎮`);
-      props.onClose();
-    } catch (err) {
-      setError("Qualcosa è andato storto. Riprova.");
-      notify("Errore durante il voto 😕",); // se hai tipi di notifica
-    }
   };
 
   return (
-    <Show when={props.isOpen && auth.isAuthenticated()}>
+    <div>   
+    <Show when={props.isOpen && auth.isAuthenticated()} >
+
       <div
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
         onClick={props.onClose}
@@ -76,34 +52,34 @@ const PlayersVoteModal = (props: VoteServerProps) => {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header con logo Discord */}
-{/* Header con avatar dell'utente Discord */}
-<div class="flex flex-col items-center mb-6">
-  <div class="relative mb-3">
-    <img
-      src={
-                auth.user()?.avatar
-                ? `https://cdn.discordapp.com/avatars/${auth.user()?.id}/${auth.user()?.avatar}.png?size=256`
-                : `https://cdn.discordapp.com/embed/avatars/0.png` 
-            }
-            alt="Il tuo avatar Discord"
-            class="w-20 h-20 rounded-full object-cover border-4 border-zinc-700 shadow-lg"
-            />
-            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-zinc-900" />
+          {/* Header con avatar dell'utente Discord */}
+          <div class="flex flex-col items-center mb-6">
+            <div class="relative mb-3">
+              <img
+                src={
+                  auth.user()?.avatar
+                    ? `https://cdn.discordapp.com/avatars/${auth.user()?.id}/${auth.user()?.avatar}.png?size=256`
+                    : `https://cdn.discordapp.com/embed/avatars/0.png`
+                }
+                alt="Il tuo avatar Discord"
+                class="w-20 h-20 rounded-full object-cover border-4 border-zinc-700 shadow-lg"
+              />
+              <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-zinc-900" />
 
-        </div>
+            </div>
 
             <div class="text-white"> {auth.user()?.global_name} </div>
 
 
-        <h2 class="text-2xl font-bold text-white text-center">
-            Vota il Server
-        </h2>
-        <p class="text-zinc-400 text-sm mt-1">
-            Scrivi qui il nome del giocatore di Hytale.
-            <br> </br>Ritira i tuoi premi nel server con <span style={{color: "violet"}}> /claim. </span>
-            
-        </p>
-        </div>
+            <h2 class="text-2xl font-bold text-white text-center">
+              Vota il Server
+            </h2>
+            <p class="text-zinc-400 text-sm mt-1">
+              Scrivi qui il nome del giocatore di Hytale.
+              <br> </br>Ritira i tuoi premi nel server con <span style={{ color: "violet" }}> /claim. </span>
+
+            </p>
+          </div>
 
           {/* Nome Server (fisso / disabilitato) */}
           <div class="mb-6">
@@ -113,7 +89,7 @@ const PlayersVoteModal = (props: VoteServerProps) => {
             <input
               type="text"
               disabled
-              value={props.serverVoted}
+              value={props.server_name}
               class="
                 w-full px-4 py-3 bg-zinc-800/70 border border-zinc-600 
                 rounded-lg text-zinc-300 cursor-not-allowed
@@ -129,8 +105,11 @@ const PlayersVoteModal = (props: VoteServerProps) => {
             </label>
             <input
               type="text"
-              value={playerName()}
-              onInput={(e) => setPlayerName(e.currentTarget.value)}
+              value={props.player_game_name}
+              onInput={(e) => {
+                setPlayerName(e.currentTarget.value)
+                props.onPlayerNameChange(e.currentTarget.value);
+              }}
               placeholder="Es. xX_DarkKiller_Xx"
               class="
                 w-full px-4 py-3 bg-zinc-800 border border-zinc-700 
@@ -179,6 +158,7 @@ const PlayersVoteModal = (props: VoteServerProps) => {
         </div>
       </div>
     </Show>
+    </div>
   );
 };
 

@@ -1,13 +1,15 @@
-// src/services/server.service.ts
-import type { ServerResponse } from '../types/ServerResponse';
-
-
 interface Vote {
     id: string,
-    server_id: string,
+    server_id: number,
     playerGameName: string,
     voted_at: string
 }
+
+interface Aviable {
+    success: boolean,
+    wait_time: string,
+}
+
 
 export class VoteService {
 
@@ -16,8 +18,8 @@ export class VoteService {
     /**
      * Ottiene un singolo server per nome
      */
-    static async checkVote(secret_key: string, playerGameName: string): Promise<Vote> {
-        const url = `${VoteService.baseUrl}/vote/${secret_key}/${playerGameName}`;
+    static async checkVote(secret_key: string, playerGameName: string): Promise<Vote[]> {
+        const url = `${VoteService.baseUrl}/vote/check/${secret_key}/${playerGameName}`;
 
         try {
             const res = await fetch(url, {
@@ -26,8 +28,6 @@ export class VoteService {
             });
 
             if (!res.ok) {
-                // Gestire 404, capire dove gestirli, se a livello di componente o qui
-                // sarebbe meglio qui 100%
                 throw new Error(`Errore ${res.status}: ${res.statusText}`);
             }
 
@@ -39,16 +39,15 @@ export class VoteService {
         }
     }
 
-    
-
-    static async addVote(server_id: number, playerGameName: string): Promise<Vote> {
+    // Aggiungi un voto
+    static async addVote(discord_user_id : string, server_id: number, playerGameName: string): Promise<Vote> {
 
         try {
             const res = await fetch(`${VoteService.baseUrl}/vote`, {
               method: "POST",
               credentials: 'include',
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({server_id, playerGameName}),
+              body: JSON.stringify({discord_user_id, server_id, playerGameName}),
             });
 
             if(!res.ok) {
@@ -62,6 +61,22 @@ export class VoteService {
             throw new Error(`[VoteService] Errore durante addVote: ${err}`);
         }
     };
+
+    // Verifica se puoi votare
+    static async aviableVote(): Promise<Aviable> {
+        try {
+            const res = await fetch(`${VoteService.baseUrl}/vote/aviable`, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+            });
+            return await res.json();
+        } catch (err) {
+            throw new Error(`[VoteService] Errore durante aviableVote: ${err}`);
+        }
+        
+    }
+
 
 
 }

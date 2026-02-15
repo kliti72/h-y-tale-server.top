@@ -21,7 +21,6 @@ function App() {
       )}
     >
       <Route path="/" component={Hero} />
-      <Route path="/board" component={Board} />
       <Route path="/owner" component={MyServerBoard} />
       <Route path="/server/:name" component={ServerDetail} />
       <Route path="*" component={NotFound} />

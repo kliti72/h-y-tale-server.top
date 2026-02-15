@@ -7,6 +7,7 @@ import {
 } from 'solid-js';
 import { useAuth } from '../../auth/AuthContext';
 import AddServerModal from "../modal/AddServerModal";
+import NotAuthenticatedNotice from '../NoAuthenticationNotice';
 
 type Server = {
   id: number;
@@ -89,6 +90,11 @@ export default function MyServersBoard() {
     <div class="min-h-screen bg-gradient-to-b from-black via-violet-950/95 to-black text-white">
       {/* Hero-like header */}
       <div class="relative py-16 px-6 text-center border-b border-emerald-900/100 backdrop-blur-sm">
+      <NotAuthenticatedNotice />
+
+      <Show when={user.isAuthenticated()}>
+
+
         <div class="absolute inset-0 bg-gradient-to-br from-emerald-900/100 via-transparent to-cyan-900/5 pointer-events-none" />
         
         <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
@@ -213,6 +219,8 @@ export default function MyServersBoard() {
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
         />
+      </Show>
+
       </div>
     </div>
   );

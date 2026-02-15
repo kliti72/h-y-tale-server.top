@@ -12,7 +12,7 @@ export function registerVoteService(
 
   //* API FRONTEND
   //
-  // ** Insert Server
+  // ** INSERT VOTE
   // 
   //*
   app.post(
@@ -20,19 +20,47 @@ export function registerVoteService(
     async ({ body, set, cookie }) => {
       const sessionId = await SessioneRepository.getSessionIdFromCookie(cookie);
       const user = await SessioneRepository.validateSession(sessionId, db);
+      
+      return VoteRepository.handleVote(db, body.discord_user_id, body.server_id, body.playerGameName);
+    }, {
+    body: t.Object({
+      discord_user_id: t.String(),
+      playerGameName: t.String(),
+      server_id: t.Number(),
+    })
+  });
 
-      const vote = VoteRepository.put({
-        server_id: body.server_id,
-        playerGameName:  body.server_id,
-        voted_at: new Date().toString()
-      }, db);
+  //* API FRONTEND
+  //
+  // ** GET ALL VOTE
+  // 
+  //*
+  app.get(
+    '/',
+    async ({ body, set, cookie }) => {
+      const sessionId = await SessioneRepository.getSessionIdFromCookie(cookie);
+      const user = await SessioneRepository.validateSession(sessionId, db);
 
-      return vote;
+      const votes = VoteRepository.getAll(db);
+      return votes;
     
     }, {
     body: t.Object({
       server_id: t.String(),
       playerGameName: t.String(),
+    })
+  });
+
+  app.get(
+    '/aviable',
+    async ({ body, set, cookie }) => {
+      const sessionId = await SessioneRepository.getSessionIdFromCookie(cookie);
+      const user = await SessioneRepository.validateSession(sessionId, db);
+
+      return VoteRepository.aviableVote(db, user.userId ?? '');
+    
+    }, {
+    body: t.Object({
     })
   });
 
@@ -45,7 +73,6 @@ export function registerVoteService(
 
       const sessionId = await SessioneRepository.getSessionIdFromCookie(cookie);
       const user = await SessioneRepository.validateSession(sessionId, db);
-      console.log("Body arrivato", body);
 
       // Arriva la secret key e playerGameName
       // Verifica se esiste un server con quella secret key
@@ -73,7 +100,6 @@ export function registerVoteService(
     async ({ body, set, cookie }) => {
       const sessionId = await SessioneRepository.getSessionIdFromCookie(cookie);
       const user = await SessioneRepository.validateSession(sessionId, db);
-      console.log("Body arrivato", body);
 
       const serverSecretKey = generateSecretKey();
 

@@ -1,3 +1,5 @@
+import { Database } from 'bun:sqlite';
+
 export interface DiscordUser {
   id: string;             // Discord snowflake → string
   username: string;
@@ -7,3 +9,4 @@ export interface DiscordUser {
   email?: string | null;
   created_at: string;
 }
+

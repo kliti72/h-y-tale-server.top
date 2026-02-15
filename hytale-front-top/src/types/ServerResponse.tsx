@@ -6,6 +6,7 @@ export type ServerResponse = {
     port?: string,
     tags: string,
     logoUrl?: string
+    secret_key: string,
 
 }
 

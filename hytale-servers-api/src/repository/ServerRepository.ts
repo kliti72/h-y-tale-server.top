@@ -123,8 +123,7 @@ export class ServerRepository {
   }
 
   public static getServerBySecret(secret_key: string, db: Database) {
-    const SEARCH_SERVER_BY_SECRET = `
-            SELECT * FROM servers WHERE secret_key = ?`
+    const SEARCH_SERVER_BY_SECRET = `SELECT * FROM servers WHERE secret_key = ?`
 
     const stmt = db.prepare(SEARCH_SERVER_BY_SECRET);
     const server = stmt.get(secret_key) as Server;
@@ -132,4 +131,16 @@ export class ServerRepository {
     return server;
 
   }
+
+   public static getById(id: number, db: Database) {
+    const SEARCH_SERVER_BY_SECRET = `SELECT * FROM servers WHERE id = ?`
+
+    const stmt = db.prepare(SEARCH_SERVER_BY_SECRET);
+    const server = stmt.get(id) as Server;
+
+    return server;
+
+  }
+
+  
 }

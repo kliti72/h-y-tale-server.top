@@ -1,20 +1,36 @@
 // src/components/ServerCard.tsx
 import { useNavigate } from "@solidjs/router";
-import { Component } from "solid-js";
+import { Component, createResource, Show } from "solid-js";
 import { notify } from "../template/Notification";
 import { ServerResponse } from "../../types/ServerResponse";
+import { VoteService } from "../../services/votes.service";
 
 
 type ServerCardProps = {
   server: ServerResponse;
-  onVoteRequest: (serverName: string, server_id: number, serverIp: string) => void;
+  onVoteRequest: (server: ServerResponse) => void;
 };
 
 const ServerCard: Component<ServerCardProps> = (props) => {
+  const [aviableVoteResource] = createResource(VoteService.aviableVote);
+
   const navigate = useNavigate();
-  const logoSrc = () =>
-    props.server.logoUrl ||
-    "https://via.placeholder.com/80/" + "Mario";
+  const logoSrc = () => props.server.logoUrl || "https://via.placeholder.com/80/" + "Mario";
+
+  const HandleVotaPropation = (e : MouseEvent) => {
+
+    e.stopPropagation();
+    if(aviableVoteResource()?.success) {
+      props.onVoteRequest(props.server);
+      
+    } else {
+      notify("Hai già votato oggi cucciolo");
+    }
+
+    
+  
+  
+  }
 
   return (
     <div
@@ -28,7 +44,7 @@ const ServerCard: Component<ServerCardProps> = (props) => {
         cursor-pointer
       `}
     >
-        
+
       <div class="absolute inset-0 bg-gradient-to-br from-emerald-900/10 via-transparent to-cyan-900/5 pointer-events-none" />
 
       <div class="relative p-5 flex items-center gap-5">
@@ -61,31 +77,50 @@ const ServerCard: Component<ServerCardProps> = (props) => {
             </div>
           </div>
 
-                            
+
         </div>
 
         {/* Pulsanti – colonna compatta a destra */}
         <div class="flex flex-col gap-2.5 flex-shrink-0">
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              props.onVoteRequest(
-                props.server.name || 'Sconosciuto',
-                props.server.id || 0,
-                props.server.ip || '0.0.0.0'
-              )
-            }}
-            class={`
-              px-6 py-2.5 rounded-lg text-sm font-semibold
-              bg-gradient-to-r from-emerald-700 to-teal-700
-              hover:from-emerald-600 hover:to-teal-600
-              text-white shadow-md shadow-emerald-900/40
-              border border-emerald-600/50 hover:border-emerald-400/60
-              active:scale-97 transition-all duration-200
-            `}
-          >
-            Vota
-          </button>
+
+
+
+          <Show when={aviableVoteResource()?.success}>
+
+            <button
+              onClick={(e) => { HandleVotaPropation(e);}}
+              class={`
+                px-6 py-2.5 rounded-lg text-sm font-semibold
+                bg-gradient-to-r from-emerald-700 to-teal-700
+                hover:from-emerald-600 hover:to-teal-600
+                text-white shadow-md shadow-emerald-900/40
+                border border-emerald-600/50 hover:border-emerald-400/60
+                active:scale-97 transition-all duration-200
+              `}
+            >
+              Vota
+            </button>
+
+          </Show>
+
+          <Show when={!aviableVoteResource()?.success} >
+            <button
+               onClick={(e) => { HandleVotaPropation(e);}}
+              class={`
+                px-6 py-2.5 rounded-lg text-sm font-semibold
+                bg-gradient-to-r from-orange-700 to-red-700
+                hover:from-red hover:to-red-600
+                text-white shadow-md shadow-emerald-900/40
+                border border-red /50 hover:border-emerald-400/60
+                active:scale-97 transition-all duration-200
+              `}
+            >
+              Prossimo voto tra {aviableVoteResource()?.wait_time}h
+            </button>
+          </Show>
+
+
+
 
           <button
             onClick={(e) => {

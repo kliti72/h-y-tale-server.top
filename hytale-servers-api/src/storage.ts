@@ -29,18 +29,6 @@ export function initDatabaseSchema(db: Database) {
 
 
     db.run(`
-    CREATE TABLE IF NOT EXISTS server_stats (
-        players_online  INTEGER DEFAULT 0,
-        max_players     INTEGER DEFAULT 0,
-        status          TEXT DEFAULT 'offline',     
-        tps             REAL,     
-        last_updated    TEXT DEFAULT (datetime('now')),
-        FOREIGN KEY (server_name) REFERENCES servers(name) ON DELETE CASCADE   
-    )
-    `);
-
-
-    db.run(`
     CREATE TABLE IF NOT EXISTS discord_users (
         id TEXT PRIMARY KEY,                    -- discord user id (string)
         username TEXT NOT NULL,
@@ -48,6 +36,7 @@ export function initDatabaseSchema(db: Database) {
         avatar TEXT,
         discriminator TEXT,
         email TEXT,
+        last_vote_at TEXT,
         created_at TEXT DEFAULT (datetime('now'))
     )
     `);
