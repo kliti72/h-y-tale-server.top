@@ -91,6 +91,7 @@ const ServerCardFloatingRealm: Component<ServerCardProps> = (props) => {
           </div>
         </div>
 
+
         {/* Status panel – stile cartello Minecraft */}
         <div class={`
           relative bg-gradient-to-b from-stone-900/90 to-black/80

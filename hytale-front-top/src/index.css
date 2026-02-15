@@ -35,21 +35,47 @@
 }
 
 .background_1 {
-  background-image: url("bg_1.png");
+  background-image: url("bg_1.jpg");
   background-size: 500px;
 }
 
 
 .background_2 {
-  background-image: url("bg_2.png");
+  background-image: url("bg_2.jpg");
+  background-size: 500px;
+}
+
+.background_4 {
+  background-image: url("bg_4.jpg");
+  background-size: 500px;
+}
+
+.background_5 {
+  background-image: url("bg_5.jpg");
+  background-size: 500px;
+}
+
+.background_6 {
+  background-image: url("bg_6.jpg");
+  background-size: 500px;
+}
+
+.background_7 {
+  background-image: url("bg_5.jpg");
+  background-size: 0px;
+} 
+
+.background_8 {
+  background-image: url("bg_8.png");
+  background-size: 500px;
+}
+
+.background_9 {
+  background-image: url("bg_9.png");
   background-size: 500px;
 }
 
 
-.background_3 {
-  background-image: url("bg_3.png");
-  background-size: 500px;
-}
 
 button {
   cursor: pointer;
@@ -70,3 +96,19 @@ button {
 .animate-float-slow { animation: float-slow 12s infinite ease-in-out; }
 .animate-float-reverse { animation: float-reverse 15s infinite ease-in-out; }
 .animate-pulse-slow { animation: pulse-slow 8s infinite ease-in-out; }
+
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #1e1b2e;
+  border-radius: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #8b5cf6;
+  border-radius: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #a78bfa;
+}

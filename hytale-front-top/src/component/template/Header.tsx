@@ -14,80 +14,104 @@ const Header: Component = () => {
   const toggleMenu = () => setMenuOpen(!menuOpen());
 
   return (
-    <header class="sticky top-0 z-50 w-full bg-black/95 border-b border-zinc-800/70 backdrop-blur-md">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
-        {/* Logo con leggero glow hover */}
-        <A
-          href="/"
-          class="relative group"
-        >
-          <h1 class="
-            text-2xl sm:text-3xl font-extrabold 
-            text-emerald-400 tracking-tight 
-            transition-all duration-300
-            group-hover:text-indigo-300 group-hover:drop-shadow-[0_0_8px_rgba(129,140,248,0.6)]
-          ">
-            H-Y-Tale.top
-          </h1>
-          {/* Particelle/glow sottile sotto il logo */}
-          <div class="
-            absolute -bottom-1 left-1/2 -translate-x-1/2 w-20 h-1 
-            bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent 
-            blur-sm opacity-0 group-hover:opacity-80 transition-opacity duration-500
-          " />
+    <header
+      class={`
+        sticky top-0 z-50 w-full
+        bg-gradient-to-b from-black via-gray-950 to-slate-950
+        border-b border-violet-900/40 hover:border-violet-600/60
+        shadow-2xl shadow-violet-950/50 backdrop-blur-xl
+        transition-all duration-500
+      `}
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-6">
+        {/* Logo con glow neon */}
+        <A href="/" class="relative group flex items-center gap-3">
+          <div class="relative">
+            <div
+              class="
+                absolute inset-0 rounded-full bg-gradient-to-br from-violet-600/30 to-fuchsia-600/20
+                blur-xl opacity-70 group-hover:opacity-100 transition-opacity duration-500
+              "
+            />
+            <span class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 group-hover:from-violet-300 group-hover:via-fuchsia-300 group-hover:to-pink-300 transition-all tracking-tighter drop-shadow-lg">
+              HYTALE
+            </span>
+          </div>
+          <span class="text-xl sm:text-2xl font-bold text-white/90 group-hover:text-violet-300 transition-colors">
+            .top
+          </span>
+
+          {/* Sottile linea glow sotto logo */}
+          <div
+            class="
+              absolute -bottom-2 left-0 right-0 h-0.5
+              bg-gradient-to-r from-transparent via-fuchsia-500/60 to-transparent
+              blur-sm opacity-0 group-hover:opacity-80 transition-opacity duration-700
+            "
+          />
         </A>
 
-        {/* Desktop Nav */}
-        <nav class="hidden md:flex items-center gap-6 lg:gap-8">
+        {/* Desktop Nav – stile gaming */}
+        <nav class="hidden md:flex items-center gap-7 lg:gap-10">
+          {[
+            { path: "/", label: "Home", icon: "🏠" },
+            { path: "/top", label: "Top Server", icon: "🏆" },
+            { path: "/panel", label: "I Miei Server", icon: "🖥️", authOnly: true },
+            { path: "/plugin", label: "Vote Plugin", icon: "🔌" },
+          ].map((item) =>
+            (!item.authOnly || isAuthenticated()) ? (
+              <A
+                href={item.path}
+                class={`
+                  relative group flex items-center gap-2 text-base font-medium
+                  text-violet-300 hover:text-fuchsia-300 transition-all duration-300
+                  ${isActive(item.path) ? "text-fuchsia-400" : ""}
+                `}
+              >
+                <span class="text-lg opacity-80 group-hover:opacity-100 transition">
+                  {item.icon}
+                </span>
+                {item.label}
 
-          <A
-            href="/"
-            class={`text-emerald-400 hover:text-indigo-300 font-medium transition-colors ${isActive("/") ? "underline underline-offset-4" : ""}`}
-          >
-            <span class="icon">🏠</span>
-            Home
-          </A>
+                {/* Sottolineatura glow attiva */}
+                <span
+                  class={`
+                    absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-fuchsia-500 to-violet-500
+                    transition-all duration-400
+                    ${isActive(item.path) ? "w-full opacity-90" : "w-0 opacity-0 group-hover:w-full group-hover:opacity-70"}
+                  `}
+                />
+              </A>
+            ) : null
+          )}
 
-      <A
-            href="/top"
-            class={`text-emerald-400 hover:text-indigo-300 font-medium transition-colors ${isActive("/top") ? "underline underline-offset-4" : ""}`}
-          >
-            <span class="icon">🏆</span>Top Server
-          </A>
-
-          <Show when={isAuthenticated()}>
-    <A
-            href="/panel"
-            class={`text-emerald-400 hover:text-indigo-300 font-medium transition-colors ${isActive("/panel") ? "underline underline-offset-4" : ""}`}
-          >              <span class="icon">🖥️</span>I Miei Server
-            </A>
-          </Show>
-
-      <A
-            href="/plugin"
-            class={`text-emerald-400 hover:text-indigo-300 font-medium transition-colors ${isActive("/plugin") ? "underline underline-offset-4" : ""}`}
-          >
-            <span class="icon">🔌</span>Vote Plugin
-          </A>
-
-          <div class="h-5 w-px bg-zinc-700/60 mx-2" />
+          <div class="h-6 w-px bg-violet-900/60 mx-3" />
 
           <Show
             when={isAuthenticated()}
-            fallback={<DiscordLoginButton />}
+            fallback={
+              <DiscordLoginButton  />
+            }
           >
             <button
               onClick={logout}
-              class="px-4 py-1.5 text-sm font-medium bg-indigo-800/80 hover:bg-indigo-700 text-white border border-indigo-700/60 rounded-md transition-all hover:shadow-md hover:shadow-indigo-900/40 active:scale-95"
+              class="
+                px-6 py-2.5 text-base font-semibold
+                bg-gradient-to-r from-violet-800/90 to-fuchsia-800/90
+                hover:from-violet-700 hover:to-fuchsia-700
+                text-white rounded-xl border border-violet-700/50 hover:border-violet-500/70
+                shadow-lg shadow-violet-950/50 hover:shadow-violet-900/70
+                transition-all duration-300 active:scale-97
+              "
             >
               Esci
             </button>
           </Show>
         </nav>
 
-        {/* Hamburger su mobile */}
+        {/* Hamburger mobile */}
         <button
-          class="md:hidden text-emerald-400 hover:text-emerald-300 transition-colors text-2xl"
+          class="md:hidden text-violet-400 hover:text-fuchsia-400 text-3xl transition-colors"
           onClick={toggleMenu}
           aria-label="Toggle menu"
         >
@@ -95,44 +119,59 @@ const Header: Component = () => {
         </button>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Menu – stesso stile */}
       <Show when={menuOpen()}>
-        <div class="
-          md:hidden absolute top-full left-0 right-0 
-          bg-black/95 border-b border-zinc-800/70 backdrop-blur-md
-          animate-fade-in-down
-          shadow-2xl shadow-black/60
-        ">
-          <nav class="flex flex-col p-5 gap-4">
-            <A href="/" class={`mobile-link ${isActive("/") ? "active" : ""}`} onClick={toggleMenu}>
-              <span class="icon text-emerald-500">🏠 Home </span>
-            </A>
+        <div
+          class="
+            md:hidden absolute top-full left-0 right-0
+            bg-gradient-to-b from-gray-950 to-black
+            border-b border-violet-900/50 backdrop-blur-xl
+            shadow-2xl shadow-violet-950/60
+            animate-fade-in-down
+          "
+        >
+          <nav class="flex flex-col p-6 gap-5">
+            {[
+              { path: "/", label: "Home", icon: "🏠" },
+              { path: "/top", label: "Top Server", icon: "🏆" },
+              { path: "/panel", label: "I Miei Server", icon: "🖥️", authOnly: true },
+              { path: "/plugin", label: "Vote Plugin", icon: "🔌" },
+            ].map((item) =>
+              (!item.authOnly || isAuthenticated()) ? (
+                <A
+                  href={item.path}
+                  class={`
+                    flex items-center gap-4 text-xl font-medium
+                    text-violet-300 hover:text-fuchsia-300 transition-colors py-3 px-5 rounded-xl
+                    hover:bg-violet-950/40 ${isActive(item.path) ? "bg-violet-950/50 text-fuchsia-400" : ""}
+                  `}
+                  onClick={toggleMenu}
+                >
+                  <span class="text-2xl">{item.icon}</span>
+                  {item.label}
+                </A>
+              ) : null
+            )}
 
-            <A href="/top" class={`mobile-link ${isActive("/top") ? "active" : ""}`} onClick={toggleMenu}>
-              <span class="icon text-emerald-500">🏆 Top Server </span>
-            </A>
-
-            <Show when={isAuthenticated()}>
-              <A href="/panel" class={`mobile-link ${isActive("/panel") ? "active" : ""}`} onClick={toggleMenu}>
-                <span class="icon text-emerald-500">🖥️ I Miei Server</span>
-              </A>
-            </Show>
-
-            <A href="/plugins" class={`mobile-link ${isActive("/plugins") ? "active" : ""}`} onClick={toggleMenu}>
-              <span class="icon text-emerald-500">🔌 </span>
-            </A>
+            <div class="h-px bg-violet-900/50 my-2" />
 
             <Show when={isAuthenticated()}>
               <button
                 onClick={() => { logout(); toggleMenu(); }}
-                class="mt-2 px-5 py-3 text-base font-medium bg-indigo-800/80 hover:bg-indigo-700 text-white rounded-lg transition-all active:scale-95"
+                class="
+                  mt-2 px-6 py-4 text-lg font-semibold
+                  bg-gradient-to-r from-violet-800 to-fuchsia-800
+                  hover:from-violet-700 hover:to-fuchsia-700
+                  text-white rounded-xl transition-all active:scale-97
+                  shadow-md shadow-violet-900/50
+                "
               >
                 Esci
               </button>
             </Show>
 
             <Show when={!isAuthenticated()}>
-              <div class="mt-2" onClick={toggleMenu}>
+              <div class="mt-3 px-2" onClick={toggleMenu}>
                 <DiscordLoginButton />
               </div>
             </Show>
@@ -143,28 +182,4 @@ const Header: Component = () => {
   );
 };
 
-// Stili globali necessari (mettili in un file CSS globale o in <style> nel root)
-const globalStyles = `
-  .nav-link {
-    @apply flex items-center gap-1.5 text-emerald-400 hover:text-indigo-300 font-medium transition-all duration-200;
-  }
-  .nav-link.active {
-    @apply text-indigo-300 underline underline-offset-4;
-  }
-  .mobile-link {
-    @apply flex items-center gap-3 text-lg text-emerald-300 hover:text-indigo-300 transition-colors py-2 px-4 rounded-lg hover:bg-zinc-900/50;
-  }
-  .mobile-link.active {
-    @apply text-indigo-300 bg-zinc-900/40;
-  }
-  @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .animate-fade-in-down {
-    animation: fadeInDown 0.25s ease-out forwards;
-  }
-`;
-
-// Puoi aggiungere <style>{globalStyles}</style> nel tuo App.tsx o importare un file CSS
 export default Header;
