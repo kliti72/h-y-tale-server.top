@@ -1,15 +1,15 @@
 import { Component, createSignal, For, Show } from "solid-js";
 import { createResource } from "solid-js";
-import ServerCard from "../card/ServerCard";
-import PlayersVoteModal from "../modal/PlayersVoteModal";
-import HeroSection from "./hero/HeroTieatryServer";
-import TertiaryHero from "./SecondaryHero";
-import HeroMain from "./hero/HeroMain";
-import { ServerService } from "../../services/server.service";
-import Notifications, { notify, requireDiscordLogin } from "../template/Notification";
-import { ServerResponse } from "../../types/ServerResponse";
-import { VoteService } from "../../services/votes.service";
-import { useAuth } from "../../auth/AuthContext";
+import ServerCard from "../component/card/ServerCard";
+import PlayersVoteModal from "../component/modal/PlayersVoteModal";
+import HeroSection from "../component/hero/HeroTieatryServer";
+import TertiaryHero from "../component/hero/SecondaryHero";
+import HeroMain from "../component/hero/HeroMain";
+import { ServerService } from "../services/server.service";
+import Notifications, { notify, requireDiscordLogin } from "../component/template/Notification";
+import { ServerResponse } from "../types/ServerResponse";
+import { VoteService } from "../services/votes.service";
+import { useAuth } from "../auth/AuthContext";
 
 
 const Hero: Component = () => {

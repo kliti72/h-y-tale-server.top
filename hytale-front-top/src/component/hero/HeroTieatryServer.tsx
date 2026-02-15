@@ -52,7 +52,7 @@ const HeroTieatryServer: Component = () => {
 
 
           <button
-            onClick={() => navigate("/owner")} // o dove hai il form per aggiungere server
+            onClick={() => navigate("/panel")} // o dove hai il form per aggiungere server
             class={`
               flex items-center justify-center gap-3 px-8 py-5 rounded-xl text-lg font-semibold
               bg-black/40 hover:bg-emerald-950/60 text-emerald-300

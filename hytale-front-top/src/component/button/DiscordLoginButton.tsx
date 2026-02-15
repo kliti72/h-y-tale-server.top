@@ -1,5 +1,5 @@
 import { Show, type Component } from "solid-js";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
 
 const DiscordLoginButton: Component = () => {
   const auth = useAuth();

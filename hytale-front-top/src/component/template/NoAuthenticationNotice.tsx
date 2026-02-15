@@ -1,19 +1,10 @@
 // src/components/NotAuthenticatedNotice.tsx
 import { Component, Show } from "solid-js";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
 
 const NotAuthenticatedNotice: Component = () => {
   const auth = useAuth();
   const isAuthenticated = () => !!auth.user(); // o auth.isAuthenticated() se ce l'hai
-
-  // Funzione per avviare il login Discord (adatta al tuo sistema)
-  const startDiscordLogin = () => {
-    // Esempio comune con redirect
-    window.location.href = "/api/auth/discord/login"; // ← cambia con il TUO endpoint
-
-    // Oppure se usi un metodo nel context:
-    // auth.loginWithDiscord?.();
-  };
 
   return (
     <Show when={!isAuthenticated()}>

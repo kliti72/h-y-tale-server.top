@@ -3,11 +3,10 @@ import NotFound from './component/template/NotFound';
 import { AuthProvider } from './auth/AuthContext';
 import Header from './component/template/Header';
 import Footer from './component/template/Footer';
-import MyServerBoard from './component/board/MyServerBoard';
-import ServerDetail from './component/server/ServerDetail';
-import Hero from './component/board/Hero';
-import Board from './component/board/Board';
-
+import MyServerBoard from './pages/Panel';
+import ServerDetail from './pages/ServerDetail';
+import Hero from './pages/Hero';
+import Top from './pages/Top';
 
 function App() {
   return (
@@ -21,7 +20,8 @@ function App() {
       )}
     >
       <Route path="/" component={Hero} />
-      <Route path="/owner" component={MyServerBoard} />
+            <Route path="/top" component={Top} />
+      <Route path="/panel" component={MyServerBoard} />
       <Route path="/server/:name" component={ServerDetail} />
       <Route path="*" component={NotFound} />
     </Router>

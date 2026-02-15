@@ -1,11 +1,11 @@
 // src/components/ServerDetail.tsx
 import { Component, createResource, createSignal, For, Show, Suspense } from 'solid-js';
 import { useParams } from '@solidjs/router';
-import { ServerService } from '../../services/server.service';
-import { ServerResponse } from '../../types/ServerResponse';
-import PlayersVoteModal from '../modal/PlayersVoteModal';
-import Notifications, { notify } from '../template/Notification';
-import { useAuth } from '../../auth/AuthContext';
+import { ServerService } from '../services/server.service';
+import { ServerResponse } from '../types/ServerResponse';
+import PlayersVoteModal from '../component/modal/PlayersVoteModal';
+import Notifications, { notify } from '../component/template/Notification';
+import { useAuth } from '../auth/AuthContext';
 
 const ServerDetail: Component = () => {
   const params = useParams();
@@ -214,14 +214,6 @@ const ServerDetail: Component = () => {
         </Suspense>
 
         <Notifications />
-
-        <PlayersVoteModal
-          serverVoted={serverName()}
-          serverIp={server()?.ip}
-          isOpen={isModalOpen()}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleSubmit}
-        />
 
       </div>
     </div>

@@ -2,7 +2,7 @@
 import { Component, createSignal, Show } from "solid-js";
 import { A, useLocation } from "@solidjs/router";
 import { useAuth } from "../../auth/AuthContext";
-import DiscordLoginButton from "../DiscordLoginButton";
+import DiscordLoginButton from "../button/DiscordLoginButton";
 
 const Header: Component = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -49,16 +49,16 @@ const Header: Component = () => {
           </A>
 
       <A
-            href="/board"
-            class={`text-emerald-400 hover:text-indigo-300 font-medium transition-colors ${isActive("/board") ? "underline underline-offset-4" : ""}`}
+            href="/top"
+            class={`text-emerald-400 hover:text-indigo-300 font-medium transition-colors ${isActive("/top") ? "underline underline-offset-4" : ""}`}
           >
             <span class="icon">🏆</span>Top Server
           </A>
 
           <Show when={isAuthenticated()}>
     <A
-            href="/owner"
-            class={`text-emerald-400 hover:text-indigo-300 font-medium transition-colors ${isActive("/owner") ? "underline underline-offset-4" : ""}`}
+            href="/panel"
+            class={`text-emerald-400 hover:text-indigo-300 font-medium transition-colors ${isActive("/panel") ? "underline underline-offset-4" : ""}`}
           >              <span class="icon">🖥️</span>I Miei Server
             </A>
           </Show>
@@ -108,12 +108,12 @@ const Header: Component = () => {
               <span class="icon text-emerald-500">🏠 Home </span>
             </A>
 
-            <A href="/board" class={`mobile-link ${isActive("/board") ? "active" : ""}`} onClick={toggleMenu}>
+            <A href="/top" class={`mobile-link ${isActive("/top") ? "active" : ""}`} onClick={toggleMenu}>
               <span class="icon text-emerald-500">🏆 Top Server </span>
             </A>
 
             <Show when={isAuthenticated()}>
-              <A href="/owner" class={`mobile-link ${isActive("/owner") ? "active" : ""}`} onClick={toggleMenu}>
+              <A href="/panel" class={`mobile-link ${isActive("/panel") ? "active" : ""}`} onClick={toggleMenu}>
                 <span class="icon text-emerald-500">🖥️ I Miei Server</span>
               </A>
             </Show>

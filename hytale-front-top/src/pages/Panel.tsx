@@ -5,9 +5,9 @@ import {
   Show, 
   Suspense 
 } from 'solid-js';
-import { useAuth } from '../../auth/AuthContext';
-import AddServerModal from "../modal/AddServerModal";
-import NotAuthenticatedNotice from '../NoAuthenticationNotice';
+import { useAuth } from '../auth/AuthContext';
+import AddServerModal from "../component/modal/AddServerModal";
+import NotAuthenticatedNotice from '../component/template/NoAuthenticationNotice';
 
 type Server = {
   id: number;

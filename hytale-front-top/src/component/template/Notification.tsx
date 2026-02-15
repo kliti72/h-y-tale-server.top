@@ -1,7 +1,7 @@
 // src/components/template/Notification.tsx
 import { createSignal, For, Show } from "solid-js";
 import { useAuth } from "../../auth/AuthContext"; // ← presumo tu abbia questo
-import DiscordLoginButton from "../DiscordLoginButton";
+import DiscordLoginButton from "../button/DiscordLoginButton";
 
 type Toast = { id: number; msg: string; type?: "success" | "error" | "info" };
 
