@@ -7,6 +7,9 @@ import MyServerBoard from './pages/Panel';
 import ServerDetail from './pages/ServerDetail';
 import Hero from './pages/Hero';
 import Top from './pages/Top';
+import VotePlugin from './pages/VotePlugin';
+import Forum from './pages/Forum';
+import Panel from './pages/Panel';
 
 function App() {
   return (
@@ -21,8 +24,10 @@ function App() {
     >
       <Route path="/" component={Hero} />
             <Route path="/top" component={Top} />
-      <Route path="/panel" component={MyServerBoard} />
+      <Route path="/forum" component={Forum} />
+      <Route path="/panel" component={Panel} />
       <Route path="/server/:name" component={ServerDetail} />
+      <Route path="/plugin" component={VotePlugin} />
       <Route path="*" component={NotFound} />
     </Router>
   );

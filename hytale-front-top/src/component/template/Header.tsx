@@ -54,10 +54,11 @@ const Header: Component = () => {
         {/* Desktop Nav – stile gaming */}
         <nav class="hidden md:flex items-center gap-7 lg:gap-10">
           {[
-            { path: "/", label: "Home", icon: "🏠" },
-            { path: "/top", label: "Top Server", icon: "🏆" },
-            { path: "/panel", label: "I Miei Server", icon: "🖥️", authOnly: true },
-            { path: "/plugin", label: "Vote Plugin", icon: "🔌" },
+            { path: "/", label: "Home", icon: "🖼️" },
+            { path: "/top", label: "Top Server", icon: "🥇" },
+            { path: "/forum", label: "Forum", icon: "☘️" },
+            { path: "/panel", label: "I Miei Server", icon: "⚙️", authOnly: true },
+            { path: "/plugin", label: "Vote Plugin", icon: "📖" },
           ].map((item) =>
             (!item.authOnly || isAuthenticated()) ? (
               <A
@@ -132,7 +133,7 @@ const Header: Component = () => {
         >
           <nav class="flex flex-col p-6 gap-5">
             {[
-              { path: "/", label: "Home", icon: "🏠" },
+              { path: "/", label: "Home", icon: "⌂" },
               { path: "/top", label: "Top Server", icon: "🏆" },
               { path: "/panel", label: "I Miei Server", icon: "🖥️", authOnly: true },
               { path: "/plugin", label: "Vote Plugin", icon: "🔌" },

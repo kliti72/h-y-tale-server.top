@@ -34,7 +34,7 @@ const HeroMain: Component = () => {
         </p>
 
         <button
-          onClick={() => navigate("/board")}
+          onClick={() => navigate("/top")}
           class={`
             inline-flex items-center gap-3 px-10 py-5 rounded-xl text-xl font-bold
             bg-gradient-to-r from-emerald-600 to-teal-600
