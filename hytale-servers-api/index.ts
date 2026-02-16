@@ -1,11 +1,11 @@
 // index.ts
 import { Elysia, t } from 'elysia'
 import { Database } from 'bun:sqlite'
-import { registerServerRoutes } from './src/api/server/ServerController';
+import { registerServerRoutes } from './src/controller/server/ServerController';
 import { initDatabaseSchema } from './src/storage';
 import { cors } from '@elysiajs/cors'
-import { registerAuthRoutes } from './src/api/auth/auth';
-import { registerVoteService } from './src/api/vote/VoteController';
+import { registerAuthRoutes } from './src/controller/auth/DiscordAuthController';
+import { registerVoteService } from './src/controller/vote/VoteController';
 
 const db = new Database('servers.db', { create: true })
 

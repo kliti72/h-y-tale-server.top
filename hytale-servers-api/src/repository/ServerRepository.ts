@@ -1,22 +1,5 @@
 import { Database } from 'bun:sqlite';
-
-export interface Server {
-  id?: number;
-  name: string;
-  ip: string;
-  port: string;
-  tags?: string[];
-  description?: string;
-  website_url?: string;
-  discord_url?: string;
-  banner_url?: string;
-  logo_url?: string;
-  rules?: string;
-  secret_key?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
+import { type ServerResponse } from '../types/types';
 
 export class ServerRepository {
 
@@ -26,7 +9,7 @@ export class ServerRepository {
     RETURNING *
   `;
 
-  static put(db: Database, data: Omit<Server, 'id'>) {
+  static put(db: Database, data: Omit<ServerResponse, 'id'>) {
     console.log("Metodo put chiamato");
     // Convertiamo tags in stringa
     let tagsString: string;
@@ -56,7 +39,7 @@ export class ServerRepository {
       data.secret_key ?? '',
       data.created_at ?? '',
       data.updated_at ?? '',
-    ) as Server | undefined;
+    ) as ServerResponse | undefined;
 
     console.log("Inserito", row);
     if (!row) {
@@ -67,30 +50,30 @@ export class ServerRepository {
   }
 
   // Opzionale: metodo per trovare per nome
-  static async findByName(db: Database, name: string): Promise<Server | null> {
+  static async findByName(db: Database, name: string): Promise<ServerResponse | null> {
     const row = db
       .prepare('SELECT * FROM servers WHERE name = ?')
-      .get(name) as Server | undefined;
+      .get(name) as ServerResponse | undefined;
 
     return row ?? null;
   }
 
-  static getAll(db: Database): Server[] {
+  static getAll(db: Database): ServerResponse[] {
     const rawRows = db.prepare('SELECT * FROM servers').all();
 
     return rawRows.map(row => {
       // Qui potresti usare una funzione di validazione se vuoi
-      return row as Server;
+      return row as ServerResponse;
     });
   }
 
-  static getByName(db: Database, serverName: string): Server {
+  static getByName(db: Database, serverName: string): ServerResponse {
     const server = db.prepare('SELECT * FROM servers WHERE name = ?').get(serverName);
-    return server as Server;
+    return server as ServerResponse;
   }
 
 
-  static getServersByUserID(userId: string, db: Database): Server[] {
+  static getServersByUserID(userId: string, db: Database): ServerResponse[] {
     const rawRows = db
       .query(`
         SELECT 
@@ -114,7 +97,7 @@ export class ServerRepository {
       .all(userId ?? 0);
 
     return rawRows.map(row => {
-      return row as Server;
+      return row as ServerResponse;
     });
   }
 
@@ -132,7 +115,7 @@ export class ServerRepository {
     const SEARCH_SERVER_BY_SECRET = `SELECT * FROM servers WHERE secret_key = ?`
 
     const stmt = db.prepare(SEARCH_SERVER_BY_SECRET);
-    const server = stmt.get(secret_key) as Server;
+    const server = stmt.get(secret_key) as ServerResponse;
 
     return server;
 
@@ -142,7 +125,7 @@ export class ServerRepository {
     const SEARCH_SERVER_BY_SECRET = `SELECT * FROM servers WHERE id = ?`
 
     const stmt = db.prepare(SEARCH_SERVER_BY_SECRET);
-    const server = stmt.get(id) as Server;
+    const server = stmt.get(id) as ServerResponse;
 
     return server;
 

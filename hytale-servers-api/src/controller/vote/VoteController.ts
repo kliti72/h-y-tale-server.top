@@ -1,6 +1,6 @@
 import { Elysia, t } from 'elysia';
 import { Database } from 'bun:sqlite';
-import { generateSecretKey } from '../../helper/generateSecretKey';
+import { generateSecretKey } from '../../helper/GenerateSecretKey';
 import { SessioneRepository } from '../../repository/SessionRepository';
 import { VoteRepository } from '../../repository/VoteRepository';
 import { ServerRepository } from '../../repository/ServerRepository';

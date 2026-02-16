@@ -1,6 +1,6 @@
 import Elysia, { redirect } from 'elysia';
 import { randomBytes } from 'crypto'
-import { sha256Base64url } from '../../helper/generatePKCE';
+import { sha256Base64url } from '../../helper/GeneratePKCE';
 import { Database } from 'bun:sqlite'
 
 export function registerAuthRoutes(

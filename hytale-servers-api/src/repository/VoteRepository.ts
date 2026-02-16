@@ -1,5 +1,4 @@
 import { Database } from 'bun:sqlite';
-import type { Server } from './ServerRepository';
 
 interface Vote {
     id: string,

@@ -1,10 +1,9 @@
 import { Elysia, t } from 'elysia';
 import { Database } from 'bun:sqlite';
-import { generateSecretKey } from '../../helper/generateSecretKey';
-import { ServerRepository, type Server } from '../../repository/ServerRepository';
+import { generateSecretKey } from '../../helper/GenerateSecretKey';
+import { ServerRepository, } from '../../repository/ServerRepository';
 import { SessioneRepository } from '../../repository/SessionRepository';
-import { serve } from 'bun';
-
+import { type ServerResponse } from '../../types/types';
 
 export function registerServerRoutes(
   app = new Elysia({ prefix: '/api' }),
