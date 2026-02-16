@@ -5,9 +5,8 @@ import {
   Show,
   Suspense
 } from 'solid-js';
+import { useNavigate } from '@solidjs/router'; // Aggiungi questo import
 import { useAuth } from '../auth/AuthContext';
-import AddServerModal from "../component/modal/AddServerModal";
-import EditServerModal from "../component/modal/EditServerModal";
 import ConfirmDeleteModal from '../component/modal/ConifrmDeleteModal';
 import NotAuthenticatedNotice from '../component/template/NoAuthenticationNotice';
 import { notify } from '../component/template/Notification';
@@ -18,39 +17,54 @@ import StringArrayUtils from '../utils/StringArrayUtils';
 
 export default function Panel() {
   const auth = useAuth();
-  const [isAddModalOpen, setIsAddModalOpen] = createSignal(false);
-  const [editModalOpen, setEditModalOpen] = createSignal(false);
+  const navigate = useNavigate(); // Usa questo invece di navigation
   const [deleteModalOpen, setDeleteModalOpen] = createSignal(false);
   const [selectedServer, setSelectedServer] = createSignal<ServerResponse | null>(null);
 
-  const [featuredd] = createResource(() => ServerService.getServers());
-  const servers = () => featuredd()?.data ?? [];
-
-  const handleAddServer = async (server: ServerResponse) => {
-    try {
-      ServerService.addServer(server);
-      setIsAddModalOpen(false);
-      notify("Server aggiunto con successo! 🎉", "success");
-    } catch (err: any) {
-      notify(err.message || "Errore durante l'aggiunta", "error");
+  // Fetch dei tuoi server
+  const [myServersData, { refetch }] = createResource(
+    () => auth.isAuthenticated(), // Dipendenza: rifai fetch se auth cambia
+    async () => {
+      if (!auth.isAuthenticated()) return null;
+      
+      try {
+        const data = await ServerService.getMyServers();
+        console.log("I tuoi server:", data);
+        return data;
+      } catch (error) {
+        console.error("Errore caricamento server:", error);
+        notify("Errore nel caricamento dei server bro!", "error");
+        return null;
+      }
     }
-  };
+  );
 
-  // Update server
-  const handleUpdateServer = async () => {
-    const server = selectedServer();
-    if (!server) return;
-
-  };
+  // Helper per prendere solo l'array di server
+  const servers = () => myServersData()?.servers || [];
 
   // Delete server
   const handleConfirmDelete = async () => {
     const server = selectedServer();
+    if (!server) return;
 
+    try {
+      // Chiamata API per eliminare
+      await ServerService.deleteServer(server.id); // Devi implementare questo metodo
+      
+      notify(`Server "${server.name}" eliminato con successo! 🗑️`, "success");
+      setDeleteModalOpen(false);
+      setSelectedServer(null);
+      
+      // Ricarica la lista
+      refetch();
+    } catch (error) {
+      console.error("Errore eliminazione:", error);
+      notify("Non sono riuscito a eliminare il server fra!", "error");
+    }
   };
 
   return (
-    <div class="bg-black">
+    <div class="bg-black min-h-screen">
       <NotAuthenticatedNotice />
 
       <Show when={auth.isAuthenticated()}>
@@ -66,11 +80,11 @@ export default function Panel() {
             I MIEI SERVER
           </h1>
           <p class="text-xl md:text-2xl text-violet-200/90 max-w-4xl mx-auto mb-10">
-            Gestisci i tuoi regni Hytale, personalizza i dettagli, carica il logo e mantieni il controllo totale.
+            Gestisci i tuoi regni, personalizza i dettagli e mantieni il controllo totale fra! 💪
           </p>
 
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={() => navigate("/servers/add")}
             class="
               inline-flex items-center gap-4 px-10 py-5 rounded-2xl text-xl font-bold
               bg-gradient-to-r from-violet-700 via-fuchsia-700 to-pink-700
@@ -91,30 +105,29 @@ export default function Panel() {
             shadow-2xl shadow-violet-950/40
           ">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
-             <div class="relative mb-3">
-              <img
-                src={
-                  auth.user()?.avatar
-                    ? `https://cdn.discordapp.com/avatars/${auth.user()?.id}/${auth.user()?.avatar}.png?size=256`
-                    : `https://cdn.discordapp.com/embed/avatars/0.png`
-                }
-                alt="Il tuo avatar Discord"
-                class="w-30 h-30 rounded-full object-cover border-4 border-zinc-700 shadow-lg"
-              />
+              <div class="relative mb-3">
+                <img
+                  src={
+                    auth.user()?.avatar
+                      ? `https://cdn.discordapp.com/avatars/${auth.user()?.id}/${auth.user()?.avatar}.png?size=256`
+                      : `https://cdn.discordapp.com/embed/avatars/0.png`
+                  }
+                  alt="Il tuo avatar Discord"
+                  class="w-30 h-30 rounded-full object-cover border-4 border-zinc-700 shadow-lg"
+                />
               </div>
-
 
               <div class="flex-1 text-center md:text-left">
                 <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-400 mb-3">
-                  {auth.user()?.username}
+                  {auth.user()?.global_name || auth.user()?.username}
                 </h2> 
                 <p class="text-xl text-violet-300/90 mb-2">@{auth.user()?.username || "username"}</p>
                 <div class="flex flex-wrap gap-6 text-lg text-zinc-300 mt-6">
                   <div>
-                    <span class="text-violet-400 font-bold">Server posseduti:</span> {servers?.length || 0}
+                    <span class="text-violet-400 font-bold">Server posseduti:</span> {servers().length}
                   </div>
                   <div>
-                    <span class="text-violet-400 font-bold">Registrato il:</span> {new Date().toLocaleDateString('it-IT')}
+                    <span class="text-violet-400 font-bold">Totale voti:</span> {servers().reduce((acc, s) => acc + (s.votes || 0), 0)}
                   </div>
                 </div>
               </div>
@@ -122,13 +135,20 @@ export default function Panel() {
           </div>
 
           {/* Lista server */}
-          <Suspense fallback={<div class="text-center py-20 text-violet-400 text-2xl">Caricamento dei tuoi regni...</div>}>
-            <Show when={servers().length} fallback={
-              <div class="text-center py-20 text-xl text-zinc-400 bg-black/40 rounded-2xl border border-violet-900/50 p-12">
-                Non hai ancora creato nessun server.<br />
-                <span class="text-violet-300">Clicca sopra per aggiungere il tuo primo regno Hytale!</span>
-              </div>
-            }>
+          <Suspense fallback={
+            <div class="text-center py-20 text-violet-400 text-2xl">
+              ⏳ Caricamento dei tuoi server...
+            </div>
+          }>
+            <Show 
+              when={!myServersData.loading && servers().length > 0} 
+              fallback={
+                <div class="text-center py-20 text-xl text-zinc-400 bg-black/40 rounded-2xl border border-violet-900/50 p-12">
+                  Non hai ancora creato nessun server bro!<br />
+                  <span class="text-violet-300">Clicca sopra per aggiungere il tuo primo server! 🚀</span>
+                </div>
+              }
+            >
               <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 <For each={servers()}>
                   {(server) => (
@@ -141,10 +161,10 @@ export default function Panel() {
                     "
                     >
                       {/* Logo / immagine server */}
-                      <div class="h-48 bg-gradient-to-br from-violet-900/40 to-black relative overflow-hidden"
-                    onclick={() => navigation.navigate(`/server/${server.name}`)}
-                    style={{cursor: "pointer"}}
-                           >
+                      <div 
+                        class="h-48 bg-gradient-to-br from-violet-900/40 to-black relative overflow-hidden cursor-pointer"
+                            onClick={() => navigate(`/server/${server.id}`)} // Usa ID non name!
+                      >
                         <Show when={server.logo_url}>
                           <img
                             src={server.logo_url}
@@ -153,8 +173,7 @@ export default function Panel() {
                           />
                         </Show>
                         <Show when={!server.logo_url}>
-                          <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-30" 
-                          >
+                          <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-30">
                             {server.name?.[0]?.toUpperCase() || "?"}
                           </div>
                         </Show>
@@ -183,40 +202,45 @@ export default function Panel() {
 
                         {/* Tags */}
                         <div class="flex flex-wrap gap-2 mb-6">
-                          <For each={StringArrayUtils.toArray(server.tags)}>
+                          <For each={StringArrayUtils.toArray(server.tags).slice(0, 5)}>
                             {(tag) => (
                               <span class="
                                 px-3 py-1 text-xs rounded-full
                                 bg-violet-900/60 text-violet-200 border border-violet-700/40
                               ">
-                                {tag}
+                                #{tag}
                               </span>
                             )}
                           </For>
                           <Show when={StringArrayUtils.toArray(server.tags).length > 5}>
-                            <span class="text-xs text-violet-400">+{StringArrayUtils.toArray(server.tags).length - 5}</span>
+                            <span class="text-xs text-violet-400">
+                              +{StringArrayUtils.toArray(server.tags).length - 5}
+                            </span>
                           </Show>
                         </div>
 
-                        {/* Statistiche placeholder */}
+                        {/* Statistiche */}
                         <div class="grid grid-cols-3 gap-4 text-center text-sm mb-6">
                           <div>
-                            <div class="text-emerald-400 font-bold">Giocatori</div>
-                            <div>{server.players_online ?? "?"} / {server.max_players ?? "?"}</div>
+                            <div class="text-emerald-400 font-bold">Online</div>
+                            <div class="text-zinc-300">
+                              {server.players_online ?? "?"}/{server.max_players ?? "?"}
+                            </div>
                           </div>
                           <div>
                             <div class="text-fuchsia-400 font-bold">Voti</div>
-                            <div>{server.votes ?? 0}</div>
+                            <div class="text-zinc-300">{server.votes ?? 0}</div>
                           </div>
                           <div>
-                            <div class="text-violet-400 font-bold">Creato</div>
-                            <div>{new Date(server.created_at).toLocaleDateString('it-IT', { month: 'short', year: 'numeric' })}</div>
+                            <div class="text-violet-400 font-bold">Ruolo</div>
+                            <div class="text-zinc-300 capitalize">{server.role || "owner"}</div>
                           </div>
                         </div>
 
-                        <div class="mt-4 pt-4 border-t border-violet-800/40 m-2">
-                          <p class="text-xs text-violet-400 mb-2 flex items-center gap-2 ">
-                            <span>🔑 Secret Key (per il plugin)</span>
+                        {/* Secret Key */}
+                        <div class="mt-4 pt-4 border-t border-violet-800/40">
+                          <p class="text-xs text-violet-400 mb-2 flex items-center gap-2">
+                            <span>🔑</span> Secret Key (per il plugin)
                           </p>
                           <div class="flex items-center gap-2 bg-black/70 rounded-lg p-2.5 border border-violet-800/50">
                             <code class="flex-1 font-mono text-emerald-300/90 text-xs break-all select-all">
@@ -225,7 +249,7 @@ export default function Panel() {
                             <button
                               onClick={() => {
                                 navigator.clipboard.writeText(server.secret_key);
-                                notify("Copiata!", "success");
+                                notify("Copiata bro! 📋", "success");
                               }}
                               class="p-1.5 rounded hover:bg-violet-900/80 transition-colors"
                             >
@@ -235,12 +259,9 @@ export default function Panel() {
                         </div>
 
                         {/* Pulsanti azioni */}
-                        <div class="flex gap-4">
+                        <div class="flex gap-4 mt-6"> 
                           <button
-                            onClick={() => {
-                              setSelectedServer(server);
-                              setEditModalOpen(true);
-                            }}
+                            onClick={() => navigate(`/servers/edit/${server.id}`)} // Usa ID non name!
                             class="
                               flex-1 py-3 px-6 rounded-xl text-base font-semibold
                               bg-gradient-to-r from-violet-800 to-fuchsia-800
@@ -249,7 +270,7 @@ export default function Panel() {
                               transition-all duration-300 active:scale-95 shadow-md
                             "
                           >
-                            Modifica
+                            ✏️ Modifica
                           </button>
 
                           <button
@@ -265,7 +286,7 @@ export default function Panel() {
                               transition-all duration-300 active:scale-95 shadow-md
                             "
                           >
-                            Elimina
+                            🗑️ Elimina
                           </button>
                         </div>
                       </div>
@@ -277,19 +298,7 @@ export default function Panel() {
           </Suspense>
         </div>
 
-        {/* Modali */}
-        <AddServerModal
-          isOpen={isAddModalOpen()}
-          onClose={() => setIsAddModalOpen(false)}
-        />
-
-        <EditServerModal
-          isOpen={editModalOpen()}
-          server={selectedServer()}
-          onClose={() => setEditModalOpen(false)}
-          onSubmit={handleUpdateServer}
-        />
-
+        {/* Modal conferma eliminazione */}
         <ConfirmDeleteModal
           isOpen={deleteModalOpen()}
           serverName={selectedServer()?.name || ""}

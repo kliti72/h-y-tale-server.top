@@ -22,6 +22,19 @@ export function initDatabaseSchema(db: Database) {
     )
     `)
 
+       db.run(`
+        CREATE TABLE IF NOT EXISTS server_stats (
+            server_id           BIGINT PRIMARY KEY REFERENCES servers(id) ON DELETE CASCADE,
+            players_online      INTEGER NOT NULL DEFAULT 0,
+            players_max         INTEGER NOT NULL DEFAULT 0,
+            is_online           BOOLEAN NOT NULL DEFAULT FALSE,
+            version             VARCHAR(80),
+            motd                TEXT,
+            latency_ms          INTEGER,
+            last_updated        TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        );
+    `)
+
     db.run(`
     CREATE TABLE IF NOT EXISTS votes (
         id              INTEGER PRIMARY KEY AUTOINCREMENT,

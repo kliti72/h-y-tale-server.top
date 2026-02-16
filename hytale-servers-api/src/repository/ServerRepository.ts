@@ -1,5 +1,5 @@
 import { Database } from 'bun:sqlite';
-import { type ServerResponse } from '../types/types';
+import { type ServerResponse, type ServerStatus } from '../types/types';
 
 export class ServerRepository {
 
@@ -121,7 +121,7 @@ export class ServerRepository {
 
   }
 
-   public static getById(id: number, db: Database) {
+  public static getById(id: number, db: Database) {
     const SEARCH_SERVER_BY_SECRET = `SELECT * FROM servers WHERE id = ?`
 
     const stmt = db.prepare(SEARCH_SERVER_BY_SECRET);
@@ -131,5 +131,271 @@ export class ServerRepository {
 
   }
 
-  
+  static isUserOwner(db: Database, serverId: number, userId: string): boolean {
+    const serverIdNum = typeof serverId === 'string' ? parseInt(serverId) : serverId;
+
+    const stmt = db.prepare(`
+    SELECT discord_user_id
+    FROM server_owners  
+    WHERE server_id = ? AND discord_user_id = ? AND role = 'owner'
+    `);
+
+    const result = stmt.get(serverIdNum, userId);
+    const isOwner = result !== null && result !== undefined;
+    return isOwner;
+  }
+
+  /**
+   * Update server
+   */
+  static update(
+    db: Database,
+    serverId: number,
+    data: {
+      name: string;
+      ip: string;
+      port: string;
+      tags: string;
+      description: string;
+      website_url: string;
+      discord_url: string;
+      banner_url: string;
+      logo_url: string;
+      rules: string;
+      secret_key?: string;
+    }
+  ): ServerResponse {
+    // Converti array tags in stringa
+
+    const stmt = db.prepare(`
+      UPDATE servers 
+      SET 
+        name = ?,
+        ip = ?,
+        port = ?,
+        tags = ?,
+        description = ?,
+        website_url = ?,
+        discord_url = ?,
+        banner_url = ?,
+        logo_url = ?,
+        rules = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `);
+
+    stmt.run(
+      data.name,
+      data.ip,
+      data.port,
+      data.tags,
+      data.description,
+      data.website_url,
+      data.discord_url,
+      data.banner_url,
+      data.logo_url,
+      data.rules,
+      serverId
+    );
+
+    // Ritorna il server aggiornato
+    const updatedServer = this.getById(serverId, db);
+
+    if (!updatedServer) {
+      throw new Error("Server non trovato dopo l'update!");
+    }
+
+    return updatedServer;
+  }
+
+  /**
+   * Delete server
+   */
+  static delete(db: Database, serverId: number): void {
+    const stmt = db.prepare(`
+      DELETE FROM servers WHERE id = ?
+    `);
+
+    stmt.run(serverId);
+
+    console.log(`Server ${serverId} eliminato dal database`);
+  }
+
+
+
+  // ... continua dentro la classe ServerRepository
+
+  // ───────────────────────────────────────────────
+  //           METODI PER server_stats
+  // ───────────────────────────────────────────────
+
+  /**
+   * Crea o aggiorna lo status attuale di un server
+   * (UPSERT: se esiste già per quel server_id, aggiorna, altrimenti inserisce)
+   */
+  static upsertServerStatus(
+    db: Database,
+    data: Omit<ServerStatus, 'id' | 'last_updated'>
+  ): ServerStatus {
+    const UPSERT_SQL = `
+    INSERT INTO server_stats (
+      server_id, players_online, players_max, is_online,
+      version_name, version_protocol, motd, latency_ms,
+      software_type, last_ping_error, last_updated
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT(server_id) DO UPDATE SET
+      players_online      = excluded.players_online,
+      players_max         = excluded.players_max,
+      is_online           = excluded.is_online,
+      version_name        = excluded.version_name,
+      version_protocol    = excluded.version_protocol,
+      motd                = excluded.motd,
+      latency_ms          = excluded.latency_ms,
+      software_type       = excluded.software_type,
+      last_ping_error     = excluded.last_ping_error,
+      last_updated        = CURRENT_TIMESTAMP
+    RETURNING *
+  `;
+
+    const stmt = db.prepare(UPSERT_SQL);
+
+    const row = stmt.get(
+      data.server_id,
+      data.players_online,
+      data.players_max,
+      data.is_online ? 1 : 0,           // SQLite vuole 1/0 per boolean
+      data.version_name ?? null,
+      data.version_protocol ?? null,
+      data.motd ?? null,
+      data.latency_ms ?? null,
+      data.software_type ?? null,
+      data.last_ping_error ?? null
+    ) as ServerStatus | undefined;
+
+    if (!row) {
+      throw new Error(`Impossibile aggiornare/creare status per server ${data.server_id}`);
+    }
+
+    return row;
+  }
+
+  /**
+   * Ottiene lo status più recente di un server
+   */
+  static getLatestStatus(db: Database, serverId: number): ServerStatus | null {
+    const row = db
+      .prepare('SELECT * FROM server_stats WHERE server_id = ? ORDER BY last_updated DESC LIMIT 1')
+      .get(serverId) as ServerStatus | undefined;
+
+    return row ?? null;
+  }
+
+  /**
+   * Ottiene lo status di tutti i server (ultimo per ognuno)
+   * Utile per la lista principale "/servers"
+   */
+  static getAllLatestStatuses(db: Database): (ServerResponse & { status: ServerStatus | null })[] {
+    const rows = db.prepare(`
+    SELECT 
+      s.*,
+      st.players_online,
+      st.players_max,
+      st.is_online,
+      st.version_name,
+      st.motd,
+      st.latency_ms,
+      st.last_updated
+    FROM servers s
+    LEFT JOIN (
+      SELECT *
+      FROM server_stats
+      WHERE (server_id, last_updated) IN (
+        SELECT server_id, MAX(last_updated)
+        FROM server_stats
+        GROUP BY server_id
+      )
+    ) st ON s.id = st.server_id
+    ORDER BY st.players_online DESC, s.name
+  `).all() as any[];
+
+    return rows.map(row => ({
+      ...row,
+      status: row.players_online !== undefined ? {
+        server_id: row.id,
+        players_online: row.players_online,
+        players_max: row.players_max,
+        is_online: !!row.is_online,
+        version_name: row.version_name,
+        motd: row.motd,
+        latency_ms: row.latency_ms,
+        last_updated: row.last_updated
+      } : null
+    }));
+  }
+
+  /**
+   * Elimina lo status di un server (es. quando elimini il server)
+   */
+  static deleteStatus(db: Database, serverId: number): boolean {
+    const result = db
+      .prepare('DELETE FROM server_stats WHERE server_id = ?')
+      .run(serverId);
+
+    return result.changes > 0;
+  }
+
+  /**
+   * Ottiene gli ultimi N aggiornamenti di status di un server
+   * (utile per grafico storico / uptime)
+   */
+  static getStatusHistory(
+    db: Database,
+    serverId: number,
+    limit: number = 50
+  ): ServerStatus[] {
+    const rows = db
+      .prepare('SELECT * FROM server_stats WHERE server_id = ? ORDER BY last_updated DESC LIMIT ?')
+      .all(serverId, limit) as ServerStatus[];
+
+    return rows;
+  }
+
+  /**
+   * Conta quanti server sono attualmente online
+   * (utile per statistiche in homepage)
+   */
+  static countOnlineServers(db: Database): number {
+    const row = db
+      .prepare('SELECT COUNT(*) as count FROM server_stats WHERE is_online = 1')
+      .get() as { count: number };
+
+    return row.count;
+  }
+
+  /**
+   * Ottiene i server più popolati al momento
+   */
+  static getTopPopulated(db: Database, limit: number = 10): (ServerResponse & { status: ServerStatus })[] {
+    const rows = db.prepare(`
+    SELECT s.*, st.*
+    FROM servers s
+    INNER JOIN server_stats st ON s.id = st.server_id
+    WHERE st.is_online = 1
+    ORDER BY st.players_online DESC
+    LIMIT ?
+  `).all(limit) as any[];
+
+    return rows.map(row => ({
+      ...row,
+      status: {
+        server_id: row.server_id,
+        players_online: row.players_online,
+        players_max: row.players_max,
+        is_online: !!row.is_online,
+        // ... altri campi se li hai selezionati
+      }
+    }));
+  }
+
+
 }

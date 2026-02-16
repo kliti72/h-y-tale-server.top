@@ -95,7 +95,7 @@ const Header: Component = () => {
             {[
               { path: "/", label: "Home", icon: "🏠" },
               { path: "/servers", label: "Server", icon: "🎮" },
-              { path: "/top", label: "Top Server", icon: "🏆" },
+              { path: "/leaderboard", label: "Top Server", icon: "🏆" },
               { path: "/forum", label: "Forum", icon: "💬" },
               { path: "/earn", label: "Earn", icon: "💸" },
               { path: "/premium", label: "Premium", icon: "🌟" },
@@ -362,7 +362,7 @@ const Header: Component = () => {
             {[
               { path: "/", label: "Home", icon: "🏠" },
               { path: "/servers", label: "Server", icon: "🎮" },
-              { path: "/top", label: "Top Server", icon: "🏆" },
+              { path: "/leaderboard", label: "Top Server", icon: "🏆" },
               { path: "/forum", label: "Forum", icon: "💬" },
               { path: "/events", label: "Eventi", icon: "🎉" },
             ].map((item) =>

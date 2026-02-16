@@ -16,7 +16,8 @@ import Home from './pages/Home';
 import GuidesPage from './pages/Guide';
 import Contatti from './pages/Contatti';
 import PrivacyPolicy from './pages/PrivacyPolicy';
-
+import { ServerEditWrapper} from './component/modal/ServerEditWrapper';
+import { ServerAddWrapper } from './component/modal/ServerAddWrapper';
 function App() {
   return (
     <Router
@@ -29,8 +30,10 @@ function App() {
       )}
     >
       <Route path="/" component={Home} />
-      <Route path="/top" component={Leaderboard} />
+      <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/servers" component={ServerBoard} />
+      <Route path="/servers/add" component={ServerAddWrapper} />
+      <Route path="/servers/edit/:id" component={ServerEditWrapper} />
       <Route path="/forum" component={Forum} />
       <Route path="/panel" component={Panel} />
       <Route path="/server/:name" component={ServerDetail} />

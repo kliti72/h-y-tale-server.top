@@ -87,7 +87,7 @@ const Footer: Component = () => {
             <h4 class="text-lg font-semibold text-emerald-300">Esplora</h4>
             <ul class="space-y-2.5">
               <li><A href="/servers" class="hover:text-emerald-300 transition">Server</A></li>
-              <li><A href="/top" class="hover:text-emerald-300 transition">Top Votati</A></li>
+              <li><A href="/leaderboard" class="hover:text-emerald-300 transition">Top Votati</A></li>
               <li><A href="/forum" class="hover:text-emerald-300 transition">Forum</A></li>
               <li><A href="/guide" class="hover:text-emerald-300 transition">Guide Hytale</A></li>
             </ul>

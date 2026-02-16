@@ -110,7 +110,7 @@ const Docs: Component = () => {
 
       <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex gap-8">
-          
+
           {/* Sidebar Navigation */}
           <aside class="hidden lg:block w-64 flex-shrink-0">
             <div class="sticky top-24 space-y-2">
@@ -126,6 +126,7 @@ const Docs: Component = () => {
                           : "text-violet-300 hover:bg-violet-950/40 hover:text-white"}
                       `}
                     >
+                      
                       <span class="text-xl">{section.icon}</span>
                       <span>{section.title}</span>
                     </button>
@@ -167,7 +168,13 @@ const Docs: Component = () => {
                   </h1>
                   <p class="text-xl text-violet-200 mb-6">
                     Benvenuto nella documentazione completa di H-YTALE.top! Qui troverai tutte le informazioni 
-                    necessarie per integrare il tuo server Minecraft con la nostra piattaforma.
+                    necessarie per integrare il tuo server Minecraft con la nostra piattaforma. <br> </br>
+                              Endpoint,Metodo,Descrizione,Esempio chiamata <br> </br>
+/api/servers/status/:serverId,GET,Status attuale singolo server,/api/servers/status/42 <br> </br>
+/api/servers/status,GET,Status di tutti i server,/api/servers/status <br> </br>
+/api/servers/status/ping,POST,Aggiorna status (dal ping bot),"body: secret_key: ""..."", players_online: 87, ... " <br> </br>
+/api/servers/top-populated,GET,Top 10 server più popolati,/api/servers/top-populated?limit=5 <br> </br>
+/api/servers/online-count,GET,Conteggio server online,/api/servers/online-count <br> </br>
                   </p>
 
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">

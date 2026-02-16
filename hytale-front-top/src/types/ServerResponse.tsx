@@ -20,4 +20,5 @@ export type ServerResponse = {
     rules?: string,
     secret_key: string,
     role?: string,
+    updated_at?: string
 }

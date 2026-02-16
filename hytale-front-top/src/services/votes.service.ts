@@ -77,6 +77,20 @@ export class VoteService {
         
     }
 
+    static async getVote(): Promise<Vote> {
+        try {
+            const res = await fetch(`${VoteService.baseUrl}/vote`, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+            });
+            return await res.json();
+        } catch (err) {
+            throw new Error(`[VoteService] Errore durante aviableVote: ${err}`);
+        }
+        
+    }
+
 
 
 }
