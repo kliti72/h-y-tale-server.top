@@ -10,6 +10,11 @@ export function initDatabaseSchema(db: Database) {
         ip TEXT NOT NULL,
         port TEXT NOT NULL,
         tags TEXT DEFAULT '',
+        website_url TEXT DEFAULT '',
+        discord_url TEXT DEFAULT '',
+        banner_url TEXT DEFAULT '',
+        logo_url TEXT DEFAULT '',
+        rules TEXT DEFAULT '',
         secret_key  TEXT NOT NULL,
         created_at TEXT DEFAULT (datetime('now')),
         updated_at  TEXT DEFAULT (datetime('now'))

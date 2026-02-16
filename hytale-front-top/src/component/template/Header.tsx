@@ -97,6 +97,8 @@ const Header: Component = () => {
               { path: "/servers", label: "Server", icon: "🎮" },
               { path: "/top", label: "Top Server", icon: "🏆" },
               { path: "/forum", label: "Forum", icon: "💬" },
+              { path: "/earn", label: "Earn", icon: "💸" },
+              { path: "/premium", label: "Premium", icon: "🌟" },
               { path: "/plugin", label: "Docs", icon: "🕮" },
             ].map((item) =>
               (true) ? (

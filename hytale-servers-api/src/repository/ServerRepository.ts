@@ -6,17 +6,11 @@ export interface Server {
   ip: string;
   port: string;
   tags?: string[];
-  secret_key?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface ServerAdmin {
-  id?: number;
-  name: string;
-  ip: string;
-  port: string;
-  tags?: string[];
+  website?: string;
+  discord?: string;
+  banner?: string;
+  logo_url?: string;
+  rules?: string;
   secret_key?: string;
   created_at?: string;
   updated_at?: string;
@@ -26,8 +20,8 @@ export interface ServerAdmin {
 export class ServerRepository {
 
   private static readonly INSERT_SQL = `
-    INSERT INTO servers (name, ip, port, tags, secret_key, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO servers (name, ip, port, tags, website_url, discord_url, banner_url, logo_url, rules, secret_key, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     RETURNING *
   `;
 
@@ -35,6 +29,7 @@ export class ServerRepository {
     console.log("Metodo put chiamato");
     // Convertiamo tags in stringa
     let tagsString: string;
+
     if (Array.isArray(data.tags)) {
       tagsString = data.tags.join(',');           // "pvp,survival,italia"
     } else if (typeof data.tags === 'string') {
@@ -51,6 +46,11 @@ export class ServerRepository {
       data.ip,
       data.port,
       tagsString,
+      data.website ?? '',
+      data.discord ?? '',
+      data.banner ?? '',
+      data.logo_url ?? '',
+      data.rules ?? '',
       data.secret_key ?? '',
       data.created_at ?? '',
       data.updated_at ?? '',

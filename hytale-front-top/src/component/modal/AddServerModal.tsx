@@ -12,6 +12,7 @@ type AddServerModalProps = {
     version: string;
     description: string;
     tags: string[];
+    logo_url?: string,
     website?: string;
     discord?: string;
     banner?: string;
@@ -36,6 +37,7 @@ const AddServerModal: Component<AddServerModalProps> = (props) => {
   const [discord, setDiscord] = createSignal("");
   
   // Media
+  const [logoUrl, setLogoUrl] = createSignal("");
   const [bannerUrl, setBannerUrl] = createSignal("");
   
   // Regole
@@ -95,6 +97,7 @@ const AddServerModal: Component<AddServerModalProps> = (props) => {
       website: website() || undefined,
       discord: discord() || undefined,
       banner: bannerUrl() || undefined,
+      logo_url: logoUrl() || undefined,
       rules: rules() || undefined,
     });
 
@@ -112,6 +115,7 @@ const AddServerModal: Component<AddServerModalProps> = (props) => {
     setWebsite("");
     setDiscord("");
     setBannerUrl("");
+    setLogoUrl("");
     setRules("");
     setCurrentStep(1);
   };
@@ -265,31 +269,7 @@ const AddServerModal: Component<AddServerModalProps> = (props) => {
                   </div>
                 </div>
 
-                {/* Versione */}
-                <div>
-                  <label class="block text-violet-300 font-semibold mb-2 flex items-center gap-2">
-                    <span>🎮</span> Versione Minecraft *
-                  </label>
-                  <select
-                    value={version()}
-                    onChange={(e) => setVersion(e.currentTarget.value)}
-                    class="
-                      w-full px-6 py-4 bg-black/60 border-2 border-violet-700/50 
-                      rounded-xl text-white text-lg
-                      focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/30
-                      transition-all duration-200
-                    "
-                  >
-                    <option value="1.20.4">1.20.4 (Latest)</option>
-                    <option value="1.20.1">1.20.1</option>
-                    <option value="1.19.4">1.19.4</option>
-                    <option value="1.19.2">1.19.2</option>
-                    <option value="1.18.2">1.18.2</option>
-                    <option value="1.16.5">1.16.5</option>
-                    <option value="1.12.2">1.12.2</option>
-                    <option value="Multi">Multi-Version</option>
-                  </select>
-                </div>
+               
 
                 {/* Descrizione */}
                 <div>
@@ -445,6 +425,41 @@ const AddServerModal: Component<AddServerModalProps> = (props) => {
                       "
                     />
                   </div>
+                </div>
+
+ {/* Banner */}
+                <div>
+                  <label class="block text-violet-300 font-semibold mb-2 flex items-center gap-2">
+                    <span>🖼️</span> Logo Url (opzionale..)
+                  </label>
+                  <input
+                    type="url"
+                    value={logoUrl()}
+                    onInput={(e) => setLogoUrl(e.currentTarget.value)}
+                    placeholder="https://example.com/logo.png"
+                    class="
+                      w-full px-6 py-4 bg-black/60 border-2 border-violet-700/50 
+                      rounded-xl text-white placeholder-violet-400
+                      focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/30
+                      transition-all duration-200
+                    "
+                  />
+                  <p class="text-xs text-violet-400 mt-2">
+                    Consigliato: 1200x400px, formato JPG o PNG
+                  </p>
+                  
+                  <Show when={logoUrl()}>
+                    <div class="mt-4 border-2 border-violet-700/50 rounded-xl overflow-hidden">
+                      <img 
+                        src={logoUrl()} 
+                        alt="Preview Banner" 
+                        class="w-full h-48 object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  </Show>
                 </div>
 
                 {/* Banner */}

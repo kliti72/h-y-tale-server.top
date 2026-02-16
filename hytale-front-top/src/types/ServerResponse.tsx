@@ -6,6 +6,10 @@ export type ServerResponse = {
     port?: string,
     tags: string,
     logoUrl?: string
+    discord_url?: string,
+    banner_url?: string,
+    logo_url?: string,
+    rules?: string,
     secret_key: string,
 
 }

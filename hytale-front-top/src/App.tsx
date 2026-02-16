@@ -9,10 +9,11 @@ import VotePlugin from './pages/VotePlugin';
 import Forum from './pages/Forum';
 import Panel from './pages/Panel';
 import Leaderboard from './pages/Leaderboard';
-import ServerBoard from './pages/Top';
+import ServerBoard from './pages/ServerBoard';
 import Docs from './pages/VotePlugin';
 import Earn from './pages/Earn';
 import Premium from './pages/Premium';
+import ProfileEarnings from './pages/Profile';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
       <Route path="/plugin" component={Docs} />
       <Route path="/earn" component={Earn} />
       <Route path="/premium" component={Premium} />
+      <Route path="/profile" component={ProfileEarnings} />
       <Route path="*" component={NotFound} />
     </Router>
   );

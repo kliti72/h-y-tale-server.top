@@ -51,6 +51,12 @@ export function registerServerRoutes(
       ip: t.String(),
       port: t.String(),
       tags: t.Array(t.String()),
+      website: t.String(),
+      discord: t.String(),
+      banner: t.String(),
+      logo_url: t.String(),
+      rules: t.String()
+
     })
   });
 
