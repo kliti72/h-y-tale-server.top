@@ -1,0 +1,500 @@
+import { Component, createSignal, For, Show, createMemo, onMount } from "solid-js";
+import { A } from "@solidjs/router";
+import { createResource } from "solid-js";
+import { ServerService } from "../services/server.service";
+import { ServerResponse } from "../types/ServerResponse";
+
+// Types per le classifiche
+type LeaderboardPeriod = "today" | "week" | "month" | "alltime";
+type LeaderboardType = "votes" | "players" | "trending" | "new";
+
+type ServerRanking = {
+  rank: number;
+  server: ServerResponse;
+  value: number;
+  change: number; // +/- posizioni rispetto al periodo precedente
+  trend: "up" | "down" | "same";
+};
+
+const Leaderboard: Component = () => {
+  const [selectedPeriod, setSelectedPeriod] = createSignal<LeaderboardPeriod>("week");
+  const [selectedType, setSelectedType] = createSignal<LeaderboardType>("votes");
+  const [searchQuery, setSearchQuery] = createSignal("");
+  
+  const [servers] = createResource(() => ServerService.getServers());
+
+  // Stats animate
+  const [totalVotes, setTotalVotes] = createSignal(0);
+  const [totalServers, setTotalServers] = createSignal(0);
+  const [activeNow, setActiveNow] = createSignal(0);
+
+  onMount(() => {
+    // Animazione contatori
+    let count = 0;
+    const interval = setInterval(() => {
+      count += 1;
+      setTotalVotes(Math.min(count * 127, 12784));
+      setTotalServers(Math.min(count * 2, 247));
+      setActiveNow(Math.min(count * 3, 342));
+      if (count >= 100) clearInterval(interval);
+    }, 15);
+  });
+
+  // Mock data per le classifiche (sostituisci con dati reali)
+  const generateRankings = (): ServerRanking[] => {
+    const serverData = servers()?.data || [];
+    
+    return serverData.slice(0, 50).map((server, index) => {
+      // Mock values basati sul tipo di classifica
+      let value = 0;
+      if (selectedType() === "votes") {
+        value = server.votes || Math.floor(Math.random() * 1000);
+      } else if (selectedType() === "players") {
+        value = Math.floor(Math.random() * 200);
+      } else if (selectedType() === "trending") {
+        value = Math.floor(Math.random() * 500);
+      } else {
+        value = Math.floor(Math.random() * 100);
+      }
+
+      const change = Math.floor(Math.random() * 10) - 5;
+      const trend: "up" | "down" | "same" = change > 0 ? "up" : change < 0 ? "down" : "same";
+
+      return {
+        rank: index + 1,
+        server,
+        value,
+        change: Math.abs(change),
+        trend
+      };
+    }).sort((a, b) => b.value - a.value);
+  };
+
+  const rankings = createMemo(() => {
+    let data = generateRankings();
+    
+    // Filtro ricerca
+    const query = searchQuery().toLowerCase().trim();
+    if (query) {
+      data = data.filter(r => 
+        r.server.name.toLowerCase().includes(query) ||
+        r.server.ip.toLowerCase().includes(query)
+      );
+    }
+
+    return data;
+  });
+
+  const periods = [
+    { id: "today" as const, label: "Oggi", icon: "📅" },
+    { id: "week" as const, label: "Settimana", icon: "📊" },
+    { id: "month" as const, label: "Mese", icon: "📈" },
+    { id: "alltime" as const, label: "Sempre", icon: "🏆" }
+  ];
+
+  const types = [
+    { id: "votes" as const, label: "Top Voti", icon: "🔥", desc: "Server più votati" },
+    { id: "players" as const, label: "Top Player", icon: "👥", desc: "Server con più giocatori" },
+    { id: "trending" as const, label: "Trending", icon: "📈", desc: "Server in crescita" },
+    { id: "new" as const, label: "Nuovi", icon: "🆕", desc: "Server appena aggiunti" }
+  ];
+
+  const getMedalEmoji = (rank: number) => {
+    if (rank === 1) return "🥇";
+    if (rank === 2) return "🥈";
+    if (rank === 3) return "🥉";
+    return `#${rank}`;
+  };
+
+  const getRankColor = (rank: number) => {
+    if (rank === 1) return "from-yellow-500 to-amber-500";
+    if (rank === 2) return "from-gray-300 to-gray-400";
+    if (rank === 3) return "from-amber-600 to-orange-700";
+    return "from-violet-600 to-purple-600";
+  };
+
+  const getValueLabel = () => {
+    switch (selectedType()) {
+      case "votes": return "voti";
+      case "players": return "player";
+      case "trending": return "punti";
+      case "new": return "giorni fa";
+    }
+  };
+
+  return (
+    <div class="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-purple-950 text-white">
+      
+      {/* Hero Section */}
+      <div class="relative overflow-hidden bg-black/40 border-b border-violet-900/50">
+        {/* Particelle di sfondo */}
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+          <div class="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl -top-20 -left-20 animate-pulse" />
+          <div class="absolute w-96 h-96 bg-fuchsia-500/20 rounded-full blur-3xl -bottom-20 -right-20 animate-pulse delay-700" />
+          <div class="absolute w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl top-1/2 left-1/2 animate-pulse delay-1000" />
+        </div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h1 class="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-violet-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent">
+            🏆 CLASSIFICHE SERVER
+          </h1>
+          <p class="text-xl md:text-2xl text-violet-200 max-w-3xl mx-auto mb-8">
+            Scopri i server più votati, popolati e in crescita della community!
+          </p>
+
+          
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        {/* Controls Section */}
+        <div class="bg-gradient-to-br from-gray-900/90 to-black/90 rounded-2xl p-6 md:p-8 mb-8 border border-violet-900/50 backdrop-blur-md">
+          
+          {/* Type Selection */}
+          <div class="mb-8">
+            <h3 class="text-2xl font-bold text-fuchsia-400 mb-4 flex items-center gap-2">
+              <span>📊</span> Tipo di Classifica
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <For each={types}>
+                {(type) => (
+                  <button
+                    onClick={() => setSelectedType(type.id)}
+                    class={`
+                      group relative overflow-hidden p-6 rounded-xl border-2 transition-all duration-300
+                      ${selectedType() === type.id
+                        ? "bg-gradient-to-br from-violet-600/30 to-fuchsia-600/30 border-fuchsia-500 scale-105 shadow-lg shadow-fuchsia-900/50"
+                        : "bg-violet-950/30 border-violet-800/30 hover:border-violet-600/50 hover:bg-violet-900/40"
+                      }
+                    `}
+                  >
+                    <div class="relative z-10">
+                      <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">
+                        {type.icon}
+                      </div>
+                      <h4 class="font-bold text-white text-lg mb-1">{type.label}</h4>
+                      <p class="text-sm text-violet-300">{type.desc}</p>
+                    </div>
+                    
+                    {selectedType() === type.id && (
+                      <div class="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 animate-pulse" />
+                    )}
+                  </button>
+                )}
+              </For>
+            </div>
+          </div>
+
+          {/* Period & Search */}
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            
+            {/* Period Tabs */}
+            <div class="flex flex-wrap gap-2">
+              <For each={periods}>
+                {(period) => (
+                  <button
+                    onClick={() => setSelectedPeriod(period.id)}
+                    class={`
+                      flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all
+                      ${selectedPeriod() === period.id
+                        ? "bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white shadow-lg shadow-fuchsia-900/50"
+                        : "bg-violet-950/60 text-violet-300 hover:bg-violet-900/80 border border-violet-700/30"
+                      }
+                    `}
+                  >
+                    <span class="text-xl">{period.icon}</span>
+                    <span>{period.label}</span>
+                  </button>
+                )}
+              </For>
+            </div>
+
+            {/* Search */}
+            <div class="relative w-full md:w-80">
+              <input
+                type="text"
+                placeholder="Cerca server..."
+                value={searchQuery()}
+                onInput={(e) => setSearchQuery(e.currentTarget.value)}
+                class="
+                  w-full px-6 py-3 pl-12 bg-black/60 border-2 border-violet-700/50 
+                  rounded-xl text-white placeholder-violet-400
+                  focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/30
+                  transition-all duration-200
+                "
+              />
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl">🔍</span>
+              <Show when={searchQuery()}>
+                <button 
+                  onClick={() => setSearchQuery("")}
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-violet-400 hover:text-red-400"
+                >
+                  ✕
+                </button>
+              </Show>
+            </div>
+          </div>
+        </div>
+
+        {/* Leaderboard Table */}
+        <Show 
+          when={rankings().length > 0}
+          fallback={
+            <div class="bg-gradient-to-br from-gray-900/90 to-black/90 rounded-2xl p-12 border border-violet-900/50 text-center">
+              <div class="text-6xl mb-4">🔍</div>
+              <h3 class="text-2xl font-bold text-white mb-2">Nessun server trovato</h3>
+              <p class="text-violet-300">Prova a modificare i filtri o la ricerca</p>
+            </div>
+          }
+        >
+          <div class="space-y-4">
+            
+            {/* Top 3 - Cards Speciali */}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <For each={rankings().slice(0, 3)}>
+                {(ranking) => (
+                  <div class={`
+                    relative overflow-hidden rounded-2xl 
+                    bg-gradient-to-br ${getRankColor(ranking.rank)} p-1
+                    hover:scale-105 transition-transform duration-300
+                    ${ranking.rank === 1 ? "md:col-span-3 md:row-start-1" : ""}
+                  `}>
+                    <div class="bg-gray-900/95 backdrop-blur-sm rounded-2xl p-6 h-full">
+                      
+                      {/* Medal */}
+                      <div class="flex items-start justify-between mb-4">
+                        <div class={`
+                          text-6xl ${ranking.rank === 1 ? "animate-bounce" : ""}
+                        `}>
+                          {getMedalEmoji(ranking.rank)}
+                        </div>
+                        
+                        {/* Trend */}
+                        <Show when={ranking.trend !== "same"}>
+                          <div class={`
+                            flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold
+                            ${ranking.trend === "up" ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"}
+                          `}>
+                            <span>{ranking.trend === "up" ? "↑" : "↓"}</span>
+                            {ranking.change}
+                          </div>
+                        </Show>
+                      </div>
+
+                      <A 
+                        href={`/server/${ranking.server.name}`}
+                        class="group"
+                      >
+                        <h3 class="text-2xl font-black text-white mb-2 group-hover:text-fuchsia-300 transition-colors">
+                          {ranking.server.name}
+                        </h3>
+                      </A>
+
+                      <div class="flex items-center gap-2 text-violet-300 mb-4 font-mono text-sm">
+                        <span>🌐</span>
+                        {ranking.server.ip}
+                      </div>
+
+                      <div class="flex items-center justify-between pt-4 border-t border-violet-800/30">
+                        <div>
+                          <div class="text-3xl font-black text-white">
+                            {ranking.value.toLocaleString()}
+                          </div>
+                          <div class="text-sm text-violet-400">{getValueLabel()}</div>
+                        </div>
+
+                        <A
+                          href={`/server/${ranking.server.name}`}
+                          class="
+                            px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600
+                            hover:from-violet-500 hover:to-fuchsia-500
+                            rounded-xl font-bold shadow-lg
+                            transition-all
+                          "
+                        >
+                          Visita →
+                        </A>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </For>
+            </div>
+
+            {/* Rest of Rankings - List */}
+            <div class="bg-gradient-to-br from-gray-900/90 to-black/90 rounded-2xl overflow-hidden border border-violet-900/50 backdrop-blur-md">
+              
+              {/* Table Header */}
+              <div class="bg-violet-950/50 border-b border-violet-800/50 px-6 py-4 hidden md:grid md:grid-cols-12 gap-4 text-sm font-semibold text-violet-300">
+                <div class="col-span-1">Pos.</div>
+                <div class="col-span-1">Trend</div>
+                <div class="col-span-5">Server</div>
+                <div class="col-span-2 text-center">{getValueLabel().charAt(0).toUpperCase() + getValueLabel().slice(1)}</div>
+                <div class="col-span-3 text-right">Azioni</div>
+              </div>
+
+              {/* Table Rows */}
+              <div class="divide-y divide-violet-900/30">
+                <For each={rankings().slice(3)}>
+                  {(ranking) => (
+                    <div class="
+                      px-4 md:px-6 py-4 hover:bg-violet-950/30 transition-colors
+                      grid grid-cols-1 md:grid-cols-12 gap-4 items-center
+                    ">
+                      
+                      {/* Rank */}
+                      <div class="md:col-span-1 flex md:block items-center gap-3 md:gap-0">
+                        <span class="text-sm text-violet-400 md:hidden">Posizione:</span>
+                        <div class="text-2xl font-black text-white">
+                          #{ranking.rank}
+                        </div>
+                      </div>
+
+                      {/* Trend */}
+                      <div class="md:col-span-1 flex md:block items-center gap-3 md:gap-0">
+                        <span class="text-sm text-violet-400 md:hidden">Variazione:</span>
+                        <Show 
+                          when={ranking.trend !== "same"}
+                          fallback={
+                            <span class="text-gray-500 text-sm">—</span>
+                          }
+                        >
+                          <div class={`
+                            inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm font-bold
+                            ${ranking.trend === "up" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}
+                          `}>
+                            <span>{ranking.trend === "up" ? "↑" : "↓"}</span>
+                            {ranking.change}
+                          </div>
+                        </Show>
+                      </div>
+
+                      {/* Server Info */}
+                      <div class="md:col-span-5">
+                        <A 
+                          href={`/server/${ranking.server.name}`}
+                          class="group"
+                        >
+                          <h4 class="text-lg font-bold text-white mb-1 group-hover:text-fuchsia-400 transition-colors">
+                            {ranking.server.name}
+                          </h4>
+                        </A>
+                        <div class="flex items-center gap-2 text-sm text-violet-400 font-mono">
+                          <span>🌐</span>
+                          {ranking.server.ip}
+                        </div>
+                      </div>
+
+                      {/* Value */}
+                      <div class="md:col-span-2 flex md:block items-center gap-3 md:gap-0">
+                        <span class="text-sm text-violet-400 md:hidden capitalize">{getValueLabel()}:</span>
+                        <div class="md:text-center">
+                          <div class="text-2xl font-black text-fuchsia-400">
+                            {ranking.value.toLocaleString()}
+                          </div>
+                          <div class="text-xs text-violet-500 hidden md:block">{getValueLabel()}</div>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div class="md:col-span-3 flex items-center justify-start md:justify-end gap-2">
+                        <A
+                          href={`/server/${ranking.server.name}`}
+                          class="
+                            flex-1 md:flex-none px-6 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600
+                            hover:from-violet-500 hover:to-fuchsia-500
+                            rounded-xl font-semibold text-sm
+                            transition-all text-center
+                          "
+                        >
+                          Visita
+                        </A>
+                        <button
+                          onClick={() => alert("Vota funzionalità in arrivo!")}
+                          class="
+                            px-6 py-2.5 bg-violet-950/60 hover:bg-violet-900/80
+                            border border-violet-700/50 hover:border-fuchsia-500/50
+                            rounded-xl font-semibold text-sm
+                            transition-all
+                          "
+                        >
+                          🔥 Vota
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </For>
+              </div>
+
+              {/* Footer Info */}
+              <div class="bg-violet-950/30 border-t border-violet-800/30 px-6 py-4 text-center text-sm text-violet-400">
+                Mostrando {rankings().length} server • Aggiornato in tempo reale
+              </div>
+            </div>
+          </div>
+        </Show>
+
+        {/* Info Box */}
+        <div class="mt-8 bg-gradient-to-br from-violet-950/40 to-fuchsia-950/40 rounded-2xl p-6 border border-violet-700/30">
+          <div class="flex items-start gap-4">
+            <span class="text-4xl">ℹ️</span>
+            <div>
+              <h3 class="text-lg font-bold text-white mb-2">Come Funzionano le Classifiche</h3>
+              <p class="text-violet-200 mb-3">
+                Le classifiche vengono aggiornate in tempo reale basandosi sui voti ricevuti dai server. 
+                Più voti riceve un server, più sale in classifica!
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-violet-300">
+                <div class="flex items-center gap-2">
+                  <span class="text-green-400">↑</span>
+                  <span>Freccia verde = server in crescita</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-red-400">↓</span>
+                  <span>Freccia rossa = server in calo</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span>🥇🥈🥉</span>
+                  <span>Medaglie per i primi 3 posti</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span>🔥</span>
+                  <span>Vota per aiutare i tuoi server preferiti!</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div class="mt-8 text-center">
+          <div class="inline-block bg-gradient-to-br from-gray-900/90 to-black/90 rounded-2xl p-8 border border-violet-900/50">
+            <h3 class="text-2xl font-bold text-white mb-3">
+              Hai un server Minecraft?
+            </h3>
+            <p class="text-violet-300 mb-6">
+              Aggiungilo alla nostra piattaforma e inizia a scalare le classifiche!
+            </p>
+            <A
+              href="/panel"
+              class="
+                inline-flex items-center gap-3 px-8 py-4 
+                bg-gradient-to-r from-green-600 to-emerald-600
+                hover:from-green-500 hover:to-emerald-500
+                rounded-xl font-bold text-lg shadow-lg shadow-green-900/50
+                transition-all
+              "
+            >
+              <span class="text-2xl">🚀</span>
+              Aggiungi il Tuo Server
+            </A>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Leaderboard;

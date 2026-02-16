@@ -36,13 +36,16 @@ const Footer: Component = () => {
         {/* Sezione superiore: credits + messaggio */}
         <div class="text-center mb-8">
           <p class="text-lg font-medium text-emerald-300 mb-3">
-            Etherwood • Floating Realms of Hytale
+            H-Y-TALE.top • Floating Realms of Hytale
           </p>
 
           <p class="max-w-3xl mx-auto leading-relaxed mb-4">
             Un progetto nato dalla passione per Hytale e supportato da tutta la community.  
-            Grazie infinite a <span class="text-emerald-400 font-medium">Grok</span>,{" "}
-            <span class="text-emerald-400 font-medium">ChatGPT</span> e soprattutto a tutti i
+            Grazie infinite a <span class="text-blue-400 font-medium">Grok</span>,{" "}
+            <span class="text-emerald-400 font-medium">ChatGPT </span>,
+            <span class="text-orange-400 font-medium"> Claude </span>
+            
+             e soprattutto a tutti i
             <span class="text-emerald-400 font-medium"> creatori di server</span> che rendono questo mondo vivo ogni giorno.
           </p>
 

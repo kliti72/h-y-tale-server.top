@@ -131,7 +131,7 @@ export default function Panel() {
   };
 
   return (
-    <div class="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-purple-950 text-white">
+    <div class="bg-black">
       <NotAuthenticatedNotice />
 
       <Show when={auth.isAuthenticated()}>

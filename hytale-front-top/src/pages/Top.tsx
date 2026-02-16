@@ -10,7 +10,7 @@ import { useAuth } from "../auth/AuthContext";
 import { A } from "@solidjs/router";
 import Pagination from "../component/template/Pagination";
 
-const Top: Component = () => {
+const ServerBoard: Component = () => {
   const auth = useAuth();
   const discord_id_user = auth.user()?.id ?? '';
 
@@ -709,4 +709,4 @@ const Top: Component = () => {
   );
 };
 
-export default Top;
+export default ServerBoard;

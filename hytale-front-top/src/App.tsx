@@ -3,13 +3,16 @@ import NotFound from './component/template/NotFound';
 import { AuthProvider } from './auth/AuthContext';
 import Header from './component/template/Header';
 import Footer from './component/template/Footer';
-import MyServerBoard from './pages/Panel';
 import ServerDetail from './pages/ServerDetail';
 import Hero from './pages/Hero';
-import Top from './pages/Top';
 import VotePlugin from './pages/VotePlugin';
 import Forum from './pages/Forum';
 import Panel from './pages/Panel';
+import Leaderboard from './pages/Leaderboard';
+import ServerBoard from './pages/Top';
+import Docs from './pages/VotePlugin';
+import Earn from './pages/Earn';
+import Premium from './pages/Premium';
 
 function App() {
   return (
@@ -23,11 +26,14 @@ function App() {
       )}
     >
       <Route path="/" component={Hero} />
-            <Route path="/top" component={Top} />
+      <Route path="/top" component={Leaderboard} />
+      <Route path="/servers" component={ServerBoard} />
       <Route path="/forum" component={Forum} />
       <Route path="/panel" component={Panel} />
       <Route path="/server/:name" component={ServerDetail} />
-      <Route path="/plugin" component={VotePlugin} />
+      <Route path="/plugin" component={Docs} />
+      <Route path="/earn" component={Earn} />
+      <Route path="/premium" component={Premium} />
       <Route path="*" component={NotFound} />
     </Router>
   );
