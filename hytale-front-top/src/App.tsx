@@ -4,8 +4,6 @@ import { AuthProvider } from './auth/AuthContext';
 import Header from './component/template/Header';
 import Footer from './component/template/Footer';
 import ServerDetail from './pages/ServerDetail';
-import Hero from './pages/Hero';
-import VotePlugin from './pages/VotePlugin';
 import Forum from './pages/Forum';
 import Panel from './pages/Panel';
 import Leaderboard from './pages/Leaderboard';
@@ -14,6 +12,10 @@ import Docs from './pages/VotePlugin';
 import Earn from './pages/Earn';
 import Premium from './pages/Premium';
 import ProfileEarnings from './pages/Profile';
+import Home from './pages/Home';
+import GuidesPage from './pages/Guide';
+import Contatti from './pages/Contatti';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 function App() {
   return (
@@ -26,15 +28,18 @@ function App() {
         </AuthProvider>
       )}
     >
-      <Route path="/" component={Hero} />
+      <Route path="/" component={Home} />
       <Route path="/top" component={Leaderboard} />
       <Route path="/servers" component={ServerBoard} />
       <Route path="/forum" component={Forum} />
       <Route path="/panel" component={Panel} />
       <Route path="/server/:name" component={ServerDetail} />
+      <Route path="/guide" component={GuidesPage} />
       <Route path="/plugin" component={Docs} />
       <Route path="/earn" component={Earn} />
       <Route path="/premium" component={Premium} />
+      <Route path="/contatti" component={Contatti} />
+      <Route path="/privacy" component={PrivacyPolicy} />
       <Route path="/profile" component={ProfileEarnings} />
       <Route path="*" component={NotFound} />
     </Router>

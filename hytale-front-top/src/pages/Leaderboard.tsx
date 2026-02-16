@@ -85,20 +85,6 @@ const Leaderboard: Component = () => {
     return data;
   });
 
-  const periods = [
-    { id: "today" as const, label: "Oggi", icon: "📅" },
-    { id: "week" as const, label: "Settimana", icon: "📊" },
-    { id: "month" as const, label: "Mese", icon: "📈" },
-    { id: "alltime" as const, label: "Sempre", icon: "🏆" }
-  ];
-
-  const types = [
-    { id: "votes" as const, label: "Top Voti", icon: "🔥", desc: "Server più votati" },
-    { id: "players" as const, label: "Top Player", icon: "👥", desc: "Server con più giocatori" },
-    { id: "trending" as const, label: "Trending", icon: "📈", desc: "Server in crescita" },
-    { id: "new" as const, label: "Nuovi", icon: "🆕", desc: "Server appena aggiunti" }
-  ];
-
   const getMedalEmoji = (rank: number) => {
     if (rank === 1) return "🥇";
     if (rank === 2) return "🥈";
@@ -149,94 +135,7 @@ const Leaderboard: Component = () => {
       {/* Main Content */}
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        {/* Controls Section */}
-        <div class="bg-gradient-to-br from-gray-900/90 to-black/90 rounded-2xl p-6 md:p-8 mb-8 border border-violet-900/50 backdrop-blur-md">
-          
-          {/* Type Selection */}
-          <div class="mb-8">
-            <h3 class="text-2xl font-bold text-fuchsia-400 mb-4 flex items-center gap-2">
-              <span>📊</span> Tipo di Classifica
-            </h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <For each={types}>
-                {(type) => (
-                  <button
-                    onClick={() => setSelectedType(type.id)}
-                    class={`
-                      group relative overflow-hidden p-6 rounded-xl border-2 transition-all duration-300
-                      ${selectedType() === type.id
-                        ? "bg-gradient-to-br from-violet-600/30 to-fuchsia-600/30 border-fuchsia-500 scale-105 shadow-lg shadow-fuchsia-900/50"
-                        : "bg-violet-950/30 border-violet-800/30 hover:border-violet-600/50 hover:bg-violet-900/40"
-                      }
-                    `}
-                  >
-                    <div class="relative z-10">
-                      <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">
-                        {type.icon}
-                      </div>
-                      <h4 class="font-bold text-white text-lg mb-1">{type.label}</h4>
-                      <p class="text-sm text-violet-300">{type.desc}</p>
-                    </div>
-                    
-                    {selectedType() === type.id && (
-                      <div class="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 animate-pulse" />
-                    )}
-                  </button>
-                )}
-              </For>
-            </div>
-          </div>
-
-          {/* Period & Search */}
-          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            
-            {/* Period Tabs */}
-            <div class="flex flex-wrap gap-2">
-              <For each={periods}>
-                {(period) => (
-                  <button
-                    onClick={() => setSelectedPeriod(period.id)}
-                    class={`
-                      flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all
-                      ${selectedPeriod() === period.id
-                        ? "bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white shadow-lg shadow-fuchsia-900/50"
-                        : "bg-violet-950/60 text-violet-300 hover:bg-violet-900/80 border border-violet-700/30"
-                      }
-                    `}
-                  >
-                    <span class="text-xl">{period.icon}</span>
-                    <span>{period.label}</span>
-                  </button>
-                )}
-              </For>
-            </div>
-
-            {/* Search */}
-            <div class="relative w-full md:w-80">
-              <input
-                type="text"
-                placeholder="Cerca server..."
-                value={searchQuery()}
-                onInput={(e) => setSearchQuery(e.currentTarget.value)}
-                class="
-                  w-full px-6 py-3 pl-12 bg-black/60 border-2 border-violet-700/50 
-                  rounded-xl text-white placeholder-violet-400
-                  focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/30
-                  transition-all duration-200
-                "
-              />
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl">🔍</span>
-              <Show when={searchQuery()}>
-                <button 
-                  onClick={() => setSearchQuery("")}
-                  class="absolute right-4 top-1/2 -translate-y-1/2 text-violet-400 hover:text-red-400"
-                >
-                  ✕
-                </button>
-              </Show>
-            </div>
-          </div>
-        </div>
+   
 
         {/* Leaderboard Table */}
         <Show 

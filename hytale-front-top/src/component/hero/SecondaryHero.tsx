@@ -43,7 +43,7 @@ const SecondaryHero: Component = () => {
         <button
           onClick={() => {
             // Scroll smooth alla lista server (se è sotto)
-            document.getElementById("server-board")?.scrollIntoView({ behavior: "smooth" });
+            navigation.navigate("/servers")
           }}
           class={`
             inline-flex items-center gap-3 px-9 py-4 rounded-xl text-lg font-semibold
@@ -54,7 +54,7 @@ const SecondaryHero: Component = () => {
             transition-all duration-300 active:scale-95
           `}
         >
-          <span class="text-xl">↓</span>
+          <span class="text-xl">→</span>
           Inizia a sfogliare i server
         </button>
 

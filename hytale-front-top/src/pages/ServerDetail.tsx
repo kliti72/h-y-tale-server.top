@@ -6,12 +6,12 @@ import { ServerResponse } from '../types/ServerResponse';
 import PlayersVoteModal from '../component/modal/PlayersVoteModal';
 import Notifications, { notify } from '../component/template/Notification';
 import { useAuth } from '../auth/AuthContext';
-import { VoteService } from '../services/votes.service';
 import ShareButton from '../component/card/ShareButton';
 import SaveButton from '../component/card/SaveButton';
 import VoteButton from '../component/button/VoteButton';
 import Breadcrumb from '../component/card/Breadcrumb';
 import { ServerHeaderStats } from '../component/card/ServerHeaderStats';
+import ServerNotFound from '../component/card/ServerNotFound';
 
 
 
@@ -20,9 +20,10 @@ import { ServerHeaderStats } from '../component/card/ServerHeaderStats';
 
 const ServerDetail: Component = () => {
   const params = useParams();
-  console.log("Parametro", params, "Catturato");
   
   const serverName = () => decodeURIComponent(params.name || '');
+  console.log(serverName());
+
   const [isModalOpen, setIsModalOpen] = createSignal(false);
   const [playerGameName, setPlayerGameName] = createSignal("");
 
@@ -30,16 +31,17 @@ const ServerDetail: Component = () => {
   const discord_id_user = auth.user()?.id ?? '';
 
 
-  const [server] = createResource<ServerResponse>(() => ServerService.getServerByName("daw"));
-
-  const tagsArray = () => {
-    const tags = server()?.tags;
-    if (!tags || typeof tags !== 'string') return [];
-    return tags
-      .split(',')
-      .map(t => t.trim())
-      .filter(Boolean);
-  };
+  const [server] = createResource<ServerResponse | null>(
+    async () => {
+      try {
+        return await ServerService.getServerByName(serverName());
+      } catch (err) {
+        console.error("Errore caricamento server:", err);
+        return null;
+      }
+    },
+    { initialValue: null }
+  );
 
   const handlePlayerVote = () => {
 
@@ -47,10 +49,22 @@ const ServerDetail: Component = () => {
 
 
   return (
-    <div class="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-purple-950 text-white">
-      {/* Hero Section */}
-      <div class="relative overflow-hidden bg-black/40 border-b border-violet-900/50 backdrop-blur-sm">
+    <div class="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-purple-950 text-white"
 
+  >
+
+      {/* Hero Section */}
+      <div class="relative overflow-hidden bg-black/40 border-b border-violet-900/50 backdrop-blur-sm"
+      style={{
+    "background-image": server()?.banner_url ? `url(${server()?.banner_url})` : "none",
+    "background-color": server()?.banner_url ? "transparent" : "#1e1b4b",
+    "background-size": "cover",
+    "background-position": "center",
+    "background-repeat": "no-repeat"
+      }}
+      >
+    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/70 to-black/90 pointer-events-none" />
+    
         {/* Particelle di sfondo */}
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
           <div class="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl -top-20 -left-20 animate-pulse" />
@@ -67,25 +81,26 @@ const ServerDetail: Component = () => {
             <Show
               when={server()}
               fallback={
-                <div class="text-center py-20">
-                  <div class="text-6xl mb-6">❌</div>
-                  <h2 class="text-3xl font-bold text-white mb-4"> Server non trovato </h2>
-                  <p class="text-violet-300 text-lg mb-8"> Il server <strong class="text-fuchsia-400">{serverName()}</strong> non esiste nel database bro, come ci sei finito qui </p>
-                  <A href="/"class="inline-block px-8 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-xl font-bold hover:scale-105 transition-transform">
-                    ← Torna ai Server
-                  </A>
-                </div>
+                  <ServerNotFound 
+                    serverName={server()?.name ?? ''}
+                  />
               }
             >
             {(serverData) => (
                 <div>
+
                   <Breadcrumb items={[
                       { label: "Home", href: "/" },
                       { label: "Server", href: "/servers" },
-                      { label: "NomeServer", isActive: true }]} />
+                      { label: serverData().name ?? '', isActive: true }]} />
+
                   <div class="flex flex-col lg:flex-row items-start justify-between gap-6 mb-8">
+
                     {/* Header principale Contiene nome e tags di stato*/}
-                    <ServerHeaderStats />
+                    <ServerHeaderStats 
+                      server={serverData()}
+                    />
+
                     {/* Actions */}
                     <div class="flex flex-col gap-3 w-full lg:w-auto">
                       <VoteButton />

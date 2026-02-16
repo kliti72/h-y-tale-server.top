@@ -1,20 +1,12 @@
 // src/component/modal/EditServerModal.tsx
 import { Component, createSignal, Show } from "solid-js";
-
-type Server = {
-  id: number;
-  name: string;
-  ip: string;
-  port: string;
-  tags: string[];
-  // secret_key?: string; // se vuoi permettere modifica (di solito no)
-};
+import { ServerResponse } from "../../types/ServerResponse";
 
 type EditServerModalProps = {
   isOpen: boolean;
-  server: Server | null;
+  server: ServerResponse | null;
   onClose: () => void;
-  onSubmit: (updatedServer: Partial<Server>) => Promise<void>;
+  onSubmit: (updatedServer: Partial<ServerResponse> | null) => Promise<void>;
 };
 
 const EditServerModal: Component<EditServerModalProps> = (props) => {

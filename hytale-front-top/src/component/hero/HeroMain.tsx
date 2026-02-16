@@ -1,22 +1,41 @@
 // src/components/HomeHero.tsx
-import { Component, createResource } from "solid-js";
+import { Component, createEffect, createResource, Match, Switch } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { For, Show } from "solid-js";
+import { ServerService } from "../../services/server.service";
+import ServerCardPortalRealm from "../card/ServerCardPortalRealm";
+import ServerCard from "../card/ServerCard";
+import GamingCard from "../card/GamingCard";
 
-const API_URL = "http://localhost:3000";
 
-const fetchFeaturedServers = async () => {
-  // Potresti avere un endpoint dedicato tipo /api/servers/featured
-  // Oppure riutilizzare /api/servers e prendere i primi 8-10
-  const res = await fetch(`${API_URL}/api/servers?limit=10&sort=created_at:desc`);
-  if (!res.ok) throw new Error("Errore caricamento server in evidenza");
-  return res.json();
-};
 
 const HeroMain: Component = () => {
-  const navigate = useNavigate();
-  const [featured] = createResource(fetchFeaturedServers);
 
+  
+  const navigate = useNavigate();
+  const [featuredd] = createResource(() => ServerService.getServers());
+  const featured = () => featuredd()?.data ?? [];
+
+  // Sostituisci con il TUO server ID
+  const DISCORD_GUILD_ID = "610190493862854676"; // ← metti il tuo
+  const DISCORD_INVITE = "https://discord.gg/tuoinvito"; // ← invito permanente
+
+
+  const fetchOnlineCount = async () => {
+  try {
+    const res = await fetch(`https://discord.com/api/guilds/${DISCORD_GUILD_ID}/widget.json`);
+    if (!res.ok) return null;
+    
+    const data = await res.json();
+    return data.presence_count ?? 0; // numero utenti online
+  } catch (err) {
+    console.error("Errore fetch Discord online count:", err);
+    return null;
+  }
+};
+  const [onlineCount] = createResource<number | null>(fetchOnlineCount);
+ 
+  
   return (
     <section class="relative w-full min-h-[70vh] flex flex-col items-center justify-center py-16 px-6 bg-gradient-to-b from-black via-zinc-950 to-black overflow-hidden">
       <div class="absolute inset-0 opacity-10 pointer-events-none">
@@ -33,20 +52,54 @@ const HeroMain: Component = () => {
           Esplora regni epici, unisciti a comunità attive, vota i tuoi preferiti e trova il tuo prossimo mondo da conquistare.
         </p>
 
-        <button
-          onClick={() => navigate("/top")}
+       <button
+          onClick={() => navigate("/servers")}
           class={`
             inline-flex items-center gap-3 px-10 py-5 rounded-xl text-xl font-bold
             bg-gradient-to-r from-emerald-600 to-teal-600
             hover:from-emerald-500 hover:to-teal-500
             text-white shadow-xl shadow-emerald-900/40 hover:shadow-emerald-700/60
             border border-emerald-500/40 hover:border-emerald-400/60
-            transition-all duration-300 active:scale-95
+            transition-all duration-300 active:scale-95 m-2
           `}
         >
-          <span class="text-2xl">🔍</span>
-          Esplora tutti i server
+          <span class="text-2xl"> </span>
+          Esplora tutti 
         </button>
+
+<button
+      onClick={() => window.open(DISCORD_INVITE, "_blank")}
+      class={`
+        inline-flex items-center gap-3 px-8 py-5 rounded-xl text-xl font-bold
+        bg-gradient-to-r from-indigo-600 to-purple-600
+        hover:from-indigo-500 hover:to-purple-500
+        text-white shadow-xl shadow-indigo-900/40 hover:shadow-indigo-700/60
+        border border-indigo-500/40 hover:border-indigo-400/60
+        transition-all duration-300 active:scale-95
+        min-w-[280px] m-2
+      `}
+    >
+      <span class="text-2xl"></span>
+      Entra nel nostro Discord
+      
+      <Switch fallback={<span class="ml-1 px-2.5 py-1 text-base bg-white/20 rounded-full">caricamento...</span>}>
+        <Match when={onlineCount.loading}>
+          <span class="ml-1 px-2.5 py-1 text-base bg-white/20 rounded-full animate-pulse">
+            ...
+          </span>
+        </Match>
+        <Match when={onlineCount() != null}>
+          <span class="ml-1 px-2.5 py-1 text-base font-semibold bg-white/20 rounded-full">
+            {onlineCount()?.toLocaleString() || 0} online
+          </span>
+        </Match>
+        <Match when={onlineCount() === null}>
+          <span class="ml-1 px-2.5 py-1 text-base bg-white/20 rounded-full">
+            ? online
+          </span>
+        </Match>
+      </Switch>
+    </button>
       </div>
 
       <div class="relative z-10 w-full mt-16">
@@ -68,41 +121,12 @@ const HeroMain: Component = () => {
                 </div>
               }
             >
-              <Show when={featured()?.length > 0} fallback={
+              <Show when={featured()?.length >= 0} fallback={
                 <p class="text-center text-zinc-500 w-full">Nessun server in evidenza al momento...</p>
               }>
                 <For each={featured()?.slice(0, 12)}>
-                  {(server) => (
-                    <div
-                      onClick={() => navigate(`/server/${server.name}`)}
-                      class={`
-                        flex-shrink-0 w-72 sm:w-80 bg-zinc-900/70 border border-zinc-700/60 rounded-xl
-                        p-5 cursor-pointer transition-all duration-300
-                        hover:border-emerald-600/70 hover:shadow-lg hover:shadow-emerald-900/30
-                        hover:-translate-y-1
-                      `}
-                    >
-                      <h4 class="text-lg font-bold text-white truncate mb-2">
-                        {server.name}
-                      </h4>
-                      <p class="text-sm text-emerald-400 mb-3">
-                        {server.ip}:{server.port}
-                      </p>
-                      <div class="flex flex-wrap gap-2">
-                        <For each={server.tags?.slice(0, 3)}>
-                          {(tag) => (
-                            <span class="px-2.5 py-1 text-xs rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
-                              {tag}
-                            </span>
-                          )}
-                        </For>
-                      </div>
-                      <div class="flex gap-4 text-xs text-zinc-400 mt-2">
-                        <span>★ {server.votes || 0} voti</span>
-                        <span>👥 ? online</span>
-                      </div>
-                    </div>
-                  )}
+                      {(server) => <GamingCard server={server} onVoteRequest={() => ("")} nascondiPulsanti={true} />}
+
                 </For>
               </Show>
             </Show>

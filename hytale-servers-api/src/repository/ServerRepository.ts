@@ -6,9 +6,10 @@ export interface Server {
   ip: string;
   port: string;
   tags?: string[];
-  website?: string;
-  discord?: string;
-  banner?: string;
+  description?: string;
+  website_url?: string;
+  discord_url?: string;
+  banner_url?: string;
   logo_url?: string;
   rules?: string;
   secret_key?: string;
@@ -20,8 +21,8 @@ export interface Server {
 export class ServerRepository {
 
   private static readonly INSERT_SQL = `
-    INSERT INTO servers (name, ip, port, tags, website_url, discord_url, banner_url, logo_url, rules, secret_key, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO servers (name, ip, port, tags, description, website_url, discord_url, banner_url, logo_url, rules, secret_key, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     RETURNING *
   `;
 
@@ -46,9 +47,10 @@ export class ServerRepository {
       data.ip,
       data.port,
       tagsString,
-      data.website ?? '',
-      data.discord ?? '',
-      data.banner ?? '',
+      data.description ?? 'Not have a description',
+      data.website_url ?? '',
+      data.discord_url ?? '',
+      data.banner_url ?? '',
       data.logo_url ?? '',
       data.rules ?? '',
       data.secret_key ?? '',
@@ -94,7 +96,11 @@ export class ServerRepository {
         SELECT 
           s.id,
           s.name,
-          s.ip,
+          s.ip, 
+          s.logo_url,
+          s.banner_url,
+          s.discord_url,
+          s.description,
           s.port,
           s.tags,
           s.secret_key,

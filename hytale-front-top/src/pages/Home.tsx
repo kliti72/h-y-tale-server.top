@@ -1,6 +1,5 @@
 import { Component, createSignal, For, Show } from "solid-js";
 import { createResource } from "solid-js";
-import ServerCard from "../component/card/ServerCard";
 import PlayersVoteModal from "../component/modal/PlayersVoteModal";
 import HeroSection from "../component/hero/HeroTieatryServer";
 import TertiaryHero from "../component/hero/SecondaryHero";
@@ -10,9 +9,10 @@ import Notifications, { notify, requireDiscordLogin } from "../component/templat
 import { ServerResponse } from "../types/ServerResponse";
 import { VoteService } from "../services/votes.service";
 import { useAuth } from "../auth/AuthContext";
+import GamingCard from "../component/card/GamingCard";
 
 
-const Hero: Component = () => {
+const Home: Component = () => {
 
   const auth = useAuth();
   const discord_id_user = auth.user()?.id ?? '';
@@ -57,7 +57,7 @@ const Hero: Component = () => {
         <TertiaryHero />
 
 
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-4xl mx-auto" id="board">
           <h2 class="text-3xl md:text-4xl font-bold text-center mb-8 text-white">
             Classifica Hytale Servers
           </h2>
@@ -67,7 +67,7 @@ const Hero: Component = () => {
               <Show when={serverCount() > 0} fallback={<p class="text-center text-zinc-500 py-8">Nessun server ancora...</p>}>
                 <div class="flex flex-col gap-6">
                   <For each={serverData() ?? []}>
-                    {(server) => <ServerCard server={server} onVoteRequest={handleVoteRequest} />}
+                    {(server) => <GamingCard server={server} onVoteRequest={handleVoteRequest} />}
                   </For>
                 </div>
               </Show>
@@ -98,4 +98,4 @@ const Hero: Component = () => {
   );
 };
 
-export default Hero;
+export default Home;

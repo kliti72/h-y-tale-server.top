@@ -1,4 +1,5 @@
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
+import { ServerResponse } from "../../types/ServerResponse";
 
 type ServerStats = {
     online: boolean;
@@ -11,7 +12,7 @@ type ServerStats = {
     ping: number;
 };
 
-export function ServerHeaderStats() {
+export function ServerHeaderStats(props: { server: ServerResponse }) {
     // Stats mockate (in futuro da API)
     const [mockStats] = createSignal<ServerStats>({
         online: true,
@@ -23,8 +24,33 @@ export function ServerHeaderStats() {
 
     return (<div class="flex-1">
         <div class="flex items-center gap-4 mb-4">
+            <Show
+                when={props.server.logo_url}
+                fallback={
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                        {props.server.name?.charAt(0)?.toUpperCase() || "?"}
+                    </div>
+                }
+            >
+                <img
+                    src={props.server.logo_url}
+                    alt={`${props.server.name} logo`}
+                    class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-violet-500/50 shadow-xl shadow-violet-900/40"
+                    onError={(e) => {
+                        // Fallback se l'immagine non carica
+                        e.currentTarget.src = ""; // o una tua immagine placeholder
+                        e.currentTarget.classList.add("hidden");
+                        e.currentTarget.nextElementSibling?.classList.remove("hidden");
+                    }}
+                />
+                {/* Hidden fallback visibile solo se img fallisce */}
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg hidden">
+                    {props.server.name?.charAt(0)?.toUpperCase() || "?"}
+                </div>
+            </Show>
+
             <h1 class="text-4xl md:text-6xl font-black bg-gradient-to-r from-violet-300 to-fuchsia-300 bg-clip-text text-transparent">
-                Nome inventato
+                {props.server.name}
             </h1>
             {mockStats().online ? (
                 <span class="px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-full text-green-300 text-sm font-medium flex items-center gap-2">

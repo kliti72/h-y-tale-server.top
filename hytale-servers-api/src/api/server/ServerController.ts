@@ -24,14 +24,9 @@ export function registerServerRoutes(
       console.log("Body arrivato", body);
 
       const serverSecretKey = generateSecretKey();
+      body.secret_key = serverSecretKey;
 
-      const serverCreated = ServerRepository.put(db, {
-        name: body.name,
-        ip: body.ip,
-        port: body.port,
-        tags: body.tags,
-        secret_key: serverSecretKey
-      });
+      const serverCreated = ServerRepository.put(db, body);
 
       console.log("Server creato con id", serverCreated.id);
 
@@ -51,12 +46,13 @@ export function registerServerRoutes(
       ip: t.String(),
       port: t.String(),
       tags: t.Array(t.String()),
-      website: t.String(),
-      discord: t.String(),
-      banner: t.String(),
+      description: t.String(),
+      website_url: t.String(),
+      discord_url: t.String(),
+      banner_url: t.String(),
+      rules: t.String(),
       logo_url: t.String(),
-      rules: t.String()
-
+      secret_key: t.String(),
     })
   });
 
@@ -83,6 +79,7 @@ export function registerServerRoutes(
   //*
   app.get('/servers/:name', (body) => {
     const serverName = body.params.name;
+    console.log("Ricevuto", serverName);
     const servers = ServerRepository.getByName(db, serverName);
     
     return {

@@ -14,38 +14,15 @@ const HeroTieatryServer: Component = () => {
       <div class="relative z-10 max-w-6xl mx-auto text-center">
         {/* Titolo secondario */}
         <h2 class="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-6">
-          Entra nel Mondo Hytale
-          <span class="block text-emerald-400 mt-2">Scegli il tuo server</span>
+          Aggiungi il tuo server
+          <span class="block text-emerald-400 mt-2">Facile, Intuitivo, Personalizzabile </span>
         </h2>
 
         {/* Descrizione breve + tech vibe */}
         <p class="text-lg sm:text-xl text-zinc-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-          Centinaia di server attivi, comunità italiane e internazionali, modpack custom, survival estremo e roleplay epico.  
-          Copia l'IP, entra in gioco e vota i tuoi preferiti.
+          Condividi il tuo server con i altri giocatori, gioca con loro esperienze indimenticabili.
+          Personalizza la tua pagina con la massima liberta che ti da <span class="block text-red-400 ">HTML5 e CSS3. </span>
         </p>
-
-        {/* Stats rapide (glass cards) */}
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-12 max-w-4xl mx-auto">
-          <div class="backdrop-blur-md bg-black/30 border border-emerald-800/40 rounded-xl p-5 shadow-lg shadow-emerald-950/20">
-            <div class="text-3xl sm:text-4xl font-bold text-emerald-400">+120</div>
-            <div class="text-sm text-zinc-400 mt-1">Server attivi</div>
-          </div>
-
-          <div class="backdrop-blur-md bg-black/30 border border-emerald-800/40 rounded-xl p-5 shadow-lg shadow-emerald-950/20">
-            <div class="text-3xl sm:text-4xl font-bold text-emerald-400">8.4k</div>
-            <div class="text-sm text-zinc-400 mt-1">Giocatori oggi</div>
-          </div>
-
-          <div class="backdrop-blur-md bg-black/30 border border-emerald-800/40 rounded-xl p-5 shadow-lg shadow-emerald-950/20">
-            <div class="text-3xl sm:text-4xl font-bold text-emerald-400">47k</div>
-            <div class="text-sm text-zinc-400 mt-1">Voti totali</div>
-          </div>
-
-          <div class="backdrop-blur-md bg-black/30 border border-emerald-800/40 rounded-xl p-5 shadow-lg shadow-emerald-950/20">
-            <div class="text-3xl sm:text-4xl font-bold text-emerald-400">24/7</div>
-            <div class="text-sm text-zinc-400 mt-1">Uptime medio</div>
-          </div>
-        </div>
 
         {/* Call to action principali */}
         <div class="flex flex-col sm:flex-row justify-center items-center gap-5 sm:gap-8">

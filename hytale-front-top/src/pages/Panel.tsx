@@ -11,75 +11,25 @@ import EditServerModal from "../component/modal/EditServerModal";
 import ConfirmDeleteModal from '../component/modal/ConifrmDeleteModal';
 import NotAuthenticatedNotice from '../component/template/NoAuthenticationNotice';
 import { notify } from '../component/template/Notification';
+import { ServerService } from '../services/server.service';
+import { ServerResponse } from '../types/ServerResponse';
+import StringArrayUtils from '../utils/StringArrayUtils';
 
-type Server = {
-  id: number;
-  name: string;
-  ip: string;
-  port: string;
-  description?: string;
-  logo_url?: string;
-  website?: string;
-  tags: string[];
-  secret_key: string;
-  created_at: string;
-  role: string;
-  owner: {
-    id: string;
-    username: string;
-    displayName: string;
-  };
-  // placeholder per statistiche (puoi fetchare dopo)
-  players_online?: number;
-  max_players?: number;
-  votes?: number;
-};
-
-type ApiResponse = {
-  user: {
-    id: string;
-    username: string;
-    displayName: string;
-  };
-  servers: Server[];
-  count: number;
-};
-
-const fetchMyServers = async (): Promise<ApiResponse> => {
-  const response = await fetch('http://localhost:3000/api/servers/mine', {
-    credentials: 'include',
-    headers: { 'Accept': 'application/json' },
-  });
-
-  if (!response.ok) throw new Error(`Errore ${response.status}`);
-  return response.json();
-};
-
-const API_URL = "http://localhost:3000";
 
 export default function Panel() {
   const auth = useAuth();
   const [isAddModalOpen, setIsAddModalOpen] = createSignal(false);
   const [editModalOpen, setEditModalOpen] = createSignal(false);
   const [deleteModalOpen, setDeleteModalOpen] = createSignal(false);
-  const [selectedServer, setSelectedServer] = createSignal<Server | null>(null);
+  const [selectedServer, setSelectedServer] = createSignal<ServerResponse | null>(null);
 
-  const [data, { refetch }] = createResource<ApiResponse>(fetchMyServers);
+  const [featuredd] = createResource(() => ServerService.getServers());
+  const servers = () => featuredd()?.data ?? [];
 
-  // Aggiungi server
-  const handleAddServer = async (formData: any) => {
+  const handleAddServer = async (server: ServerResponse) => {
     try {
-      const res = await fetch(`${API_URL}/api/servers`, {
-        method: "POST",
-        credentials: 'include',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
+      ServerService.addServer(server);
       setIsAddModalOpen(false);
-      refetch();
       notify("Server aggiunto con successo! 🎉", "success");
     } catch (err: any) {
       notify(err.message || "Errore durante l'aggiunta", "error");
@@ -87,47 +37,16 @@ export default function Panel() {
   };
 
   // Update server
-  const handleUpdateServer = async (updated: Partial<Server>) => {
+  const handleUpdateServer = async () => {
     const server = selectedServer();
     if (!server) return;
 
-    try {
-      const res = await fetch(`${API_URL}/api/servers/${server.id}`, {
-        method: "PATCH",
-        credentials: 'include',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updated),
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      setEditModalOpen(false);
-      refetch();
-      notify("Server aggiornato con successo!", "success");
-    } catch (err: any) {
-      notify(err.message || "Errore durante l'aggiornamento", "error");
-    }
   };
 
   // Delete server
   const handleConfirmDelete = async () => {
     const server = selectedServer();
-    if (!server) return;
 
-    try {
-      const res = await fetch(`${API_URL}/api/servers/${server.id}`, {
-        method: "DELETE",
-        credentials: 'include',
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      setDeleteModalOpen(false);
-      refetch();
-      notify("Server eliminato con successo", "success");
-    } catch (err: any) {
-      notify(err.message || "Errore durante l'eliminazione", "error");
-    }
   };
 
   return (
@@ -172,17 +91,27 @@ export default function Panel() {
             shadow-2xl shadow-violet-950/40
           ">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
-              <div class="w-32 h-32 rounded-2xl bg-gradient-to-br from-violet-800/40 to-fuchsia-800/40 flex items-center justify-center text-6xl shadow-inner overflow-hidden">
-                {auth.user()?.username}
+             <div class="relative mb-3">
+              <img
+                src={
+                  auth.user()?.avatar
+                    ? `https://cdn.discordapp.com/avatars/${auth.user()?.id}/${auth.user()?.avatar}.png?size=256`
+                    : `https://cdn.discordapp.com/embed/avatars/0.png`
+                }
+                alt="Il tuo avatar Discord"
+                class="w-30 h-30 rounded-full object-cover border-4 border-zinc-700 shadow-lg"
+              />
               </div>
+
+
               <div class="flex-1 text-center md:text-left">
                 <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-400 mb-3">
                   {auth.user()?.username}
-                </h2>
+                </h2> 
                 <p class="text-xl text-violet-300/90 mb-2">@{auth.user()?.username || "username"}</p>
                 <div class="flex flex-wrap gap-6 text-lg text-zinc-300 mt-6">
                   <div>
-                    <span class="text-violet-400 font-bold">Server posseduti:</span> {data()?.count || 0}
+                    <span class="text-violet-400 font-bold">Server posseduti:</span> {servers?.length || 0}
                   </div>
                   <div>
                     <span class="text-violet-400 font-bold">Registrato il:</span> {new Date().toLocaleDateString('it-IT')}
@@ -194,14 +123,14 @@ export default function Panel() {
 
           {/* Lista server */}
           <Suspense fallback={<div class="text-center py-20 text-violet-400 text-2xl">Caricamento dei tuoi regni...</div>}>
-            <Show when={data()?.servers?.length} fallback={
+            <Show when={servers().length} fallback={
               <div class="text-center py-20 text-xl text-zinc-400 bg-black/40 rounded-2xl border border-violet-900/50 p-12">
                 Non hai ancora creato nessun server.<br />
                 <span class="text-violet-300">Clicca sopra per aggiungere il tuo primo regno Hytale!</span>
               </div>
             }>
               <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <For each={data()?.servers}>
+                <For each={servers()}>
                   {(server) => (
                     <div class="
                       group relative rounded-2xl overflow-hidden
@@ -209,18 +138,23 @@ export default function Panel() {
                       border-2 border-violet-800/50 hover:border-fuchsia-600/70
                       shadow-2xl shadow-violet-950/50 hover:shadow-fuchsia-900/70
                       transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2 backdrop-blur-md
-                    ">
+                    "
+                    >
                       {/* Logo / immagine server */}
-                      <div class="h-48 bg-gradient-to-br from-violet-900/40 to-black relative overflow-hidden">
+                      <div class="h-48 bg-gradient-to-br from-violet-900/40 to-black relative overflow-hidden"
+                    onclick={() => navigation.navigate(`/server/${server.name}`)}
+                    style={{cursor: "pointer"}}
+                           >
                         <Show when={server.logo_url}>
                           <img
                             src={server.logo_url}
                             alt={server.name}
-                            class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                            class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" 
                           />
                         </Show>
                         <Show when={!server.logo_url}>
-                          <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-30">
+                          <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-30" 
+                          >
                             {server.name?.[0]?.toUpperCase() || "?"}
                           </div>
                         </Show>
@@ -235,12 +169,6 @@ export default function Panel() {
                           ">
                             {server.name}
                           </h3>
-                          <span class="
-                            px-4 py-1 text-xs font-bold rounded-full
-                            bg-emerald-900/70 text-emerald-300 border border-emerald-700/50
-                          ">
-                            {server.role.toUpperCase()}
-                          </span>
                         </div>
 
                         <p class="font-mono text-violet-300 mb-3">
@@ -255,7 +183,7 @@ export default function Panel() {
 
                         {/* Tags */}
                         <div class="flex flex-wrap gap-2 mb-6">
-                          <For each={server.tags.slice(0, 5)}>
+                          <For each={StringArrayUtils.toArray(server.tags)}>
                             {(tag) => (
                               <span class="
                                 px-3 py-1 text-xs rounded-full
@@ -265,8 +193,8 @@ export default function Panel() {
                               </span>
                             )}
                           </For>
-                          <Show when={server.tags.length > 5}>
-                            <span class="text-xs text-violet-400">+{server.tags.length - 5}</span>
+                          <Show when={StringArrayUtils.toArray(server.tags).length > 5}>
+                            <span class="text-xs text-violet-400">+{StringArrayUtils.toArray(server.tags).length - 5}</span>
                           </Show>
                         </div>
 
@@ -353,7 +281,6 @@ export default function Panel() {
         <AddServerModal
           isOpen={isAddModalOpen()}
           onClose={() => setIsAddModalOpen(false)}
-          onSubmit={handleAddServer}
         />
 
         <EditServerModal
