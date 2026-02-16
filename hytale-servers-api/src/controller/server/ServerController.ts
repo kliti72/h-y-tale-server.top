@@ -3,7 +3,6 @@ import { Database } from 'bun:sqlite';
 import { generateSecretKey } from '../../helper/GenerateSecretKey';
 import { ServerRepository, } from '../../repository/ServerRepository';
 import { SessioneRepository } from '../../repository/SessionRepository';
-import { type ServerResponse } from '../../types/types';
 
 export function registerServerRoutes(
   app = new Elysia({ prefix: '/api' }),
