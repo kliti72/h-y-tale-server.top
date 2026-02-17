@@ -25,3 +25,18 @@ export type ServerResponse = {
     max_players? : number;
     votes?: number;
 }
+
+export interface MyServersResponse {
+  user: {
+    id: string;
+  };
+  servers: ServerResponse[];
+  count: number;
+}
+
+export interface GetServerParams {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  search?: string; // tanto ce l'hai ora
+}

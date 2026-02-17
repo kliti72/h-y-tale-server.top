@@ -1,17 +1,17 @@
 // src/components/ServerDetail.tsx
 import { Component, createResource, createSignal, For, Show, Suspense, createMemo, onMount } from 'solid-js';
 import { useParams, A } from '@solidjs/router';
-import { ServerService } from '../services/server.service';
-import { ServerResponse } from '../types/ServerResponse';
-import PlayersVoteModal from '../component/modal/PlayersVoteModal';
-import Notifications, { notify } from '../component/template/Notification';
-import { useAuth } from '../auth/AuthContext';
-import ShareButton from '../component/button/ShareButton';
-import SaveButton from '../component/button/SaveButton';
-import VoteButton from '../component/button/VoteButton';
-import Breadcrumb from '../component/card/widget/Breadcrumb';
-import { ServerHeaderStats } from '../component/card/details/ServerHeaderStats';
-import ServerNotFound from '../component/card/details/ServerNotFound';
+import { ServerService } from '../../services/server.service';
+import { ServerResponse } from '../../types/ServerResponse';
+import PlayersVoteModal from '../../component/modal/PlayersVoteModal';
+import Notifications, { notify } from '../../component/template/Notification';
+import { useAuth } from '../../auth/AuthContext';
+import ShareButton from '../../component/button/ShareButton';
+import SaveButton from '../../component/button/SaveButton';
+import VoteButton from '../../component/button/VoteButton';
+import Breadcrumb from '../../component/card/widget/Breadcrumb';
+import { ServerHeaderStats } from '../../component/card/details/ServerHeaderStats';
+import ServerNotFound from '../../component/card/details/ServerNotFound';
 
 const ServerDetail: Component = () => {
   const params = useParams();

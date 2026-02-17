@@ -6,16 +6,15 @@ import {
   Suspense
 } from 'solid-js';
 import { useNavigate } from '@solidjs/router'; // Aggiungi questo import
-import { useAuth } from '../auth/AuthContext';
-import ConfirmDeleteModal from '../component/modal/ConifrmDeleteModal';
-import NotAuthenticatedNotice from '../component/template/NoAuthenticationNotice';
-import { notify } from '../component/template/Notification';
-import { ServerService } from '../services/server.service';
-import { ServerResponse } from '../types/ServerResponse';
-import StringArrayUtils from '../utils/StringArrayUtils';
+import { useAuth } from '../../auth/AuthContext';
+import ConfirmDeleteModal from '../../component/modal/ConifrmDeleteModal';
+import NotAuthenticatedNotice from '../../component/template/NoAuthenticationNotice';
+import { notify } from '../../component/template/Notification';
+import { ServerService } from '../../services/server.service';
+import { ServerResponse } from '../../types/ServerResponse';
 
 
-export default function Panel() {
+export default function ManagePanelPage() {
   const auth = useAuth();
   const navigate = useNavigate(); // Usa questo invece di navigation
   const [deleteModalOpen, setDeleteModalOpen] = createSignal(false);

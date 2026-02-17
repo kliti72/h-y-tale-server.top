@@ -1,10 +1,11 @@
 import { Component, createSignal, For, Show } from "solid-js";
 import { A } from "@solidjs/router";
-import { useAuth } from "../auth/AuthContext";
-import Notifications, { notify } from "../component/template/Notification";
+import Notifications, { notify } from "../../component/template/Notification";
+import { useAuth } from "../../auth/AuthContext";
 
 const Premium: Component = () => {
   const auth = useAuth();
+  
   const [billingCycle, setBillingCycle] = createSignal<"monthly" | "yearly">("monthly");
   const [selectedPlan, setSelectedPlan] = createSignal<"starter" | "plus" | "ultra">("plus");
 

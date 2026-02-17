@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 import { A } from "@solidjs/router";
 
-const PrivacyPolicy: Component = () => {
+const PrivacyPolicyPage: Component = () => {
   const lastUpdated = "16 Febbraio 2026";
 
   return (
@@ -142,4 +142,4 @@ const PrivacyPolicy: Component = () => {
   );
 };
 
-export default PrivacyPolicy;
+export default PrivacyPolicyPage;

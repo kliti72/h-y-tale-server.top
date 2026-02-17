@@ -1,6 +1,6 @@
 import { Component, createSignal, For, Show } from "solid-js";
 import { A } from "@solidjs/router";
-import Notifications, { notify } from "../component/template/Notification";
+import Notifications, { notify } from "../../component/template/Notification";
 
 const Earn: Component = () => {
   const [selectedTier, setSelectedTier] = createSignal<"free" | "basic" | "pro" | "enterprise">("basic");

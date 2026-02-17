@@ -54,7 +54,7 @@ const Header: Component = () => {
       {/* Main Header Content */}
       <div class="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div class="flex items-center justify-between gap-6 py-4">
-          
+
           {/* Logo con effetti premium */}
           <A href="/" class="relative group flex items-center gap-3">
             <div class="relative">
@@ -67,7 +67,7 @@ const Header: Component = () => {
                   transition-opacity duration-500 animate-pulse
                 "
               />
-              
+
               {/* Logo text */}
               <div class="relative flex items-center gap-2">
                 <span class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 group-hover:from-violet-300 group-hover:via-fuchsia-300 group-hover:to-pink-300 transition-all tracking-tighter drop-shadow-lg">
@@ -95,10 +95,10 @@ const Header: Component = () => {
               { path: "/", label: "Home", icon: "🏠" },
               { path: "/servers", label: "Server", icon: "🎮" },
               { path: "/leaderboard", label: "Top Server", icon: "🏆" },
-              { path: "/forum", label: "Forum", icon: "💬" },
-              { path: "/earn", label: "Earn", icon: "💸" },
-              { path: "/premium", label: "Premium", icon: "🌟" },
-              { path: "/plugin", label: "Docs", icon: "🕮" },
+              /* { path: "/forum", label: "Forum", icon: "💬" }, 
+               { path: "/earn", label: "Earn", icon: "💸" },
+              { path: "/premium", label: "Premium", icon: "🌟" },*/
+              { path: "/docs", label: "Docs", icon: "🕮" },
             ].map((item) =>
               (true) ? (
                 <A
@@ -128,7 +128,7 @@ const Header: Component = () => {
 
           {/* Right side actions */}
           <div class="flex items-center gap-3">
-            
+
 
             {/* Notifications (solo se autenticato) */}
             <Show when={isAuthenticated()}>
@@ -147,7 +147,7 @@ const Header: Component = () => {
                   "
                 >
                   <span class="text-xl">🔔</span>
-                  
+
                   {/* Badge unread */}
                   <Show when={unreadCount() > 0}>
                     <span class="
@@ -181,7 +181,7 @@ const Header: Component = () => {
                     <div class="max-h-80 overflow-y-auto">
                       {notifications.length > 0 ? (
                         notifications.map(notif => (
-                          <div 
+                          <div
                             class={`
                               px-4 py-3 border-b border-violet-900/30 
                               hover:bg-violet-950/40 cursor-pointer transition-colors
@@ -278,13 +278,15 @@ const Header: Component = () => {
 
                     {/* Menu Items */}
                     <div class="py-2">
-                      <A
+                      {/* <A
                         href="/profile"
                         class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
                       >
                         <span class="text-xl">👤</span>
                         <span class="font-medium">Profilo</span>
                       </A>
+                      */}
+
                       <A
                         href="/panel"
                         class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
@@ -356,14 +358,14 @@ const Header: Component = () => {
           "
         >
           <nav class="max-w-[1400px] mx-auto px-4 py-6 space-y-2">
-            
+
             {/* Mobile Nav Links */}
             {[
               { path: "/", label: "Home", icon: "🏠" },
               { path: "/servers", label: "Server", icon: "🎮" },
               { path: "/leaderboard", label: "Top Server", icon: "🏆" },
-              { path: "/forum", label: "Forum", icon: "💬" },
-              { path: "/events", label: "Eventi", icon: "🎉" },
+              /* { path: "/forum", label: "Forum", icon: "💬" }, */
+              { path: "/events", label: "Eventi", icon: "🎉" }
             ].map((item) =>
               (true) ? (
                 <A

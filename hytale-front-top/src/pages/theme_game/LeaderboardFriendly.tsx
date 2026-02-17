@@ -1,8 +1,8 @@
 import { Component, createSignal, For, Show, createMemo, onMount } from "solid-js";
 import { A } from "@solidjs/router";
 import { createResource } from "solid-js";
-import { ServerService } from "../services/server.service";
-import { ServerResponse } from "../types/ServerResponse";
+import { ServerService } from "../../services/server.service";
+import { ServerResponse } from "../../types/ServerResponse";
 
 // Types per le classifiche
 type LeaderboardPeriod = "today" | "week" | "month" | "alltime";
@@ -109,33 +109,26 @@ const Leaderboard: Component = () => {
   };
 
   return (
+            <section class="game-root">
+        {/* RAINBOW TOP BAR */}
+                <div class="g-rainbow" />
     <div class="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-purple-950 text-white">
       
-      {/* Hero Section */}
-      <div class="relative overflow-hidden bg-black/40 border-b border-violet-900/50">
-        {/* Particelle di sfondo */}
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-          <div class="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl -top-20 -left-20 animate-pulse" />
-          <div class="absolute w-96 h-96 bg-fuchsia-500/20 rounded-full blur-3xl -bottom-20 -right-20 animate-pulse delay-700" />
-          <div class="absolute w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl top-1/2 left-1/2 animate-pulse delay-1000" />
-        </div>
-
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <h1 class="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-violet-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent">
-            🏆 CLASSIFICHE SERVER
-          </h1>
-          <p class="text-xl md:text-2xl text-violet-200 max-w-3xl mx-auto mb-8">
-            Scopri i server più votati, popolati e in crescita della community!
-          </p>
-
-          
-        </div>
-      </div>
+      
 
       {/* Main Content */}
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-   
+   {/* HERO */}
+                <div class="g-hero">
+                    <span class="g-hero-deco g-hero-deco-1">🎮</span>
+                    <span class="g-hero-deco g-hero-deco-2">⭐</span>
+                    <span class="g-hero-deco g-hero-deco-3">🌍</span>
+                    <div class="g-hero-tag">Top Ranking </div>
+                    <div class="g-hero-title" style="margin-top:0.5rem;">Top ranking 2</div>
+                    <div class="g-hero-sub"> Top ranking 3 </div>
+
+                    </div>
 
         {/* Leaderboard Table */}
         <Show 
@@ -150,78 +143,6 @@ const Leaderboard: Component = () => {
         >
           <div class="space-y-4">
             
-            {/* Top 3 - Cards Speciali */}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <For each={rankings().slice(0, 3)}>
-                {(ranking) => (
-                  <div class={`
-                    relative overflow-hidden rounded-2xl 
-                    bg-gradient-to-br ${getRankColor(ranking.rank)} p-1
-                    hover:scale-105 transition-transform duration-300
-                    ${ranking.rank === 1 ? "md:col-span-3 md:row-start-1" : ""}
-                  `}>
-                    <div class="bg-gray-900/95 backdrop-blur-sm rounded-2xl p-6 h-full">
-                      
-                      {/* Medal */}
-                      <div class="flex items-start justify-between mb-4">
-                        <div class={`
-                          text-6xl ${ranking.rank === 1 ? "animate-bounce" : ""}
-                        `}>
-                          {getMedalEmoji(ranking.rank)}
-                        </div>
-                        
-                        {/* Trend */}
-                        <Show when={ranking.trend !== "same"}>
-                          <div class={`
-                            flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold
-                            ${ranking.trend === "up" ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"}
-                          `}>
-                            <span>{ranking.trend === "up" ? "↑" : "↓"}</span>
-                            {ranking.change}
-                          </div>
-                        </Show>
-                      </div>
-
-                      <A 
-                        href={`/server/${ranking.server.name}`}
-                        class="group"
-                      >
-                        <h3 class="text-2xl font-black text-white mb-2 group-hover:text-fuchsia-300 transition-colors">
-                          {ranking.server.name}
-                        </h3>
-                      </A>
-
-                      <div class="flex items-center gap-2 text-violet-300 mb-4 font-mono text-sm">
-                        <span>🌐</span>
-                        {ranking.server.ip}
-                      </div>
-
-                      <div class="flex items-center justify-between pt-4 border-t border-violet-800/30">
-                        <div>
-                          <div class="text-3xl font-black text-white">
-                            {ranking.value.toLocaleString()}
-                          </div>
-                          <div class="text-sm text-violet-400">{getValueLabel()}</div>
-                        </div>
-
-                        <A
-                          href={`/server/${ranking.server.name}`}
-                          class="
-                            px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600
-                            hover:from-violet-500 hover:to-fuchsia-500
-                            rounded-xl font-bold shadow-lg
-                            transition-all
-                          "
-                        >
-                          Visita →
-                        </A>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </For>
-            </div>
-
             {/* Rest of Rankings - List */}
             <div class="bg-gradient-to-br from-gray-900/90 to-black/90 rounded-2xl overflow-hidden border border-violet-900/50 backdrop-blur-md">
               
@@ -393,6 +314,9 @@ const Leaderboard: Component = () => {
         </div>
       </div>
     </div>
+            </section>
+          
+
   );
 };
 

@@ -1,8 +1,8 @@
 import { Component, createSignal } from "solid-js";
 import { A } from "@solidjs/router";
-import Notifications, { notify } from "../component/template/Notification"; // assumo esista
+import Notifications, { notify } from "../../component/template/Notification"; // assumo esista
 
-const Contatti: Component = () => {
+const ContattiPage: Component = () => {
   const [name, setName] = createSignal("");
   const [email, setEmail] = createSignal("");
   const [subject, setSubject] = createSignal("");
@@ -191,4 +191,4 @@ const Contatti: Component = () => {
   );
 };
 
-export default Contatti;
+export default ContattiPage;

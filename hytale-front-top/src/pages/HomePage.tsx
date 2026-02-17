@@ -12,7 +12,7 @@ import { useAuth } from "../auth/AuthContext";
 import GamingCard from "../component/card/ServerCard/GamingCard";
 
 
-const Home: Component = () => {
+const HomePage: Component = () => {
 
   const auth = useAuth();
   const discord_id_user = auth.user()?.id ?? '';
@@ -98,4 +98,4 @@ const Home: Component = () => {
   );
 };
 
-export default Home;
+export default HomePage;

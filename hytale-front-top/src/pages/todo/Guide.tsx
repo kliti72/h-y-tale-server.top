@@ -1,7 +1,7 @@
 import { Component, createSignal, For, Show, createMemo, onMount, onCleanup } from "solid-js";
 import { A } from "@solidjs/router";
-import { useAuth } from "../auth/AuthContext"; // assumo esista
-import Notifications, { notify } from "../component/template/Notification";
+import { useAuth } from "../../auth/AuthContext"; // assumo esista
+import Notifications, { notify } from "../../component/template/Notification";
 import { marked } from "marked";
 
 // ────────────────────────────────────────────────
