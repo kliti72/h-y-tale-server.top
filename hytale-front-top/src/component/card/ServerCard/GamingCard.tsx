@@ -1,9 +1,9 @@
 // src/components/ServerCard.tsx
 import { useNavigate } from "@solidjs/router";
 import { Component, createResource, Show } from "solid-js";
-import { notify } from "../template/Notification";
-import { ServerResponse } from "../../types/ServerResponse";
-import { VoteService } from "../../services/votes.service";
+import { notify } from "../../template/Notification";
+import { ServerResponse } from "../../../types/ServerResponse";
+import { VoteService } from "../../../services/votes.service";
 
 type ServerCardProps = {
   server: ServerResponse;
@@ -44,7 +44,7 @@ const GamingCard: Component<ServerCardProps> = (props) => {
       backdrop-blur-md
     `}
     style={{"cursor" :"pointer"}}
-    onClick={() => navigate(`/server/${props.server.name}`)}
+    onClick={() => navigate(`/server/${props.server.id}`)}
 >
       {/* Badge in alto a sinistra */}
       <div class="absolute top-3 left-3 z-10 px-3 py-1 text-xs font-bold rounded-full bg-violet-600/90 text-white shadow-md">

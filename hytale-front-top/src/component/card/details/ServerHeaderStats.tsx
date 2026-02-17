@@ -1,5 +1,5 @@
 import { createSignal, Show } from "solid-js";
-import { ServerResponse } from "../../types/ServerResponse";
+import { ServerResponse } from "../../../types/ServerResponse";
 
 type ServerStats = {
     online: boolean;

@@ -5,7 +5,6 @@ import AddEditServerPage from "./AddEditServerPage";
 import { ServerResponse } from "../../types/ServerResponse";
 import { ServerService } from "../../services/server.service";
 import { notify } from "../../component/template/Notification";
-import { StringArraysUtilis } from "../../utils/StringArrayUtils";
 
 export const ServerEditWrapper: Component = () => {
   const params = useParams();

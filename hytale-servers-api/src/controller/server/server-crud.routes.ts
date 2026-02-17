@@ -6,9 +6,9 @@ import { ServerRepository } from '../../repository/ServerRepository';
 import { SessioneRepository } from '../../repository/SessionRepository';
 
 export function registerServerCrudRoutes<TPrefix extends string = ''>(
-  app : Elysia<TPrefix>,
+  app: Elysia<TPrefix>,
   db: Database
-) : Elysia<TPrefix> {
+): Elysia<TPrefix> {
 
   /**
    * POST /api/servers
@@ -138,6 +138,54 @@ export function registerServerCrudRoutes<TPrefix extends string = ''>(
     {
       params: t.Object({
         id: t.String()
+      })
+    }
+  );
+
+  /**
+ * GET /api/servers
+ * Lista server con pagination e sort
+ */
+  app.get(
+    '/',
+    ({ query, set }) => {
+      try {
+        const page = parseInt(query.page ?? '1');
+        const limit = parseInt(query.limit ?? '10');
+        const search = query.search ?? undefined;
+        const sort = query.sort ?? 'asc';
+
+        console.log("Arrivata all'api search", search);
+        
+        if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+          set.status = 400;
+          return {
+            success: false,
+            error: "Parametri non validi bro!"
+          };
+        }
+
+        const servers = ServerRepository.getAllQuery(db, { page, limit, sort, search });
+
+        return {
+          success: true,
+          data: servers
+        };
+      } catch (error) {
+        console.error("❌ Errore get servers:", error);
+        set.status = 500;
+        return {
+          success: false,
+          error: "Errore nel caricamento dei server"
+        };
+      }
+    },
+    {
+      query: t.Object({
+        page: t.Optional(t.String()),
+        limit: t.Optional(t.String()),
+        sort: t.Optional(t.String()),
+        search: t.Optional(t.String())
       })
     }
   );

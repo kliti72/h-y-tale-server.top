@@ -36,7 +36,7 @@ function App() {
       <Route path="/servers/edit/:id" component={ServerEditWrapper} />
       <Route path="/forum" component={Forum} />
       <Route path="/panel" component={Panel} />
-      <Route path="/server/:name" component={ServerDetail} />
+      <Route path="/server/:id" component={ServerDetail} />
       <Route path="/guide" component={GuidesPage} />
       <Route path="/plugin" component={Docs} />
       <Route path="/earn" component={Earn} />

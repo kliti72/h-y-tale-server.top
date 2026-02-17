@@ -45,7 +45,6 @@ const Header: Component = () => {
   return (
     <header
       class={`
-        sticky top-0 z-50 w-full
         ${scrolled()
           ? "bg-black/95 backdrop-blur-xl shadow-2xl shadow-violet-950/60 border-b border-violet-800/50"
           : "bg-gradient-to-b from-black via-gray-950 to-slate-950 border-b border-violet-900/40 shadow-2xl shadow-violet-950/50"

@@ -1,6 +1,6 @@
 import { createSignal, For, Show } from "solid-js";
-import { useAuth } from "../../auth/AuthContext";
-import { notify } from "../template/Notification";
+import { useAuth } from "../../../auth/AuthContext";
+import { notify } from "../../template/Notification";
 
 type Review = {
   id: number;

@@ -20,5 +20,8 @@ export type ServerResponse = {
     rules?: string,
     secret_key: string,
     role?: string,
-    updated_at?: string
+    updated_at?: string;
+    players_online? : number,
+    max_players? : number;
+    votes?: number;
 }

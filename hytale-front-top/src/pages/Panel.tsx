@@ -49,7 +49,7 @@ export default function Panel() {
 
     try {
       // Chiamata API per eliminare
-      await ServerService.deleteServer(server.id); // Devi implementare questo metodo
+      await ServerService.deleteServer(server.id ?? 0); // Devi implementare questo metodo
       
       notify(`Server "${server.name}" eliminato con successo! 🗑️`, "success");
       setDeleteModalOpen(false);
@@ -202,7 +202,7 @@ export default function Panel() {
 
                         {/* Tags */}
                         <div class="flex flex-wrap gap-2 mb-6">
-                          <For each={StringArrayUtils.toArray(server.tags).slice(0, 5)}>
+                          <For each={server.tags.slice(0, 5)}>
                             {(tag) => (
                               <span class="
                                 px-3 py-1 text-xs rounded-full
@@ -212,9 +212,9 @@ export default function Panel() {
                               </span>
                             )}
                           </For>
-                          <Show when={StringArrayUtils.toArray(server.tags).length > 5}>
+                          <Show when={server.tags.length > 5}>
                             <span class="text-xs text-violet-400">
-                              +{StringArrayUtils.toArray(server.tags).length - 5}
+                              +{server.tags.length - 5}
                             </span>
                           </Show>
                         </div>

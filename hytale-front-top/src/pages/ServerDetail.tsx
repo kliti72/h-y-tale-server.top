@@ -6,23 +6,17 @@ import { ServerResponse } from '../types/ServerResponse';
 import PlayersVoteModal from '../component/modal/PlayersVoteModal';
 import Notifications, { notify } from '../component/template/Notification';
 import { useAuth } from '../auth/AuthContext';
-import ShareButton from '../component/card/ShareButton';
-import SaveButton from '../component/card/SaveButton';
+import ShareButton from '../component/button/ShareButton';
+import SaveButton from '../component/button/SaveButton';
 import VoteButton from '../component/button/VoteButton';
-import Breadcrumb from '../component/card/Breadcrumb';
-import { ServerHeaderStats } from '../component/card/ServerHeaderStats';
-import ServerNotFound from '../component/card/ServerNotFound';
-
-
-
-
-
+import Breadcrumb from '../component/card/widget/Breadcrumb';
+import { ServerHeaderStats } from '../component/card/details/ServerHeaderStats';
+import ServerNotFound from '../component/card/details/ServerNotFound';
 
 const ServerDetail: Component = () => {
   const params = useParams();
   
-  const serverName = () => decodeURIComponent(params.name || '');
-  console.log(serverName());
+  const serverId = () => parseInt(params.id || '0');
 
   const [isModalOpen, setIsModalOpen] = createSignal(false);
   const [playerGameName, setPlayerGameName] = createSignal("");
@@ -31,17 +25,7 @@ const ServerDetail: Component = () => {
   const discord_id_user = auth.user()?.id ?? '';
 
 
-  const [server] = createResource<ServerResponse | null>(
-    async () => {
-      try {
-        return await ServerService.getServerByName(serverName());
-      } catch (err) {
-        console.error("Errore caricamento server:", err);
-        return null;
-      }
-    },
-    { initialValue: null }
-  );
+  const [server] = createResource<ServerResponse | null>(() => ServerService.getServerById(serverId()));
 
   const handlePlayerVote = () => {
 

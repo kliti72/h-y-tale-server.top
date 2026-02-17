@@ -1,5 +1,5 @@
 import { Database } from 'bun:sqlite';
-import { type ServerResponse, type ServerStatus } from '../types/types';
+import type { ServerResponse, ServerStatus } from '../types/types';
 
 export class ServerRepository {
 
@@ -66,6 +66,40 @@ export class ServerRepository {
       return row as ServerResponse;
     });
   }
+
+  static getAllQuery(
+    db: Database,
+    { page, limit, sort, search }: { page: number; limit: number; sort: string; search?: string }
+  ): ServerResponse[] {
+    const offset = (page - 1) * limit;
+
+    const validSortFields = ['id', 'name', 'created_at'];
+    const validSortOrders = ['asc', 'desc'];
+
+    const [sortField, sortOrder] = sort.split(':');
+    const safeField = validSortFields.includes(sortField ?? '') ? sortField : 'id';
+    const safeOrder = validSortOrders.includes(sortOrder ?? '') ? sortOrder : 'asc';
+
+    // Se c'è search, filtra per nome
+    const whereClause = search ? `WHERE name LIKE ?` : '';
+    console.log("Serach arrivata per ", search);
+
+    const params = search
+      ? [`%${search}%`, limit, offset]
+      : [limit, offset];
+
+    const rawRows = db
+      .prepare(
+        `SELECT * FROM servers 
+       ${whereClause}
+       ORDER BY ${safeField} ${safeOrder} 
+       LIMIT ? OFFSET ?`
+      )
+      .all(...params);
+
+    return rawRows.map(row => row as ServerResponse);
+  }
+
 
   static getByName(db: Database, serverName: string): ServerResponse {
     const server = db.prepare('SELECT * FROM servers WHERE name = ?').get(serverName);

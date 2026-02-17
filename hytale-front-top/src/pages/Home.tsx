@@ -9,7 +9,7 @@ import Notifications, { notify, requireDiscordLogin } from "../component/templat
 import { ServerResponse } from "../types/ServerResponse";
 import { VoteService } from "../services/votes.service";
 import { useAuth } from "../auth/AuthContext";
-import GamingCard from "../component/card/GamingCard";
+import GamingCard from "../component/card/ServerCard/GamingCard";
 
 
 const Home: Component = () => {

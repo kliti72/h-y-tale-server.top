@@ -1,7 +1,7 @@
 // src/components/Footer.tsx
 import { Component, createSignal, onMount } from "solid-js";
 import { A } from "@solidjs/router"; // se usi solid-router
-import ThemeToggle from "../card/ThemeToggle";
+import ThemeToggle from "../card/widget/ThemeToggle";
 
 const Footer: Component = () => {
   const [copied, setCopied] = createSignal(false);

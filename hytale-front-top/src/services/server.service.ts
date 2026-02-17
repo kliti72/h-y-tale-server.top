@@ -10,6 +10,12 @@ export interface MyServersResponse {
   count: number;
 }
 
+interface GetServerParams {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  search?: string; // tanto ce l'hai ora
+}
 
 export class ServerService {
 
@@ -81,6 +87,28 @@ export class ServerService {
       return res.json();
     } catch (err) {
       console.log(`[ServerService] errore durante la chiamata del metodo getServers`)
+    }
+  }
+
+  static async getServerParams({ page = 1, limit = 20, sort = '', search = '' }: GetServerParams = {}) {
+    try {
+      const qs = new URLSearchParams();
+      qs.set('page', String(page));
+      qs.set('limit', String(limit));
+      if (sort) qs.set('sort', sort);
+      if (search) qs.set('search', search); 
+
+      const url = `${this.baseUrl}?${qs}`;
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      return await res.json() as { success: boolean; data: ServerResponse[] };
+    } catch (err) {
+      console.error('[getServerParams]', err);
+      throw err;
     }
   }
 

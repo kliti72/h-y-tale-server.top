@@ -3,9 +3,9 @@ import { Component, createEffect, createResource, Match, Switch } from "solid-js
 import { useNavigate } from "@solidjs/router";
 import { For, Show } from "solid-js";
 import { ServerService } from "../../services/server.service";
-import ServerCardPortalRealm from "../card/ServerCardPortalRealm";
-import ServerCard from "../card/ServerCard";
-import GamingCard from "../card/GamingCard";
+import ServerCardPortalRealm from "../card/ServerCard/ServerCardPortalRealm";
+import ServerCard from "../card/ServerCard/ServerCard";
+import GamingCard from "../card/ServerCard/GamingCard";
 
 
 

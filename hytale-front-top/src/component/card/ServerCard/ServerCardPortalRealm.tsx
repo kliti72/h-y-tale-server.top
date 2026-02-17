@@ -1,9 +1,9 @@
 // src/components/ServerCardPortalRealm.tsx
 import { useNavigate } from "@solidjs/router";
 import { Component, createResource, For, Show } from "solid-js";
-import { notify } from "../template/Notification";
-import { ServerResponse } from "../../types/ServerResponse";
-import { VoteService } from "../../services/votes.service";
+import { notify } from "../../template/Notification";
+import { ServerResponse } from "../../../types/ServerResponse";
+import { VoteService } from "../../../services/votes.service";
 
 type ServerCardProps = {
   server: ServerResponse;
