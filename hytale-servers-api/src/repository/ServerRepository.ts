@@ -73,7 +73,9 @@ export class ServerRepository {
   ): ServerResponse[] {
     const offset = (page - 1) * limit;
 
-    const validSortFields = ['id', 'name', 'created_at'];
+    
+    console.log("Sort arrivato", sort);
+    const validSortFields = ['id', 'name', 'created_at', 'voti_totali'];
     const validSortOrders = ['asc', 'desc'];
 
     const [sortField, sortOrder] = sort.split(':');
@@ -88,6 +90,9 @@ export class ServerRepository {
       ? [`%${search}%`, limit, offset]
       : [limit, offset];
 
+    console.log(`Search query ${limit}`)
+
+    console.log(` ORder by ${safeField} ${safeOrder} `)
     const rawRows = db
       .prepare(
         `SELECT * FROM servers 
@@ -147,9 +152,11 @@ export class ServerRepository {
 
   public static getServerBySecret(secret_key: string, db: Database) {
     const SEARCH_SERVER_BY_SECRET = `SELECT * FROM servers WHERE secret_key = ?`
-
+    console.log("Chiave arrivata", secret_key);
     const stmt = db.prepare(SEARCH_SERVER_BY_SECRET);
     const server = stmt.get(secret_key) as ServerResponse;
+
+    console.log("Server trovato", server);
 
     return server;
 
@@ -273,21 +280,13 @@ export class ServerRepository {
   ): ServerStatus {
     const UPSERT_SQL = `
     INSERT INTO server_stats (
-      server_id, players_online, players_max, is_online,
-      version_name, version_protocol, motd, latency_ms,
-      software_type, last_ping_error, last_updated
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      server_id, players_online, players_max, is_online, last_updated
+    ) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
     ON CONFLICT(server_id) DO UPDATE SET
       players_online      = excluded.players_online,
       players_max         = excluded.players_max,
       is_online           = excluded.is_online,
-      version_name        = excluded.version_name,
-      version_protocol    = excluded.version_protocol,
-      motd                = excluded.motd,
-      latency_ms          = excluded.latency_ms,
-      software_type       = excluded.software_type,
-      last_ping_error     = excluded.last_ping_error,
-      last_updated        = CURRENT_TIMESTAMP
+      last_updated   = CURRENT_TIMESTAMP
     RETURNING *
   `;
 
@@ -297,13 +296,7 @@ export class ServerRepository {
       data.server_id,
       data.players_online,
       data.players_max,
-      data.is_online ? 1 : 0,           // SQLite vuole 1/0 per boolean
-      data.version_name ?? null,
-      data.version_protocol ?? null,
-      data.motd ?? null,
-      data.latency_ms ?? null,
-      data.software_type ?? null,
-      data.last_ping_error ?? null
+      data.is_online ? 1 : 0,         
     ) as ServerStatus | undefined;
 
     if (!row) {
@@ -335,9 +328,6 @@ export class ServerRepository {
       st.players_online,
       st.players_max,
       st.is_online,
-      st.version_name,
-      st.motd,
-      st.latency_ms,
       st.last_updated
     FROM servers s
     LEFT JOIN (
@@ -359,8 +349,6 @@ export class ServerRepository {
         players_online: row.players_online,
         players_max: row.players_max,
         is_online: !!row.is_online,
-        version_name: row.version_name,
-        motd: row.motd,
         latency_ms: row.latency_ms,
         last_updated: row.last_updated
       } : null

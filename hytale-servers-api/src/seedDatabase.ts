@@ -369,11 +369,11 @@ Guadagna rank buildando!
     const serverIds: number[] = [];
     for (const server of servers) {
         const result = db.run(`
-            INSERT INTO servers (name, ip, port, tags, description, website_url, discord_url, banner_url, logo_url, rules, secret_key)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO servers (name, ip, port, tags, description, website_url, discord_url, voti_totali, banner_url, logo_url, rules, secret_key)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
             server.name, server.ip, server.port, server.tags, server.description,
-            server.website_url, server.discord_url, server.banner_url, server.logo_url,
+            server.website_url, server.discord_url, Math.floor(Math.random() * 100), server.banner_url, server.logo_url,
             server.rules, server.secret_key
         ]);
         serverIds.push(Number(result.lastInsertRowid));
@@ -381,18 +381,18 @@ Guadagna rank buildando!
 
     // 3. SERVER STATS
     const serverStats = [
-        { server_id: serverIds[0], players_online: 245, players_max: 500, is_online: true, version: '1.20.4', motd: '§6ItalianCraft §7| §aSurvival §7| §bNuova Season!', latency_ms: 15 },
-        { server_id: serverIds[1], players_online: 89, players_max: 150, is_online: true, version: '1.19.4', motd: '§eRolePlay City §7| §dVivi la tua storia!', latency_ms: 22 },
-        { server_id: serverIds[2], players_online: 167, players_max: 300, is_online: true, version: '1.20.2', motd: '§bSkyBlock §7| §6Custom Items §7| §aEventi!', latency_ms: 18 },
-        { server_id: serverIds[3], players_online: 134, players_max: 200, is_online: true, version: '1.8.9', motd: '§4§lHARDCORE §cFactions §7| §6Raiding Enabled!', latency_ms: 12 },
-        { server_id: serverIds[4], players_online: 56, players_max: 100, is_online: true, version: '1.20.4', motd: '§5Creative Plus §7| §dLibera la creatività!', latency_ms: 20 }
+        { server_id: serverIds[0], players_online: 245, players_max: 500, is_online: true},
+        { server_id: serverIds[1], players_online: 89, players_max: 150, is_online: true},
+        { server_id: serverIds[2], players_online: 167, players_max: 300, is_online: true},
+        { server_id: serverIds[3], players_online: 134, players_max: 200, is_online: true},
+        { server_id: serverIds[4], players_online: 56, players_max: 100, is_online: true}
     ];
 
     for (const stat of serverStats) {
         db.run(`
-            INSERT INTO server_stats (server_id, players_online, players_max, is_online, version, motd, latency_ms)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `, [stat.server_id ?? 0, stat.players_online, stat.players_max, stat.is_online ? 1 : 0, stat.version, stat.motd, stat.latency_ms]);
+            INSERT INTO server_stats (server_id, players_online, players_max, is_online)
+            VALUES (?, ?, ?, ?)
+        `, [stat.server_id ?? 0, stat.players_online, stat.players_max, stat.is_online ? 1 : 0]);
     }
 
     // 4. SERVER OWNERS (Associa owner ai server)

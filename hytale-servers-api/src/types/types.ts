@@ -8,6 +8,7 @@ export interface ServerResponse {
   description?: string;
   website_url?: string;
   discord_url?: string;
+  voti_totali?: number;
   banner_url?: string;
   logo_url?: string;
   rules?: string;
@@ -22,11 +23,6 @@ export interface ServerStatus {
   players_online: number;
   players_max: number;
   is_online: boolean;
-  version_name?: string;
-  version_protocol?: number | null;
-  motd?: string | null;
   latency_ms?: number | null;
-  software_type?: string | null;
-  last_updated?: string;          // ISO string o timestamp
-  last_ping_error?: string | null;
+  last_updated?: string;
 }

@@ -13,6 +13,7 @@ export function initDatabaseSchema(db: Database) {
         description TEXT DEFAULT '',
         website_url TEXT DEFAULT '',
         discord_url TEXT DEFAULT '',
+        voti_totali INTEGER NOT NULL DEFAULT 0,
         banner_url TEXT DEFAULT '',
         logo_url TEXT DEFAULT '',
         rules TEXT DEFAULT '',
@@ -28,9 +29,6 @@ export function initDatabaseSchema(db: Database) {
             players_online      INTEGER NOT NULL DEFAULT 0,
             players_max         INTEGER NOT NULL DEFAULT 0,
             is_online           BOOLEAN NOT NULL DEFAULT FALSE,
-            version             VARCHAR(80),
-            motd                TEXT,
-            latency_ms          INTEGER,
             last_updated        TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
     `)
@@ -41,7 +39,6 @@ export function initDatabaseSchema(db: Database) {
         server_id       INTEGER NOT NULL,
         playerGameName  TEXT NOT NULL COLLATE NOCASE,
         voted_at        TEXT NOT NULL DEFAULT (datetime('now')),
-        
         FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE
     );
     `)

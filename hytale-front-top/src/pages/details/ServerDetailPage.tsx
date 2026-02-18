@@ -2,7 +2,7 @@
 import { Component, createResource, createSignal, For, Show, Suspense, createMemo, onMount } from 'solid-js';
 import { useParams, A } from '@solidjs/router';
 import { ServerService } from '../../services/server.service';
-import { ServerResponse } from '../../types/ServerResponse';
+import { ServerResponse, ServerStatus } from '../../types/ServerResponse';
 import PlayersVoteModal from '../../component/modal/PlayersVoteModal';
 import Notifications, { notify } from '../../component/template/Notification';
 import { useAuth } from '../../auth/AuthContext';
@@ -12,95 +12,78 @@ import VoteButton from '../../component/button/VoteButton';
 import Breadcrumb from '../../component/card/widget/Breadcrumb';
 import { ServerHeaderStats } from '../../component/card/details/ServerHeaderStats';
 import ServerNotFound from '../../component/card/details/ServerNotFound';
+import ServerIpBox from '../../component/card/details/ServerIpBox';
+import ServerInfoCard from '../../component/card/details/ServerInfoCard';
+import ServerQuiLinkCard from '../../component/card/details/ServerQuickLinkCard';
+import ServerContactTab from '../../component/card/ServerCard/ServerContactTab';
+import ServerAdminContactCard from '../../component/card/details/ServerAdminContactCard';
+import ServerRulesTable from '../../component/button/ServerRulesTable';
 
 const ServerDetail: Component = () => {
   const params = useParams();
-  
   const serverId = () => parseInt(params.id || '0');
-
   const [isModalOpen, setIsModalOpen] = createSignal(false);
   const [playerGameName, setPlayerGameName] = createSignal("");
-
   const auth = useAuth();
   const discord_id_user = auth.user()?.id ?? '';
-
-
   const [server] = createResource<ServerResponse | null>(() => ServerService.getServerById(serverId()));
 
   const handlePlayerVote = () => {
 
   }
 
-
   return (
-    <div class="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-purple-950 text-white"
-
-  >
+    <div class="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-purple-950 text-white">
 
       {/* Hero Section */}
       <div class="relative overflow-hidden bg-black/40 border-b border-violet-900/50 backdrop-blur-sm"
-      style={{
-    "background-image": server()?.banner_url ? `url(${server()?.banner_url})` : "none",
-    "background-color": server()?.banner_url ? "transparent" : "#1e1b4b",
-    "background-size": "cover",
-    "background-position": "center",
-    "background-repeat": "no-repeat"
-      }}
-      >
-    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/70 to-black/90 pointer-events-none" />
-    
+        style={{
+          "background-image": server()?.banner_url ? `url(${server()?.banner_url})` : "none",
+          "background-color": server()?.banner_url ? "transparent" : "#1e1b4b",
+          "background-size": "cover",
+          "background-position": "center",
+          "background-repeat": "no-repeat"
+        }}>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/70 to-black/90 pointer-events-none" />
         {/* Particelle di sfondo */}
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
           <div class="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl -top-20 -left-20 animate-pulse" />
           <div class="absolute w-96 h-96 bg-fuchsia-500/20 rounded-full blur-3xl -bottom-20 -right-20 animate-pulse delay-700" />
         </div>
-
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <Suspense fallback={
-            <div class="flex flex-col items-center justify-center py-20">
-              <div class="w-16 h-16 border-4 border-fuchsia-500 border-t-transparent rounded-full animate-spin"></div>
-              <p class="mt-6 text-xl text-violet-300">Caricamento server epico...</p>
-            </div>
-          }>
-            <Show
+     <Show
               when={server()}
-              fallback={
-                  <ServerNotFound 
-                    serverName={server()?.name ?? ''}
-                  />
-              }
-            >
-            {(serverData) => (
+              fallback={ <ServerNotFound serverName={server()?.name ?? ''} />}>
+
+              {(serverData) => (
                 <div>
 
                   <Breadcrumb items={[
-                      { label: "Home", href: "/" },
-                      { label: "Server", href: "/servers" },
-                      { label: serverData().name ?? '', isActive: true }]} />
+                    { label: "Home", href: "/" },
+                    { label: "Server", href: "/servers" },
+                    { label: serverData().name ?? '', isActive: true }]} />
 
-                  <div class="flex flex-col lg:flex-row items-start justify-between gap-6 mb-8">
+                    <div class="flex flex-col lg:flex-row items-start justify-between gap-6 mb-8">
 
-                    {/* Header principale Contiene nome e tags di stato*/}
-                    <ServerHeaderStats 
-                      server={serverData()}
-                    />
+                      <ServerHeaderStats 
+                        server={serverData()} 
+                      />
+             
 
                     {/* Actions */}
                     <div class="flex flex-col gap-3 w-full lg:w-auto">
+                      
                       <VoteButton />
                       <div class="flex gap-3">
                         <SaveButton />
                         <ShareButton />
-                        {/* Share button */}
                       </div>
+                      <ServerIpBox server={serverData()} />
                     </div>
                   </div>
-                  {/* IP Box */}
-                  {/* Serve passare i server data senno questo è tosto <ServerIpBox /> */}
                 </div>
               )}
             </Show>
-          </Suspense>
         </div>
       </div>
 
@@ -111,16 +94,16 @@ const ServerDetail: Component = () => {
             {(serverData) => (
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Sidebar Info */}
+                
                 <aside class="lg:col-span-4 space-y-6">
-                  {/* Server Info Card */}
-                  Server info
-                  {/* Quick Links */}
-                  Quik link
-                  {/* Admin Contact */}
-                  Admin contact
+                  <ServerRulesTable rules={serverData().rules ?? ''}/>
+                  <ServerInfoCard server={serverData()} />
+                  <ServerQuiLinkCard server={serverData()} />
+
+                  {/* <ServerAdminContactCard /> */}
                 </aside>
-                {/* Main Content */}
-                Contact Tab
+              
+                  <ServerContactTab server={serverData()} />
               </div>
             )}
           </Show>

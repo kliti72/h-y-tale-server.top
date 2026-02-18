@@ -4,6 +4,13 @@ export interface ServerApiResponse {
   error: string,
 }
 
+export interface ServerStatusApiResponse {
+  success: boolean;
+  data: ServerStatus;
+  error: string,
+}
+
+
 export type ServerResponse = {
     created_at?: string,
     id?: number,
@@ -24,6 +31,7 @@ export type ServerResponse = {
     players_online? : number,
     max_players? : number;
     votes?: number;
+    voti_totali?: number;
 }
 
 export interface MyServersResponse {
@@ -38,5 +46,15 @@ export interface GetServerParams {
   page?: number;
   limit?: number;
   sort?: string;
-  search?: string; // tanto ce l'hai ora
+  search?: string; 
+}
+
+
+export interface ServerStatus {
+  id?: number;
+  server_id: number;
+  players_online: number;
+  players_max: number;
+  is_online: boolean;
+  last_updated?: string;
 }

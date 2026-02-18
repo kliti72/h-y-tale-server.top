@@ -49,11 +49,11 @@ export default function ServerTabStats() {
                     <div class="space-y-3">
                         <div class="flex justify-between items-center">
                             <span class="text-violet-300">Ping Medio</span>
-                            <span class="font-bold text-white">{mockStats().ping}ms</span>
+                            <span class="font-bold text-white">2ms</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-violet-300">Uptime</span>
-                            <span class="font-bold text-green-400">{mockStats().uptime}</span>
+                            <span class="font-bold text-green-400">2</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-violet-300">TPS</span>

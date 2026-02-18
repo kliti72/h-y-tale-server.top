@@ -14,6 +14,7 @@ import { ServerAddWrapper } from './component/modal/ServerAddWrapper';
 import ServerPage from './pages/ServerPage';
 import LeaderboardHacking from './pages/LeaderboardPage';
 import PrivacyPolicyPage from './pages/about/PrivacyPolicyPage';
+import LeaderboardStonePage from './pages/theme_game/LeaderboardStonePage';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
     >
       <Route path="/" component={Home} />
       <Route path="/leaderboard" component={LeaderboardHacking} />
+      <Route path="/leaderboard/stone" component={LeaderboardStonePage} />
       <Route path="/servers" component={ServerPage} />
       <Route path="/servers/add" component={ServerAddWrapper} />
       <Route path="/servers/edit/:id" component={ServerEditWrapper} />

@@ -722,7 +722,7 @@ const LeaderboardPage: Component = () => {
       const result = await ServerService.getServerParams({
         page: 1,
         limit: 100,
-        sort: ""
+        sort: "voti_totali:desc"
       });
       setAllServers(result.data);
       return result;
@@ -770,10 +770,15 @@ const LeaderboardPage: Component = () => {
             {/* TABLE RANKS  */}
             <div class="lb-table">
               <For each={allServers()}>
-                {(r) => (
+                {(r, i) => (
                   <div class="lb-table-row">
-                    <div class="row-rank">#1</div>
+                    <div class="row-rank">#{i() + 1}</div>
                     <div>
+                         <div class="lb-info-item">
+                          <div class={LANG.info.body}>
+                          <span style="font-size:0.7rem;">{r.voti_totali} voti</span>
+                          </div>
+                        </div>
                     </div>
                     <div>
                       <div class="row-name">{r.name}</div>
@@ -788,25 +793,6 @@ const LeaderboardPage: Component = () => {
               </For>
             </div>
           </Show>
-
-          {/* INFO */}
-          <div class="lb-info">
-            <span class="lb-info-title">{LANG.info.title}</span>
-            <div class="lb-info-body">{LANG.info.body}</div>
-            <div class="lb-info-grid">
-              {[
-                { icon: "▲", cls: "c-green",  text: LANG.info.up },
-                { icon: "▼", cls: "c-pink",   text: LANG.info.down },
-                { icon: "◈", cls: "c-yellow", text: LANG.info.medals },
-                { icon: "⬡", cls: "c-cyan",   text: LANG.info.vote },
-              ].map(item => (
-                <div class="lb-info-item">
-                  <span class={item.cls} style="font-size:0.7rem;">{item.icon}</span>
-                  <span>{item.text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
 
         </div>
       </div>

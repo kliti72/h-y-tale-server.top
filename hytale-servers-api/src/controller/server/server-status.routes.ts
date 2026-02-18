@@ -13,7 +13,7 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
    * Status più recente di un singolo server
    */
   app.get(
-    '/servers/status/:serverId',
+    '/status/:serverId',
     ({ params, set }) => {
       const serverId = Number(params.serverId);
       
@@ -50,8 +50,9 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
   /**
    * GET /api/servers/status
    * Status attuale di TUTTI i server
+   * Rimuovere questo tag per la sicurezza dei secret token
    */
-  app.get('/servers/status', () => {
+  app.get('/status', () => {
     const serversWithStatus = ServerRepository.getAllLatestStatuses(db);
 
     return {
@@ -66,10 +67,10 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
    * Endpoint per aggiornare lo status (chiamato dal plugin)
    */
   app.post(
-    '/servers/status/ping',
+    '/status/ping',
     ({ body, set }) => {
       const { secret_key, ...statusData } = body;
-
+      console.log("Body in arrivo", body);
       if (!secret_key) {
         set.status = 400;
         return { 
@@ -94,6 +95,7 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
       };
 
       try {
+        console.log("Tentativo di update status tramite ping..");
         const updatedStatus = ServerRepository.upsertServerStatus(db, fullData);
         
         return {
@@ -116,12 +118,7 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
         players_online: t.Number(),
         players_max: t.Number(),
         is_online: t.Boolean(),
-        version_name: t.Optional(t.String()),
-        version_protocol: t.Optional(t.Number()),
-        motd: t.Optional(t.String()),
         latency_ms: t.Optional(t.Number()),
-        software_type: t.Optional(t.String()),
-        last_ping_error: t.Optional(t.String())
       })
     }
   );

@@ -1,4 +1,5 @@
 import { Database } from 'bun:sqlite';
+import { ServerRepository } from './ServerRepository';
 
 interface Vote {
     id: string,
@@ -82,8 +83,12 @@ export class VoteRepository {
             return { success: false, message: reason };
         }
 
-        // 2. Se può votare → registriamo il voto
-        //    (qui fai l'INSERT nella tabella votes come preferisci)
+        // 3. Incrementiamo il contatore totale sul server
+        db.prepare(`
+            UPDATE servers
+            SET voti_totali = voti_totali + 1
+            WHERE id = ?
+        `).run(serverId);
 
         db.prepare(`
         INSERT INTO votes (server_id, playerGameName, voted_at)

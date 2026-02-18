@@ -1,26 +1,15 @@
-import { createSignal, Show } from "solid-js";
-import { ServerResponse } from "../../../types/ServerResponse";
+import { createResource, createSignal, Show } from "solid-js";
+import { ServerResponse, ServerStatus } from "../../../types/ServerResponse";
+import { StatusService } from "../../../services/status.service";
 
-type ServerStats = {
-    online: boolean;
-    players: {
-        online: number;
-        max: number;
-    };
-    uptime: string;
-    version: string;
-    ping: number;
-};
+
 
 export function ServerHeaderStats(props: { server: ServerResponse }) {
-    // Stats mockate (in futuro da API)
-    const [mockStats] = createSignal<ServerStats>({
-        online: true,
-        players: { online: 47, max: 100 },
-        uptime: "99.8%",
-        version: "1.20.4",
-        ping: 23
-    });
+    const [status] = createResource<ServerStatus | null>(
+        () => StatusService.getStatusById(props.server.id ?? 1),
+        { initialValue: null }
+    );
+
 
     return (<div class="flex-1">
         <div class="flex items-center gap-4 mb-4">
@@ -52,16 +41,18 @@ export function ServerHeaderStats(props: { server: ServerResponse }) {
             <h1 class="text-4xl md:text-6xl font-black bg-gradient-to-r from-violet-300 to-fuchsia-300 bg-clip-text text-transparent">
                 {props.server.name}
             </h1>
-            {mockStats().online ? (
+            {/* Controlla se è online */}
+            <Show when={!status.loading} fallback={
+                <span class="px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-full text-red-300 text-sm font-medium">
+                    Undefined
+                </span>
+            }>
                 <span class="px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-full text-green-300 text-sm font-medium flex items-center gap-2">
                     <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                     Online
                 </span>
-            ) : (
-                <span class="px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-full text-red-300 text-sm font-medium">
-                    Offline
-                </span>
-            )}
+            </Show>
+
         </div>
 
         <p class="text-xl text-violet-200 mb-6">
@@ -69,28 +60,46 @@ export function ServerHeaderStats(props: { server: ServerResponse }) {
         </p>
 
         {/* Quick stats */}
-        <div class="flex flex-wrap items-center gap-4 text-sm">
-            <div class="flex items-center gap-2 px-4 py-2 bg-violet-950/50 rounded-lg border border-violet-800/30">
-                <span>👥</span>
-                <span class="font-bold text-white">{mockStats().players.online}/{mockStats().players.max}</span>
-                <span class="text-violet-300">giocatori</span>
+
+
+        <Show when={!status.loading} fallback={
+            <div class="px-4 py-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-sm">
+                <span class="text-yellow-300 font-bold">⚠️ Server non ha integrato H-Y-TaleVerifier.jar</span>
+                <br />
+                <span class="text-violet-400 text-xs">
+                    Sei il proprietario? <a href="/docs" class="underline text-violet-300 hover:text-white">Scaricalo qui</a>
+                </span>
             </div>
-            <div class="flex items-center gap-2 px-4 py-2 bg-violet-950/50 rounded-lg border border-violet-800/30">
-                <span>🔥</span>
-                <span class="font-bold text-white">0</span>
-                <span class="text-violet-300">voti</span>
-            </div>
-            <div class="flex items-center gap-2 px-4 py-2 bg-violet-950/50 rounded-lg border border-violet-800/30">
-                <span>⭐</span>
-                <span class="font-bold text-white">{0}</span>
-                <span class="text-violet-300">rating</span>
-            </div>
-            <div class="flex items-center gap-2 px-4 py-2 bg-violet-950/50 rounded-lg border border-violet-800/30">
-                <span>📡</span>
-                <span class="font-bold text-white">{mockStats().ping}ms</span>
-                <span class="text-violet-300">ping</span>
-            </div>
-        </div>
+        }>
+            <Show when={status()}>
+                {(statusData) => (
+                    <div class="flex flex-wrap items-center gap-4 text-sm">
+                        <div class="flex items-center gap-2 px-4 py-2 bg-violet-950/50 rounded-lg border border-violet-800/30">
+                            <span>👥</span>
+                            <span class="font-bold text-white">{statusData().players_online}/{statusData().players_max}</span>
+                            <span class="text-violet-300">giocatori</span>
+                        </div>
+                        <div class="flex items-center gap-2 px-4 py-2 bg-violet-950/50 rounded-lg border border-violet-800/30">
+                            <span>🔥</span>
+                            <span class="font-bold text-white">{props.server.voti_totali}</span>
+                            <span class="text-violet-300">voti</span>
+                        </div>
+                        <div class="flex items-center gap-2 px-4 py-2 bg-violet-950/50 rounded-lg border border-violet-800/30">
+                            <span>⭐</span>
+                            <span class="font-bold text-white">TODO</span>
+                            <span class="text-violet-300">rating</span>
+                        </div>
+                        <div class="flex items-center gap-2 px-4 py-2 bg-violet-950/50 rounded-lg border border-violet-800/30">
+                            <span>📡</span>
+                            <span class="font-bold text-white">{statusData().last_updated}</span>
+                            <span class="text-violet-300">last update</span>
+                        </div>
+                    </div>
+                )}
+
+            </Show>
+        </Show>
+
     </div>)
 
 }
