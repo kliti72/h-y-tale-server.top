@@ -1,21 +1,29 @@
 import { createSignal, Show } from "solid-js";
 import { notify } from "../template/Notification";
+import { ServerResponse } from "../../types/ServerResponse";
 
-export default function ShareButton() {
+export default function ShareButton(props : {server : ServerResponse}) {
     const [showShareMenu, setShowShareMenu] = createSignal(false);
     
      const shareServer = (platform: string) => {
         const url = window.location.href;
-        const text = `Guarda questo server Minecraft!`;
+        let text = `Guarda questo server Hytale!`;
         
         switch(platform) {
           case 'twitter':
+            if(props.server.name && props.server.ip) {  
+                text = `Guardate il server ${props.server.name}, potete giocarci dall'indirizzo ip ${props.server.ip} su hytale. Se volete altre informazioni ecco il link: `
+            }
             window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`);
             break;
           case 'discord':
-            notify("Link copiato per Discord! 💬", "success");
-            navigator.clipboard.writeText(url);
-            break;
+            if(props.server.discord_url) {
+                notify("Link copiato per Discord! 💬", "success");
+                navigator.clipboard.writeText(props.server.discord_url);
+            } else {
+                notify("Questo server non ha discord", "error");
+            }
+            break;  
           case 'copy':
             navigator.clipboard.writeText(url);
             notify("Link copiato! 🔗", "success");

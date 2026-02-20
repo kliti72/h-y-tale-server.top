@@ -275,7 +275,7 @@ export function registerServerCrudRoutes<TPrefix extends string = ''>(
         name: t.String(),
         ip: t.String(),
         port: t.String(),
-        tags: t.String(),
+        tags: t.Array(t.String()),
         description: t.String(),
         website_url: t.String(),
         discord_url: t.String(),
@@ -377,7 +377,7 @@ export function registerServerCrudRoutes<TPrefix extends string = ''>(
           return {
             success: false,
             error: "Non autenticato bro!"
-          };
+          }; 
         }
 
         const servers = ServerRepository.getServersByUserID(user.userId, db);

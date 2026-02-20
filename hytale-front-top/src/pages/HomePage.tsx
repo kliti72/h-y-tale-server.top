@@ -10,6 +10,7 @@ import { ServerResponse } from "../types/ServerResponse";
 import { VoteService } from "../services/votes.service";
 import { useAuth } from "../auth/AuthContext";
 import GamingCard from "../component/card/ServerCard/GamingCard";
+import ServerCardHacking from "../component/card/ServerCard/ServerCardHacking";
 
 
 const HomePage: Component = () => {
@@ -67,7 +68,7 @@ const HomePage: Component = () => {
               <Show when={serverCount() > 0} fallback={<p class="text-center text-zinc-500 py-8">Nessun server ancora...</p>}>
                 <div class="flex flex-col gap-6">
                   <For each={serverData() ?? []}>
-                    {(server) => <GamingCard server={server} onVoteRequest={handleVoteRequest} />}
+                    {(server) => <ServerCardHacking server={server} onVoteRequest={handleVoteRequest} />}
                   </For>
                 </div>
               </Show>

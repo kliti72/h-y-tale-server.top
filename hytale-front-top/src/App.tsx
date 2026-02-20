@@ -15,6 +15,8 @@ import ServerPage from './pages/ServerPage';
 import LeaderboardHacking from './pages/LeaderboardPage';
 import PrivacyPolicyPage from './pages/about/PrivacyPolicyPage';
 import LeaderboardStonePage from './pages/theme_game/LeaderboardStonePage';
+import Earn from './pages/todo/Earn';
+import FavoritePage from './pages/todo/TODOFavoritePage';
 
 
 function App() {
@@ -33,6 +35,7 @@ function App() {
       <Route path="/leaderboard/stone" component={LeaderboardStonePage} />
       <Route path="/servers" component={ServerPage} />
       <Route path="/servers/add" component={ServerAddWrapper} />
+      <Route path="/earn" component={Earn} />
       <Route path="/servers/edit/:id" component={ServerEditWrapper} />
       <Route path="/server/:id" component={ServerDetail} />
       <Route path="/panel" component={Panel} />
@@ -40,7 +43,7 @@ function App() {
       <Route path="/contatti" component={Contatti} />
       <Route path="/privacy" component={PrivacyPolicyPage} />
       <Route path="*" component={NotFound} />
-    </Router>
+    </Router> 
   );
 }
 

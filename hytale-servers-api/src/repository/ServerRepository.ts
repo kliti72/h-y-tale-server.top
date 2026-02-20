@@ -1,5 +1,6 @@
 import { Database } from 'bun:sqlite';
 import type { ServerResponse, ServerStatus } from '../types/types';
+import { tags } from 'typia';
 
 export class ServerRepository {
 
@@ -73,7 +74,7 @@ export class ServerRepository {
   ): ServerResponse[] {
     const offset = (page - 1) * limit;
 
-    
+
     console.log("Sort arrivato", sort);
     const validSortFields = ['id', 'name', 'created_at', 'voti_totali'];
     const validSortOrders = ['asc', 'desc'];
@@ -162,14 +163,24 @@ export class ServerRepository {
 
   }
 
-  public static getById(id: number, db: Database) {
-    const SEARCH_SERVER_BY_SECRET = `SELECT * FROM servers WHERE id = ?`
+  static toArrayTags(value: string): string[] {
+    return value
+      .split(",")
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+  }
 
-    const stmt = db.prepare(SEARCH_SERVER_BY_SECRET);
+  public static getById(id: number, db: Database) {
+    const stmt = db.prepare(`SELECT * FROM servers WHERE id = ?`);
     const server = stmt.get(id) as ServerResponse;
 
-    return server;
+    if (!server) return null;
 
+    server.tags = typeof server.tags === "string"
+      ? ServerRepository.toArrayTags(server.tags)
+      : server.tags ?? [];
+
+    return server;
   }
 
   static isUserOwner(db: Database, serverId: number, userId: string): boolean {
@@ -196,7 +207,7 @@ export class ServerRepository {
       name: string;
       ip: string;
       port: string;
-      tags: string;
+      tags: string[];
       description: string;
       website_url: string;
       discord_url: string;
@@ -225,11 +236,13 @@ export class ServerRepository {
       WHERE id = ?
     `);
 
+    const tagsToString = data.tags.join(",");
+
     stmt.run(
       data.name,
       data.ip,
       data.port,
-      data.tags,
+      tagsToString,
       data.description,
       data.website_url,
       data.discord_url,
@@ -296,7 +309,7 @@ export class ServerRepository {
       data.server_id,
       data.players_online,
       data.players_max,
-      data.is_online ? 1 : 0,         
+      data.is_online ? 1 : 0,
     ) as ServerStatus | undefined;
 
     if (!row) {

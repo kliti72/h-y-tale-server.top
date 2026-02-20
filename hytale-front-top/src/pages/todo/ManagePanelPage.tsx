@@ -12,6 +12,7 @@ import NotAuthenticatedNotice from '../../component/template/NoAuthenticationNot
 import { notify } from '../../component/template/Notification';
 import { ServerService } from '../../services/server.service';
 import { ServerResponse } from '../../types/ServerResponse';
+import StringArrayUtils from '../../utils/StringArrayUtils';
 
 
 export default function ManagePanelPage() {
@@ -25,7 +26,7 @@ export default function ManagePanelPage() {
     () => auth.isAuthenticated(), // Dipendenza: rifai fetch se auth cambia
     async () => {
       if (!auth.isAuthenticated()) return null;
-      
+
       try {
         const data = await ServerService.getMyServers();
         console.log("I tuoi server:", data);
@@ -49,11 +50,11 @@ export default function ManagePanelPage() {
     try {
       // Chiamata API per eliminare
       await ServerService.deleteServer(server.id ?? 0); // Devi implementare questo metodo
-      
+
       notify(`Server "${server.name}" eliminato con successo! 🗑️`, "success");
       setDeleteModalOpen(false);
       setSelectedServer(null);
-      
+
       // Ricarica la lista
       refetch();
     } catch (error) {
@@ -119,7 +120,7 @@ export default function ManagePanelPage() {
               <div class="flex-1 text-center md:text-left">
                 <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-400 mb-3">
                   {auth.user()?.global_name || auth.user()?.username}
-                </h2> 
+                </h2>
                 <p class="text-xl text-violet-300/90 mb-2">@{auth.user()?.username || "username"}</p>
                 <div class="flex flex-wrap gap-6 text-lg text-zinc-300 mt-6">
                   <div>
@@ -139,8 +140,8 @@ export default function ManagePanelPage() {
               ⏳ Caricamento dei tuoi server...
             </div>
           }>
-            <Show 
-              when={!myServersData.loading && servers().length > 0} 
+            <Show
+              when={!myServersData.loading && servers().length > 0}
               fallback={
                 <div class="text-center py-20 text-xl text-zinc-400 bg-black/40 rounded-2xl border border-violet-900/50 p-12">
                   Non hai ancora creato nessun server bro!<br />
@@ -179,15 +180,7 @@ export default function ManagePanelPage() {
                       </div>
 
                       <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                          <h3 class="
-                            text-2xl font-black text-transparent bg-clip-text
-                            bg-gradient-to-r from-fuchsia-300 to-violet-300 group-hover:from-fuchsia-200 group-hover:to-violet-200
-                            transition-all
-                          ">
-                            {server.name}
-                          </h3>
-                        </div>
+                    
 
                         <p class="font-mono text-violet-300 mb-3">
                           {server.ip}:{server.port}
@@ -201,40 +194,41 @@ export default function ManagePanelPage() {
 
                         {/* Tags */}
                         <div class="flex flex-wrap gap-2 mb-6">
-                          <For each={server.tags.slice(0, 5)}>
-                            {(tag) => (
-                              <span class="
-                                px-3 py-1 text-xs rounded-full
-                                bg-violet-900/60 text-violet-200 border border-violet-700/40
-                              ">
-                                #{tag}
+                          <For each={StringArrayUtils.toArray(server.tags.toString())}>
+                            {(tag, i) => (
+                              <span
+                                class="flex items-center gap-2 px-3 py-1.5"
+                                style={{
+                                  background: "linear-gradient(135deg, rgba(60,35,10,0.7) 0%, rgba(40,22,5,0.9) 100%)",
+                                  border: "1px solid #4a3520",
+                                  "border-top": "1px solid #6a4c28",
+                                  "border-bottom": "1px solid #2a1a08",
+                                  "font-family": "'Palatino Linotype', Palatino, Georgia, serif",
+                                  "font-size": "0.72rem",
+                                  color: "#c8a050",
+                                  "letter-spacing": "0.06em",
+                                  "text-shadow": "0 0 8px rgba(200,160,80,0.25), 0 1px 0 rgba(0,0,0,0.8)",
+                                  "box-shadow": "0 2px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(200,160,80,0.06)",
+                                  "clip-path": "polygon(6px 0%, calc(100% - 6px) 0%, 100% 50%, calc(100% - 6px) 100%, 6px 100%, 0% 50%)",
+                                  "padding-left": "14px",
+                                  "padding-right": "14px",
+                                }}
+                              >
+                                <span style={{
+                                  color: "#7a5c2e",
+                                  "font-size": "0.55rem",
+                                  "font-family": "serif"
+                                }}>
+                                  {/* Roman numeral style index */}
+                                  {['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', 'Ⅵ', 'Ⅶ', 'Ⅷ', 'Ⅸ', 'Ⅹ'][i()] ?? `${i() + 1}`}
+                                </span>
+                                {tag}
                               </span>
                             )}
                           </For>
-                          <Show when={server.tags.length > 5}>
-                            <span class="text-xs text-violet-400">
-                              +{server.tags.length - 5}
-                            </span>
-                          </Show>
+
                         </div>
 
-                        {/* Statistiche */}
-                        <div class="grid grid-cols-3 gap-4 text-center text-sm mb-6">
-                          <div>
-                            <div class="text-emerald-400 font-bold">Online</div>
-                            <div class="text-zinc-300">
-                              {server.players_online ?? "?"}/{server.max_players ?? "?"}
-                            </div>
-                          </div>
-                          <div>
-                            <div class="text-fuchsia-400 font-bold">Voti</div>
-                            <div class="text-zinc-300">{server.votes ?? 0}</div>
-                          </div>
-                          <div>
-                            <div class="text-violet-400 font-bold">Ruolo</div>
-                            <div class="text-zinc-300 capitalize">{server.role || "owner"}</div>
-                          </div>
-                        </div>
 
                         {/* Secret Key */}
                         <div class="mt-4 pt-4 border-t border-violet-800/40">
@@ -258,7 +252,7 @@ export default function ManagePanelPage() {
                         </div>
 
                         {/* Pulsanti azioni */}
-                        <div class="flex gap-4 mt-6"> 
+                        <div class="flex gap-4 mt-6">
                           <button
                             onClick={() => navigate(`/servers/edit/${server.id}`)} // Usa ID non name!
                             class="

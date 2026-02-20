@@ -35,9 +35,8 @@ const Header: Component = () => {
 
   // Mock notifications (da sostituire con dati reali)
   const notifications = [
-    { id: 1, text: "Nuovo evento PvP questo weekend!", icon: "⚔️", time: "2h fa", unread: true },
-    { id: 2, text: "Il tuo server ha ricevuto 5 nuovi voti", icon: "🔥", time: "5h fa", unread: true },
-    { id: 3, text: "Risposta al tuo topic nel forum", icon: "💬", time: "1 giorno fa", unread: false },
+    { id: 2, text: "Hai sbloccato la possibilità di pubblicare un server", icon: "🔥", time: "Puoi farlo nella sezione Aggiungi server dal tuo profilo", unread: false },
+    { id: 1, text: "Benvenuto su H-Y-Tale.top", icon: "⚔️", time: "Puoi finlamente votare il tuo server preferito", unread: false },
   ];
 
   const unreadCount = () => notifications.filter(n => n.unread).length;
@@ -130,6 +129,122 @@ const Header: Component = () => {
           <div class="flex items-center gap-3">
 
 
+            
+
+            {/* User Menu / Login */}
+            <Show
+              when={isAuthenticated()}
+              fallback={
+                <div class="hidden md:block">
+                  <DiscordLoginButton />
+                </div>
+              }
+            >
+              <div class="relative">
+                <button
+                  onClick={() => {
+                    setShowUserMenu(!showUserMenu());
+                    setNotificationsOpen(false);
+                  }}
+                  class="
+                    flex items-center gap-3 px-4 py-2.5 rounded-xl
+                    bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20
+                    hover:from-violet-600/30 hover:to-fuchsia-600/30
+                    border border-violet-600/50 hover:border-fuchsia-500/70
+                    transition-all duration-300
+                  "
+                >
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold">
+                    {user()?.username?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                  <span class="hidden xl:inline text-white font-semibold">
+                    {user()?.username || "User"}
+                  </span>
+                  <span class={`text-violet-300 transition-transform ${showUserMenu() ? "rotate-180" : ""}`}>
+                    ▼
+                  </span>
+                </button>
+
+                {/* User Dropdown Menu */}
+                <Show when={showUserMenu()}>
+                  <div class="
+                    absolute right-0 mt-2 w-64 
+                    bg-gradient-to-br from-gray-900 to-black 
+                    border-2 border-violet-700/50 rounded-2xl 
+                    shadow-2xl shadow-violet-900/50
+                    overflow-hidden z-50
+                  ">
+                    {/* User Info */}
+                    <div class="px-4 py-4 border-b border-violet-800/30 bg-violet-950/20">
+                      <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-xl">
+                          {user()?.username?.charAt(0).toUpperCase() || "U"}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <p class="font-bold text-white truncate">{user()?.username}</p>
+                          <p class="text-xs text-violet-400">ID: {user()?.id?.slice(0, 8)}...</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div class="py-2">
+                      {/* <A
+                        href="/profile"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
+                      >
+                        <span class="text-xl">👤</span>
+                        <span class="font-medium">Profilo</span>
+                      </A>
+                      */}
+
+                      <A
+                        href="/panel"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
+                      >
+                        <span class="text-xl">⚙️</span>
+                        <span class="font-medium">Aggiungi server</span>
+                      </A>
+                      {/* <A
+                        href="/favorites"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
+                      >
+                        <span class="text-xl">⭐</span>
+                        <span class="font-medium">Preferiti</span>
+                      </A> */}
+                      {/* <A
+                        href="/settings"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
+                      >
+                        <span class="text-xl">🔧</span>
+                        <span class="font-medium">Impostazioni</span>
+                      </A> */}
+                    </div>
+
+                    {/* Logout */}
+                    <div class="border-t border-violet-800/30 p-2">
+                      <button
+                        onClick={() => {
+                          logout();
+                          setShowUserMenu(false);
+                        }}
+                        class="
+                          w-full flex items-center gap-3 px-4 py-3 rounded-xl
+                          bg-red-600/20 hover:bg-red-600/30
+                          border border-red-500/30 hover:border-red-500/50
+                          text-red-400 hover:text-red-300
+                          transition-all font-medium
+                        "
+                      >
+                        <span class="text-xl">🚪</span>
+                        <span>Esci</span>
+                      </button>
+                    </div>
+                  </div>
+                </Show>
+              </div>
+            </Show>
+
             {/* Notifications (solo se autenticato) */}
             <Show when={isAuthenticated()}>
               <div class="relative">
@@ -220,120 +335,6 @@ const Header: Component = () => {
               </div>
             </Show>
 
-            {/* User Menu / Login */}
-            <Show
-              when={isAuthenticated()}
-              fallback={
-                <div class="hidden md:block">
-                  <DiscordLoginButton />
-                </div>
-              }
-            >
-              <div class="relative">
-                <button
-                  onClick={() => {
-                    setShowUserMenu(!showUserMenu());
-                    setNotificationsOpen(false);
-                  }}
-                  class="
-                    flex items-center gap-3 px-4 py-2.5 rounded-xl
-                    bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20
-                    hover:from-violet-600/30 hover:to-fuchsia-600/30
-                    border border-violet-600/50 hover:border-fuchsia-500/70
-                    transition-all duration-300
-                  "
-                >
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold">
-                    {user()?.username?.charAt(0).toUpperCase() || "U"}
-                  </div>
-                  <span class="hidden xl:inline text-white font-semibold">
-                    {user()?.username || "User"}
-                  </span>
-                  <span class={`text-violet-300 transition-transform ${showUserMenu() ? "rotate-180" : ""}`}>
-                    ▼
-                  </span>
-                </button>
-
-                {/* User Dropdown Menu */}
-                <Show when={showUserMenu()}>
-                  <div class="
-                    absolute right-0 mt-2 w-64 
-                    bg-gradient-to-br from-gray-900 to-black 
-                    border-2 border-violet-700/50 rounded-2xl 
-                    shadow-2xl shadow-violet-900/50
-                    overflow-hidden z-50
-                  ">
-                    {/* User Info */}
-                    <div class="px-4 py-4 border-b border-violet-800/30 bg-violet-950/20">
-                      <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-xl">
-                          {user()?.username?.charAt(0).toUpperCase() || "U"}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                          <p class="font-bold text-white truncate">{user()?.username}</p>
-                          <p class="text-xs text-violet-400">ID: {user()?.id?.slice(0, 8)}...</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div class="py-2">
-                      {/* <A
-                        href="/profile"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
-                      >
-                        <span class="text-xl">👤</span>
-                        <span class="font-medium">Profilo</span>
-                      </A>
-                      */}
-
-                      <A
-                        href="/panel"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
-                      >
-                        <span class="text-xl">⚙️</span>
-                        <span class="font-medium">I Miei Server</span>
-                      </A>
-                      <A
-                        href="/favorites"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
-                      >
-                        <span class="text-xl">⭐</span>
-                        <span class="font-medium">Preferiti</span>
-                      </A>
-                      <A
-                        href="/settings"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
-                      >
-                        <span class="text-xl">🔧</span>
-                        <span class="font-medium">Impostazioni</span>
-                      </A>
-                    </div>
-
-                    {/* Logout */}
-                    <div class="border-t border-violet-800/30 p-2">
-                      <button
-                        onClick={() => {
-                          logout();
-                          setShowUserMenu(false);
-                        }}
-                        class="
-                          w-full flex items-center gap-3 px-4 py-3 rounded-xl
-                          bg-red-600/20 hover:bg-red-600/30
-                          border border-red-500/30 hover:border-red-500/50
-                          text-red-400 hover:text-red-300
-                          transition-all font-medium
-                        "
-                      >
-                        <span class="text-xl">🚪</span>
-                        <span>Esci</span>
-                      </button>
-                    </div>
-                  </div>
-                </Show>
-              </div>
-            </Show>
-
             {/* Mobile Hamburger */}
             <button
               class="lg:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-violet-950/40 hover:bg-violet-900/60 border border-violet-800/30 text-violet-300 hover:text-white transition-all text-2xl"
@@ -411,12 +412,11 @@ const Header: Component = () => {
 
                 <div class="space-y-2">
                   <A
-                    href="/profile"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
-                    onClick={toggleMenu}
+                    href="/panel"
+                    class="flex items-center gap-3 px-4 py-3 hover:bg-violet-950/40 text-violet-200 hover:text-white transition-colors"
                   >
-                    <span class="text-lg">👤</span>
-                    <span class="font-medium">Il Mio Profilo</span>
+                    <span class="text-xl">⚙️</span>
+                    <span class="font-medium">Aggiungi server</span>
                   </A>
                   <A
                     href="/favorites"

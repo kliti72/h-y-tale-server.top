@@ -10,7 +10,6 @@ import { useAuth } from "../auth/AuthContext";
 import { A } from "@solidjs/router";
 import TopFiveServerCard from "../component/card/widget/TopFiveServerCard";
 import ServerCardHacking from "../component/card/ServerCard/ServerCardHacking";
-import SortServerWidget from "../component/card/widget/SortServerWidget";
 
 // ═══════════════════════════════════════════════
 // 🕹️ LANG CONFIG — cambia tutto il testo qui

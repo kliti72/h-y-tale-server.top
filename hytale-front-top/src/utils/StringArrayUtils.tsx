@@ -11,6 +11,13 @@ export default class StringArrayUtils {
       .filter(item => item.length > 0);
   }
 
+  static toArrayTags(value: string): string[] {
+  return value
+    .split(",")
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+}
+
   static toString(
     array: (string | null | undefined)[],
     options: { withSpace?: boolean } = { withSpace: true }

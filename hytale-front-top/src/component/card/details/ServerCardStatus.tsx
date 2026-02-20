@@ -4,7 +4,7 @@ import { StatusService } from "../../../services/status.service";
 
 
 
-export function ServerHeaderStats(props: { server: ServerResponse }) {
+export function ServerCardStatus(props: { server: ServerResponse }) {
     const [status] = createResource<ServerStatus | null>(
         () => StatusService.getStatusById(props.server.id ?? 1),
         { initialValue: null }

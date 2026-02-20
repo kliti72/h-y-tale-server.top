@@ -4,10 +4,7 @@ import { marked } from "marked";
 import DOMPurify from "dompurify";
 
 const TABS = [
-  { id: 'overview', label: 'Panoramica', icon: '⚔️' },
-  { id: 'stats',    label: 'Statistiche', icon: '📜' },
-  { id: 'reviews',  label: 'Recensioni',  icon: '🏆' },
-  { id: 'events',   label: 'Eventi',      icon: '🔮' },
+  { id: 'overview', label: 'Panoramica', icon: '⚔️' }
 ] as const;
 
 type TabId = typeof TABS[number]['id'];

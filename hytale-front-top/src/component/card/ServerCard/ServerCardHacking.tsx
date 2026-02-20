@@ -2,8 +2,10 @@
 import { useNavigate } from "@solidjs/router";
 import { Component, createResource, Show } from "solid-js";
 import { notify } from "../../template/Notification";
-import { ServerResponse } from "../../../types/ServerResponse";
+import { ServerResponse, ServerStatus } from "../../../types/ServerResponse";
 import { VoteService } from "../../../services/votes.service";
+import { ServerCardStatus } from "../details/ServerCardStatus";
+import { StatusService } from "../../../services/status.service";
 
 // ═══════════════════════════════════════════════
 // 🕹️ LANG CONFIG
@@ -186,6 +188,11 @@ type ServerCardProps = {
 };
 
 const ServerCardHacking: Component<ServerCardProps> = (props) => {
+      const [status] = createResource<ServerStatus | null>(
+          () => StatusService.getStatusById(props.server.id ?? 1),
+          { initialValue: null }
+      );
+      
   const navigate = useNavigate();
   const [aviableVoteResource] = createResource(VoteService.aviableVote);
   const logoSrc = () => props.server.logo_url || "https://via.placeholder.com/80/030810/00f5ff?text=SRV";
@@ -238,16 +245,29 @@ const ServerCardHacking: Component<ServerCardProps> = (props) => {
             </div>
 
             {/* STATS */}
-            <div style="display: flex; align-items: center; gap: 0.6rem;">
+            
+                 <Show when={!status.loading} fallback={
+            <div class="px-1 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-xs">
+                <span class="text-yellow-300 font-bold"> Non hai integrato H-Y-TaleVerifier.jar</span>
+                
+                <br />
+               <span class="text-violet-400 text-xs">
+                    Sei il proprietario? <a href="/docs" class="underline text-violet-300 hover:text-white">Scaricalo qui</a>
+                </span>
+            </div>
+        }>
+                 <div style="display: flex; align-items: center; gap: 0.6rem;">
               <span class="gcard-stat stat-online">
-                {LANG.online} <span style="color: rgba(255,255,255,0.5);">87/200</span>
+                {LANG.online} <span style="color: rgba(255,255,255,0.5);">{status()?.players_online}/{status()?.players_max}</span>
               </span>
               <div class="gcard-stat-sep" />
               <span class="gcard-stat stat-votes">
-                {LANG.votes} <span style="color: rgba(255,255,255,0.5);">{props.server.votes ?? 0}</span>
+                {LANG.votes} <span style="color: rgba(255,255,255,0.5);">{props.server.voti_totali ?? 0}</span>
               </span>
             </div>
+        </Show>
           </div>
+     
 
           {/* BUTTONS */}
           <Show when={!props.nascondiPulsanti}>
