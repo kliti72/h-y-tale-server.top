@@ -1,5 +1,5 @@
 import { Database } from 'bun:sqlite';
-import { ServerRepository } from './ServerRepository';
+import { ServerRepository } from './serverRepository';
 
 interface Vote {
     id: string,

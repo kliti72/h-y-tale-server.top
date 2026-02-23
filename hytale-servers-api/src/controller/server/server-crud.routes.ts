@@ -1,9 +1,9 @@
 // src/routes/server/server-crud.routes.ts
 import { Elysia, t } from 'elysia';
 import { Database } from 'bun:sqlite';
-import { generateSecretKey } from '../../helper/GenerateSecretKey';
-import { ServerRepository } from '../../repository/ServerRepository';
-import { SessioneRepository } from '../../repository/SessionRepository';
+import { generateSecretKey } from '../../helper/generateSecretKey';
+import { ServerRepository } from '../../repository/serverRepository';
+import { SessioneRepository } from '../../repository/sessionRepository';
 
 export function registerServerCrudRoutes<TPrefix extends string = ''>(
   app: Elysia<TPrefix>,

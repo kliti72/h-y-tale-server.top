@@ -1,9 +1,9 @@
 import { Elysia, t } from 'elysia';
 import { Database } from 'bun:sqlite';
-import { generateSecretKey } from '../../helper/GenerateSecretKey';
-import { SessioneRepository } from '../../repository/SessionRepository';
-import { VoteRepository } from '../../repository/VoteRepository';
-import { ServerRepository } from '../../repository/ServerRepository';
+import { generateSecretKey } from '../../helper/generateSecretKey';
+import { SessioneRepository } from '../../repository/sessionRepository';
+import { VoteRepository } from '../../repository/voteRepository';
+import { ServerRepository } from '../../repository/serverRepository';
 
 export function registerVoteService(
   app = new Elysia({ prefix: '/vote' }),

@@ -1,12 +1,12 @@
 import Elysia, { redirect } from 'elysia';
 import { randomBytes } from 'crypto'
-import { sha256Base64url } from '../../helper/GeneratePKCE';
 import { Database } from 'bun:sqlite'
+import { sha256Base64url } from '../../helper/generatePKCE';
 
 export function registerAuthRoutes(
   app = new Elysia({prefix: "/auth"}),
   db : Database
-) {
+) { 
 
     const authStates = new Map<string, { verifier?: string; created: number }>()
     

@@ -1,7 +1,7 @@
 // src/routes/server/server-status.routes.ts
 import { Elysia, t } from 'elysia';
 import { Database } from 'bun:sqlite';
-import { ServerRepository } from '../../repository/ServerRepository';
+import { ServerRepository } from '../../repository/serverRepository';
 
 export function registerServerStatusRoutes<TPrefix extends string = ''>(
   app : Elysia<TPrefix>,
