@@ -17,11 +17,11 @@ export default function VoteButton(props: VoteButtonProps) {
 
   const handleClick = () => {
     if (!auth.isAuthenticated()) {
-      notify("Fai login con Discord per votare bro 🔐", "error");
+      notify("AUTH_REQUIRED // fai login con Discord", "error");
       return;
     }
     if (!canVote()) {
-      notify(`Puoi votare di nuovo tra ${waitTime()} ⏳`, "error");
+      notify(`COOLDOWN_ACTIVE // riprova tra ${waitTime()}h`, "error");
       return;
     }
     props.onVoteRequest(props.server);
@@ -31,51 +31,85 @@ export default function VoteButton(props: VoteButtonProps) {
     <Show
       when={!aviableVoteResource.loading}
       fallback={
-        /* ── Loading ── */
-        <button disabled class="flex items-center justify-center gap-3 px-8 py-4 rounded-xl text-lg font-bold border opacity-50 cursor-not-allowed border-violet-800/40 bg-violet-950/40 text-violet-500">
-          <span class="text-xl animate-spin">⏳</span>
-          Controllo...
+        <button
+          disabled
+          class="relative flex items-center justify-center gap-3 px-6 py-3 text-xs tracking-widest uppercase cursor-not-allowed opacity-40"
+          style={{
+            "font-family": "'Share Tech Mono', monospace",
+            border: "1px solid rgba(0,255,65,0.15)",
+            color: "rgba(0,255,65,0.4)",
+            background: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <span class="w-3 h-3 border border-green-500 border-t-transparent rounded-full animate-spin" />
+          CHECKING_VOTE_STATUS...
         </button>
       }
     >
       <Show
         when={canVote()}
         fallback={
-          /* ── Cannot vote yet ── */
           <div class="flex flex-col items-center gap-2">
+            {/* Cannot vote */}
             <button
               disabled
-              class="flex items-center justify-center gap-3 px-8 py-4 rounded-xl text-lg font-bold border border-red-800/50 bg-red-950/30 text-red-400/70 cursor-not-allowed shadow-inner"
+              class="relative flex items-center justify-center gap-3 px-6 py-3 text-xs tracking-widest uppercase cursor-not-allowed"
+              style={{
+                "font-family": "'Share Tech Mono', monospace",
+                border: "1px solid rgba(255,80,80,0.25)",
+                color: "rgba(255,80,80,0.4)",
+                background: "rgba(20,0,0,0.5)",
+              }}
             >
-              <span class="text-xl">⏰</span>
-              Già votato
+              <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-red-700/30 pointer-events-none" />
+              <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-red-700/30 pointer-events-none" />
+              ⚠ VOTE_LOCKED
             </button>
 
             {/* Cooldown badge */}
-            <div class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-orange-800/40 bg-orange-950/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
-              <span class="text-orange-400/80 text-xs font-medium">
-                Prossimo voto tra{" "}
-                <span class="text-orange-300 font-bold">{waitTime()}h</span>
-              </span>
+            <div
+              class="flex items-center gap-2 px-3 py-1.5 text-xs"
+              style={{
+                "font-family": "'Share Tech Mono', monospace",
+                border: "1px solid rgba(255,140,0,0.2)",
+                background: "rgba(10,5,0,0.6)",
+                color: "rgba(255,140,0,0.55)",
+              }}
+            >
+              <span class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" style={{ "box-shadow": "0 0 4px rgba(255,140,0,0.5)" }} />
+              COOLDOWN:{" "}
+              <span style={{ color: "rgba(255,160,0,0.8)", "font-weight": "bold" }}>{waitTime()}h</span>
+              {" "}// riprova dopo
             </div>
           </div>
         }
       >
-        {/* ── Can vote ── */}
+        {/* Can vote */}
         <button
           onClick={handleClick}
-          class="
-            flex items-center justify-center gap-3 px-8 py-4
-            bg-gradient-to-r from-fuchsia-600 to-purple-600
-            hover:from-fuchsia-500 hover:to-purple-500
-            rounded-xl text-lg font-bold shadow-lg shadow-fuchsia-900/50
-            hover:scale-105 active:scale-95 transition-all duration-300
-            border border-fuchsia-400/50
-          "
+          class="relative flex items-center justify-center gap-3 px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all"
+          style={{
+            "font-family": "'Share Tech Mono', monospace",
+            border: "1px solid rgba(0,255,65,0.45)",
+            color: "#00ff41",
+            background: "rgba(0,255,65,0.08)",
+            "box-shadow": "0 0 20px rgba(0,255,65,0.08)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(0,255,65,0.14)";
+            e.currentTarget.style.boxShadow = "0 0 30px rgba(0,255,65,0.2)";
+            e.currentTarget.style.letterSpacing = "0.15em";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(0,255,65,0.08)";
+            e.currentTarget.style.boxShadow = "0 0 20px rgba(0,255,65,0.08)";
+            e.currentTarget.style.letterSpacing = "0.1em";
+          }}
         >
-          <span class="text-2xl">🔥</span>
-          Vota ora
+          <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-green-500/50 pointer-events-none" />
+          <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-green-500/50 pointer-events-none" />
+          <span style={{ color: "rgba(0,255,65,0.7)" }}>⬡</span>
+          ESEGUI_VOTO.exe
         </button>
       </Show>
     </Show>

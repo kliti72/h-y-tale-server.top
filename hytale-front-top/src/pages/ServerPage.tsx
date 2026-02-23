@@ -10,6 +10,8 @@ import { useAuth } from "../auth/AuthContext";
 import { A } from "@solidjs/router";
 import TopFiveServerCard from "../component/card/widget/TopFiveServerCard";
 import ServerCardHacking from "../component/card/ServerCard/ServerCardHacking";
+import HeroMain from "../component/hero/HeroMain";
+import HeroServerMain from "../component/hero/HeroServerMain";
 
 // ═══════════════════════════════════════════════
 // 🕹️ LANG CONFIG — cambia tutto il testo qui
@@ -459,229 +461,282 @@ const ServersPage: Component = () => {
     return parts.join(' + ');
   });
 
-  return (
-    <section class="arcade-bg scanlines text-white" style="font-family: 'Share Tech Mono', monospace;">
-      <style>{ARCADE_STYLES}</style>
-        <div class="lb-hero">
-          <div class="lb-hero-bg" />
-          <div class="lb-hero-grid" />
-          <div class="lb-tag">{LANG.hero.tag} <span class="blink">_</span></div>
-          <div class="lb-title">{LANG.hero.title}</div>
-          <div class="lb-subtitle">{LANG.hero.subtitle}</div>
-        </div>
+  // Sostituisci solo il JSX del return, tenendo tutta la logica esistente invariata
 
-      {/* ── MAIN LAYOUT ── */}
-      <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex gap-6">
+return (
+  <section
+    class="min-h-screen text-white"
+    style={{
+      background: "linear-gradient(160deg, #000300 0%, #000a02 40%, #000500 100%)",
+      "font-family": "'Share Tech Mono', monospace",
+    }}
+  >
+    {/* Grid bg overlay */}
+    <div
+      class="fixed inset-0 pointer-events-none opacity-100"
+      style={{
+        "background-image": `
+          linear-gradient(rgba(0,255,65,0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,255,65,0.025) 1px, transparent 1px)
+        `,
+        "background-size": "40px 40px",
+        "z-index": "0",
+      }}
+    />
+    {/* Scanlines */}
+    <div
+      class="fixed inset-0 pointer-events-none"
+      style={{
+        "z-index": "1",
+        background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,65,0.008) 3px, rgba(0,255,65,0.008) 4px)",
+      }}
+    />
 
-          {/* ── SIDEBAR SX ── */}
-          <aside class="hidden lg:block w-72 flex-shrink-0">
-            <div style="position: sticky; top: 1rem;">
+    {/* ── HERO ── */}
+    <div class="relative overflow-hidden border-b border-green-900/30 py-12 px-6 text-center">
+      <HeroServerMain />
+    </div>
 
-              {/* FILTRI ATTIVI / INATTIVI */}
-              <Show
-                when={activeFiltersMessage()}
-                fallback={
-                  <div class="arcade-card neon-border-purple p-4 mb-4">
-                    <div class="flex items-center gap-3 mb-3">
-                      <span class="text-2xl float">◎</span>
-                      <div>
-                        <div class="orbitron text-xs text-purple-300/70 font-bold">{LANG.filters.inactive.title}</div>
-                        <div class="mono text-xs text-white/30 mt-0.5">{LANG.filters.inactive.subtitle}</div>
-                      </div>
-                    </div>
-                    <div class="mono text-xs text-white/20 text-center py-2.5 border border-white/10 arcade-card">
-                      {LANG.filters.active.ghost}
-                    </div>
-                  </div>
-                }
-              >
-                <div class="arcade-card neon-border-pink p-4 mb-4">
-                  <div class="flex items-start gap-3 mb-3">
-                    <span class="text-2xl neon-text-pink">◈</span>
-                    <div class="flex-1">
-                      <div class="orbitron text-xs neon-text-pink font-black mb-1">{LANG.filters.active.title}</div>
-                      <div class="mono text-xs text-white/50">
-                        {LANG.filters.active.viewing} <span class="neon-text-cyan">{activeFiltersMessage()}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={clearAllFilters}
-                    class="arcade-btn w-full py-2.5 text-xs bg-pink-900/30 neon-border-pink neon-text-pink orbitron"
-                  >
-                    {LANG.filters.active.clear}
-                  </button>
-                </div>
-              </Show>
+    {/* ── MAIN LAYOUT ── */}
+    <div class="relative z-10 max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex gap-6">
 
-              {/* SEARCH */}
-              <div class="arcade-card neon-border-cyan p-4 mb-4">
-                <div class="orbitron text-xs neon-text-cyan font-black mb-0.5 tracking-widest">{LANG.search.title}</div>
-                <div class="mono text-xs text-white/30 mb-3">{LANG.search.subtitle}</div>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 neon-text-cyan text-sm">▶</span>
-                  <input
-                    type="text"
-                    placeholder={LANG.search.placeholder}
-                    value={searchQuery()}
-                    onInput={(e) => setSearchQuery(e.currentTarget.value)}
-                    class="arcade-input w-full pl-8 pr-4 py-2.5 text-sm rounded-none"
-                  />
-                </div>
-              </div>
+        {/* ── SIDEBAR SX ── */}
+        <aside class="hidden lg:block w-72 flex-shrink-0">
+          <div class="sticky top-4 space-y-4">
 
-              {/* TAGS */}
-              <div class="arcade-card neon-border-cyan p-4 mb-4">
-                <div class="orbitron text-xs font-black mb-3 tracking-widest">{LANG.filters.title}</div>
-                <div class="flex flex-wrap gap-2">
-                  <For each={availableTags}>
-                    {(tag) => {
-                      const idx = availableTags.indexOf(tag) % TAG_COLORS.length;
-                      const isActive = () => activeFilters().has(tag);
-                      return (
-                        <button
-                          onClick={() => toggleFilter(tag)}
-                          class={`mono text-xs px-2.5 py-1.5 border transition-all duration-200 ${isActive()
-                            ? TAG_COLORS[idx].active + ' tag-active bg-white/5'
-                            : TAG_COLORS[idx].inactive + ' bg-transparent hover:bg-white/5'
-                          }`}
-                        >
-                          {isActive() ? '◈ ' : '◎ '}#{tag}
-                        </button>
-                      );
-                    }}
-                  </For>
-                </div>
-              </div>
-
-              {/* QUICK */}
-             
-            </div>
-          </aside>
-
-          {/* ── CENTRO ── */}
-          <main class="flex-1 min-w-0">
-            {/* RESULTS BAR */}
-            <div class="arcade-card neon-border-cyan px-4 py-3 mb-6 flex items-center justify-between">
-              <div class="mono text-sm">
-                <span class="text-white/40">{LANG.results.showing} </span>
-                <span class="neon-text-cyan font-bold">{filteredServers().length}</span>
-                <span class="text-white/40"> {LANG.results.servers}</span>
-              </div>
-              <span class="neon-text-pink blink mono text-xs">◈ LIVE</span>
-            </div>
-
+            {/* Filtri attivi / inattivi */}
             <Show
-              when={!initialData.loading}
+              when={activeFiltersMessage()}
+              fallback={
+                <div class="relative border border-purple-800/40 bg-black/60 p-4">
+                  <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-purple-500/40" />
+                  <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-purple-500/40" />
+                  <div class="flex items-center gap-3 mb-3">
+                    <span class="text-xl text-purple-400/60">◎</span>
+                    <div>
+                      <div class="text-xs text-purple-300/60 font-bold tracking-widest uppercase">{LANG.filters.inactive.title}</div>
+                      <div class="text-xs text-white/25 mt-0.5">{LANG.filters.inactive.subtitle}</div>
+                    </div>
+                  </div>
+                  <div class="text-xs text-white/20 text-center py-2 border border-white/10 bg-black/40">
+                    {LANG.filters.active.ghost}
+                  </div>
+                </div>
+              }
+            >
+              <div class="relative border border-pink-700/50 bg-black/60 p-4">
+                <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-pink-500/50" />
+                <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-pink-500/50" />
+                <div class="flex items-start gap-3 mb-3">
+                  <span class="text-xl text-pink-400">◈</span>
+                  <div class="flex-1">
+                    <div class="text-xs text-pink-400 font-black tracking-widest uppercase mb-1">{LANG.filters.active.title}</div>
+                    <div class="text-xs text-white/50">
+                      {LANG.filters.active.viewing} <span class="text-cyan-400">{activeFiltersMessage()}</span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={clearAllFilters}
+                  class="w-full py-2 text-xs border border-pink-700/50 text-pink-400 bg-pink-900/20 hover:bg-pink-900/40 hover:border-pink-500/70 transition-all tracking-widest uppercase"
+                >
+                  {LANG.filters.active.clear}
+                </button>
+              </div>
+            </Show>
+
+            {/* Search */}
+            <div class="relative border border-green-800/40 bg-black/60 p-4">
+              <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-green-500/40" />
+              <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-green-500/40" />
+              <div class="text-xs text-green-400/70 font-bold tracking-widest uppercase mb-1">{LANG.search.title}</div>
+              <div class="text-xs text-white/25 mb-3">{LANG.search.subtitle}</div>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-green-500 text-xs">▶</span>
+                <input
+                  type="text"
+                  placeholder={LANG.search.placeholder}
+                  value={searchQuery()}
+                  onInput={(e) => setSearchQuery(e.currentTarget.value)}
+                  class="w-full pl-7 pr-4 py-2 text-sm bg-black/60 border border-green-900/50 text-green-300 placeholder-green-900/60 focus:outline-none focus:border-green-600/60 transition-colors"
+                  style={{ "font-family": "'Share Tech Mono', monospace" }}
+                />
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div class="relative border border-green-800/40 bg-black/60 p-4">
+              <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-green-500/40" />
+              <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-green-500/40" />
+              <div class="text-xs text-green-400/70 font-bold tracking-widest uppercase mb-3">{LANG.filters.title}</div>
+              <div class="flex flex-wrap gap-2">
+                <For each={availableTags}>
+                  {(tag) => {
+                    const idx = availableTags.indexOf(tag) % TAG_COLORS.length;
+                    const isActive = () => activeFilters().has(tag);
+                    return (
+                      <button
+                        onClick={() => toggleFilter(tag)}
+                        class={`text-xs px-2.5 py-1.5 border transition-all duration-200 tracking-wide ${
+                          isActive()
+                            ? TAG_COLORS[idx].active + " bg-white/5"
+                            : TAG_COLORS[idx].inactive + " bg-transparent hover:bg-white/5"
+                        }`}
+                        style={{ "font-family": "'Share Tech Mono', monospace" }}
+                      >
+                        {isActive() ? "◈ " : "◎ "}#{tag}
+                      </button>
+                    );
+                  }}
+                </For>
+              </div>
+            </div>
+
+          </div>
+        </aside>
+
+        {/* ── CENTRO ── */}
+        <main class="flex-1 min-w-0">
+
+          {/* Results bar */}
+          <div class="relative border border-green-800/40 bg-black/60 px-4 py-3 mb-6 flex items-center justify-between">
+            <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-green-500/40" />
+            <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-green-500/40" />
+            <div class="text-sm">
+              <span class="text-white/30">{LANG.results.showing} </span>
+              <span class="text-green-400 font-bold">{filteredServers().length}</span>
+              <span class="text-white/30"> {LANG.results.servers}</span>
+            </div>
+            <span class="text-pink-400 animate-pulse text-xs tracking-widest">◈ LIVE</span>
+          </div>
+
+          <Show
+            when={!initialData.loading}
+            fallback={
+              <div class="text-center py-20">
+                <div class="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <div class="text-sm text-green-700/60 tracking-widest">{LANG.page.loading}</div>
+              </div>
+            }
+          >
+            <Show
+              when={!initialData.error}
               fallback={
                 <div class="text-center py-20">
-                  <div class="pixel-font text-sm neon-text-cyan">{LANG.page.loading}</div>
+                  <div class="text-sm text-pink-500/70 tracking-widest">{LANG.page.error}</div>
                 </div>
               }
             >
               <Show
-                when={!initialData.error}
+                when={filteredServers().length > 0}
                 fallback={
-                  <div class="text-center py-20">
-                    <div class="pixel-font text-sm neon-text-pink">{LANG.page.error}</div>
+                  <div class="relative border border-yellow-800/40 bg-black/60 text-center py-16 px-8">
+                    <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-yellow-500/40" />
+                    <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-yellow-500/40" />
+                    <div class="text-4xl text-yellow-400/60 mb-4">?</div>
+                    <div class="text-lg text-yellow-400/80 mb-2 tracking-widest uppercase" style={{ "font-family": "'Orbitron', monospace" }}>
+                      {LANG.results.notFound}
+                    </div>
+                    <div class="text-sm text-white/25 mb-6">{LANG.results.notFoundSub}</div>
+                    <button
+                      onClick={clearAllFilters}
+                      class="px-8 py-3 border border-yellow-700/50 text-yellow-400/80 bg-yellow-900/20 hover:bg-yellow-900/40 transition-all text-sm tracking-widest uppercase"
+                      style={{ "font-family": "'Share Tech Mono', monospace" }}
+                    >
+                      {LANG.results.clearFilters}
+                    </button>
                   </div>
                 }
               >
-                <Show
-                  when={filteredServers().length > 0}
-                  fallback={
-                    <div class="arcade-card neon-border-yellow text-center py-16 px-8">
-                      <div class="pixel-font text-4xl neon-text-yellow mb-4 float">?</div>
-                      <div class="orbitron text-lg neon-text-yellow mb-2">{LANG.results.notFound}</div>
-                      <div class="mono text-sm text-white/30 mb-6">{LANG.results.notFoundSub}</div>
-                      <button
-                        onClick={clearAllFilters}
-                        class="arcade-btn px-8 py-3 bg-yellow-900/30 neon-border-yellow neon-text-yellow orbitron text-sm"
-                      >
-                        {LANG.results.clearFilters}
-                      </button>
-                    </div>
-                  }
-                >
-                  <div class="grid grid-cols-1 gap-4">
-                    <For each={filteredServers()}>
-                      {(server) => <ServerCardHacking server={server} onVoteRequest={handleVoteRequest} />}
-                    </For>
+                <div class="grid grid-cols-1 gap-4">
+                  <For each={filteredServers()}>
+                    {(server) => <ServerCardHacking server={server} onVoteRequest={handleVoteRequest} />}
+                  </For>
+                </div>
+
+                <Show when={isLoadingMore()}>
+                  <div class="text-center py-10">
+                    <div class="w-5 h-5 border border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                    <div class="text-sm text-green-800/50 tracking-widest">{LANG.results.loadingMore}</div>
                   </div>
+                </Show>
 
-                  <Show when={isLoadingMore()}>
-                    <div class="text-center py-10">
-                      <div class="mono text-sm neon-text-cyan">{LANG.results.loadingMore}</div>
+                <Show when={!hasMore() && allServers().length > 0}>
+                  <div class="text-center py-10 border-t border-green-900/20 mt-6">
+                    <div
+                      class="text-sm text-green-600/50 mb-1 tracking-widest uppercase"
+                      style={{ "font-family": "'Orbitron', monospace" }}
+                    >
+                      {LANG.results.allLoaded}
                     </div>
-                  </Show>
-
-
-
-                  <Show when={!hasMore() && allServers().length > 0}>
-                    <div class="text-center py-10 border-t border-cyan-900/30 mt-6">
-                      <div class="pixel-font text-sm neon-text-green mb-2">{LANG.results.allLoaded}</div>
-                      <div class="mono text-xs text-white/30">{LANG.results.allLoadedSub}</div>
-                    </div> 
-                  </Show>
+                    <div class="text-xs text-white/20 tracking-widest">{LANG.results.allLoadedSub}</div>
+                  </div>
                 </Show>
               </Show>
             </Show>
-          </main>
+          </Show>
+        </main>
 
-          {/* ── SIDEBAR DX ── */}
-          <aside class="hidden lg:block w-72 flex-shrink-0">
-            <TopFiveServerCard />
-            
-            <div style="position: sticky; top: 1rem;">
-               <div class="arcade-card neon-border-purple p-4">
-                <div class="orbitron text-xs neon-text-purple font-black mb-3 tracking-widest">{LANG.quick.title}</div>
-                <Show when={auth.isAuthenticated()}>
-                  <A
-                    href="/servers/add"
-                    class="arcade-btn block w-full py-2.5 text-xs text-center bg-green-900/30 border border-green-500/50 text-green-400 orbitron mb-2"
-                  >
-                    {LANG.quick.add}
-                  </A>
-                </Show>
-                <button
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  class="arcade-btn w-full py-2.5 text-xs bg-purple-900/30 border border-purple-500/50 text-purple-400 orbitron"
+        {/* ── SIDEBAR DX ── */}
+        <aside class="hidden lg:block w-72 flex-shrink-0 space-y-4">
+          {/* <TopFiveServerCard /> */}
+
+          <div class="sticky top-4">
+            <div class="relative border border-purple-800/40 bg-black/60 p-4">
+              <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-purple-500/40" />
+              <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-purple-500/40" />
+              <div class="text-xs text-purple-400/70 font-bold tracking-widest uppercase mb-3">{LANG.quick.title}</div>
+              <Show when={auth.isAuthenticated()}>
+                <A
+                  href="/servers/add"
+                  class="block w-full py-2.5 text-xs text-center border border-green-700/50 text-green-400/80 bg-green-900/20 hover:bg-green-900/40 hover:border-green-500/60 transition-all tracking-widest uppercase mb-2"
+                  style={{ "font-family": "'Share Tech Mono', monospace" }}
                 >
-                  {LANG.quick.scrollTop}
-                </button>
-              </div>
+                  {LANG.quick.add}
+                </A>
+              </Show>
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                class="w-full py-2.5 text-xs border border-purple-700/50 text-purple-400/80 bg-purple-900/20 hover:bg-purple-900/40 hover:border-purple-500/60 transition-all tracking-widest uppercase"
+                style={{ "font-family": "'Share Tech Mono', monospace" }}
+              >
+                {LANG.quick.scrollTop}
+              </button>
             </div>
-          </aside>
-        </div>
+          </div>
+        </aside>
+
       </div>
+    </div>
 
-      <PlayersVoteModal
-        isOpen={isModalOpen()}
-        onClose={() => setIsModalOpen(false)}
-        server_id={selectedServer()?.id || 0}
-        discord_id_user={discord_id_user}
-        server_secret_key={selectedServer()?.secret_key || ""}
-        server_name={selectedServer()?.name || ''}
-        server_ip={selectedServer()?.ip || ''}
-        player_game_name={playerGameName() ?? ''}
-        onPlayerNameChange={() => setPlayerGameName("")}
-        onPlayerVote={handlePlayerVote}
-      />
+    {/* Modals & Notifications */}
+    <PlayersVoteModal
+      isOpen={isModalOpen()}
+      onClose={() => setIsModalOpen(false)}
+      server_id={selectedServer()?.id || 0}
+      discord_id_user={discord_id_user}
+      server_secret_key={selectedServer()?.secret_key || ""}
+      server_name={selectedServer()?.name || ""}
+      server_ip={selectedServer()?.ip || ""}
+      player_game_name={playerGameName() ?? ""}
+      onPlayerNameChange={() => setPlayerGameName("")}
+      onPlayerVote={handlePlayerVote}
+    />
+    <Notifications />
 
-      <Notifications />
-
-      {/* SCROLL TOP BTN */}
-      <Show when={scrollY() > 500}>
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          class="fixed bottom-8 right-8 z-50 w-14 h-14 arcade-btn neon-border-pink bg-black flex items-center justify-center pixel-font text-lg neon-text-pink"
-        >
-          {LANG.scrollTop}
-        </button>
-      </Show>
-    </section>
-  );
+    {/* Scroll top FAB */}
+    <Show when={scrollY() > 500}>
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        class="fixed bottom-8 right-8 z-50 w-12 h-12 border border-pink-700/60 bg-black text-pink-400 hover:border-pink-500 hover:text-pink-300 hover:shadow-lg hover:shadow-pink-900/30 transition-all flex items-center justify-center text-lg"
+        style={{ "font-family": "'Share Tech Mono', monospace" }}
+      >
+        ↑
+      </button>
+    </Show>
+  </section>
+);
 };
 
 export default ServersPage;

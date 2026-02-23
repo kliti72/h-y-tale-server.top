@@ -1,12 +1,9 @@
 import { Router, Route } from '@solidjs/router';
 import NotFound from './component/template/NotFound';
 import { AuthProvider } from './auth/AuthContext';
-import Header from './component/template/Header';
 import Footer from './component/template/Footer';
 import ServerDetail from './pages/details/ServerDetailPage';
 import Panel from './pages/todo/ManagePanelPage';
-import Docs from './pages/DocsPage';
-import ProfileEarnings from './pages/Profile';
 import Home from './pages/HomePage';
 import Contatti from './pages/about/ContattiPage';
 import { ServerEditWrapper} from './component/modal/ServerEditWrapper';
@@ -16,7 +13,8 @@ import LeaderboardHacking from './pages/LeaderboardPage';
 import PrivacyPolicyPage from './pages/about/PrivacyPolicyPage';
 import LeaderboardStonePage from './pages/theme_game/LeaderboardStonePage';
 import Earn from './pages/todo/Earn';
-import FavoritePage from './pages/todo/TODOFavoritePage';
+import HeaderHacking from './pages/theme_game/HeaderHackingPage';
+import DocsPage from './pages/DocsPage';
 
 
 function App() {
@@ -24,7 +22,7 @@ function App() {
     <Router
       root={(props) => (
         <AuthProvider>
-          <Header />
+          <HeaderHacking />
           {props.children}
           <Footer />
         </AuthProvider>
@@ -39,7 +37,7 @@ function App() {
       <Route path="/servers/edit/:id" component={ServerEditWrapper} />
       <Route path="/server/:id" component={ServerDetail} />
       <Route path="/panel" component={Panel} />
-      <Route path="/docs" component={Docs} />
+      <Route path="/docs" component={DocsPage} />
       <Route path="/contatti" component={Contatti} />
       <Route path="/privacy" component={PrivacyPolicyPage} />
       <Route path="*" component={NotFound} />

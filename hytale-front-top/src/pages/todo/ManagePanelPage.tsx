@@ -5,7 +5,7 @@ import {
   Show,
   Suspense
 } from 'solid-js';
-import { useNavigate } from '@solidjs/router'; // Aggiungi questo import
+import { useNavigate } from '@solidjs/router';
 import { useAuth } from '../../auth/AuthContext';
 import ConfirmDeleteModal from '../../component/modal/ConifrmDeleteModal';
 import NotAuthenticatedNotice from '../../component/template/NoAuthenticationNotice';
@@ -14,284 +14,297 @@ import { ServerService } from '../../services/server.service';
 import { ServerResponse } from '../../types/ServerResponse';
 import StringArrayUtils from '../../utils/StringArrayUtils';
 
-
 export default function ManagePanelPage() {
   const auth = useAuth();
-  const navigate = useNavigate(); // Usa questo invece di navigation
+  const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = createSignal(false);
   const [selectedServer, setSelectedServer] = createSignal<ServerResponse | null>(null);
 
-  // Fetch dei tuoi server
   const [myServersData, { refetch }] = createResource(
-    () => auth.isAuthenticated(), // Dipendenza: rifai fetch se auth cambia
+    () => auth.isAuthenticated(),
     async () => {
       if (!auth.isAuthenticated()) return null;
-
       try {
         const data = await ServerService.getMyServers();
-        console.log("I tuoi server:", data);
         return data;
       } catch (error) {
-        console.error("Errore caricamento server:", error);
-        notify("Errore nel caricamento dei server bro!", "error");
+        notify("ERRORE_CARICAMENTO // riprova", "error");
         return null;
       }
     }
   );
 
-  // Helper per prendere solo l'array di server
   const servers = () => myServersData()?.servers || [];
 
-  // Delete server
   const handleConfirmDelete = async () => {
     const server = selectedServer();
     if (!server) return;
-
     try {
-      // Chiamata API per eliminare
-      await ServerService.deleteServer(server.id ?? 0); // Devi implementare questo metodo
-
-      notify(`Server "${server.name}" eliminato con successo! 🗑️`, "success");
+      await ServerService.deleteServer(server.id ?? 0);
+      notify(`SERVER_DELETED // "${server.name}"`, "success");
       setDeleteModalOpen(false);
       setSelectedServer(null);
-
-      // Ricarica la lista
       refetch();
     } catch (error) {
-      console.error("Errore eliminazione:", error);
-      notify("Non sono riuscito a eliminare il server fra!", "error");
+      notify("DELETE_FAILED // permesso negato", "error");
     }
   };
 
   return (
-    <div class="bg-black min-h-screen">
+    <div
+      class="min-h-screen text-white"
+      style={{
+        background: "linear-gradient(160deg, #000300 0%, #000a02 40%, #000500 100%)",
+        "font-family": "'Share Tech Mono', monospace",
+      }}
+    >
+      {/* Grid bg */}
+      <div class="fixed inset-0 pointer-events-none" style={{
+        "z-index": "-10",
+        "background-image": `linear-gradient(rgba(0,255,65,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,65,0.025) 1px, transparent 1px)`,
+        "background-size": "40px 40px",
+      }} />
+      {/* Scanlines */}
+      <div class="fixed inset-0 pointer-events-none" style={{
+        "z-index": "1",
+        background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,65,0.008) 3px, rgba(0,255,65,0.008) 4px)",
+      }} />
+
       <NotAuthenticatedNotice />
 
       <Show when={auth.isAuthenticated()}>
-        {/* Header hero */}
-        <div class="relative py-16 md:py-20 px-6 text-center border-b border-violet-900/60 backdrop-blur-xl">
-          <div class="absolute inset-0 bg-gradient-to-br from-violet-900/20 via-transparent to-fuchsia-900/10 pointer-events-none" />
+        <div class="relative z-1">
 
-          <h1 class="
-            text-5xl md:text-7xl font-black tracking-tight mb-6
-            text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400
-            drop-shadow-2xl animate-pulse-slow
-          ">
-            I MIEI SERVER
-          </h1>
-          <p class="text-xl md:text-2xl text-violet-200/90 max-w-4xl mx-auto mb-10">
-            Gestisci i tuoi regni, personalizza i dettagli e mantieni il controllo totale fra! 💪
-          </p>
-
-          <button
-            onClick={() => navigate("/servers/add")}
-            class="
-              inline-flex items-center gap-4 px-10 py-5 rounded-2xl text-xl font-bold
-              bg-gradient-to-r from-violet-700 via-fuchsia-700 to-pink-700
-              hover:from-violet-600 hover:via-fuchsia-600 hover:to-pink-600
-              text-white shadow-2xl shadow-violet-900/60 hover:shadow-violet-800/80
-              border-2 border-violet-600/60 hover:border-violet-400/80
-              transition-all duration-300 active:scale-95 transform hover:-translate-y-1
-            "
-          >
-            <span class="text-3xl">✦</span> Aggiungi Nuovo Server
-          </button>
-        </div>
-
-        {/* Profilo utente + statistiche */}
-        <div class="max-w-7xl mx-auto px-6 py-12">
-          <div class="
-            backdrop-blur-xl bg-black/50 border border-violet-800/50 rounded-2xl p-8 mb-16
-            shadow-2xl shadow-violet-950/40
-          ">
-            <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
-              <div class="relative mb-3">
-                <img
-                  src={
-                    auth.user()?.avatar
-                      ? `https://cdn.discordapp.com/avatars/${auth.user()?.id}/${auth.user()?.avatar}.png?size=256`
-                      : `https://cdn.discordapp.com/embed/avatars/0.png`
-                  }
-                  alt="Il tuo avatar Discord"
-                  class="w-30 h-30 rounded-full object-cover border-4 border-zinc-700 shadow-lg"
-                />
-              </div>
-
-              <div class="flex-1 text-center md:text-left">
-                <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-400 mb-3">
-                  {auth.user()?.global_name || auth.user()?.username}
-                </h2>
-                <p class="text-xl text-violet-300/90 mb-2">@{auth.user()?.username || "username"}</p>
-                <div class="flex flex-wrap gap-6 text-lg text-zinc-300 mt-6">
-                  <div>
-                    <span class="text-violet-400 font-bold">Server posseduti:</span> {servers().length}
-                  </div>
-                  <div>
-                    <span class="text-violet-400 font-bold">Totale voti:</span> {servers().reduce((acc, s) => acc + (s.votes || 0), 0)}
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* ── HERO ── */}
+  
+  
+            
+  
           </div>
 
-          {/* Lista server */}
-          <Suspense fallback={
-            <div class="text-center py-20 text-violet-400 text-2xl">
-              ⏳ Caricamento dei tuoi server...
-            </div>
-          }>
-            <Show
-              when={!myServersData.loading && servers().length > 0}
-              fallback={
-                <div class="text-center py-20 text-xl text-zinc-400 bg-black/40 rounded-2xl border border-violet-900/50 p-12">
-                  Non hai ancora creato nessun server bro!<br />
-                  <span class="text-violet-300">Clicca sopra per aggiungere il tuo primo server! 🚀</span>
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+            <button
+                onClick={() => navigate("/servers/add")}
+                class="relative inline-flex items-center gap-3 px-8 py-3.5 text-sm font-bold text-green-400 uppercase tracking-widest border border-green-700/50 bg-green-900/20 hover:bg-green-900/35 hover:border-green-500/60 transition-all"
+                style={{ "font-family": "'Share Tech Mono', monospace" }}
+              >
+                <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-green-500/50 pointer-events-none" />
+                <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-green-500/50 pointer-events-none" />
+                + DEPLOY_NEW_SERVER.exe
+              </button>
+              
+            {/* ── USER CARD ── */}
+            <div class="relative border border-green-900/30 bg-black/50 p-6 mb-10">
+              <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-green-500/30 pointer-events-none" />
+              <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-green-500/30 pointer-events-none" />
+
+              <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+                {/* Avatar */}
+                <div class="relative flex-shrink-0">
+                  <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-green-500/40 pointer-events-none" />
+                  <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-green-500/40 pointer-events-none" />
+                  <img
+                    src={
+                      auth.user()?.avatar
+                        ? `https://cdn.discordapp.com/avatars/${auth.user()?.id}/${auth.user()?.avatar}.png?size=256`
+                        : `https://cdn.discordapp.com/embed/avatars/0.png`
+                    }
+                    alt="avatar"
+                    class="w-20 h-20 object-cover"
+                    style={{ filter: "saturate(0.7) brightness(0.85)", "box-shadow": "0 0 20px rgba(0,255,65,0.1)" }}
+                  />
                 </div>
-              }
-            >
-              <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <For each={servers()}>
-                  {(server) => (
-                    <div class="
-                      group relative rounded-2xl overflow-hidden
-                      bg-gradient-to-br from-gray-950 via-indigo-950 to-purple-950
-                      border-2 border-violet-800/50 hover:border-fuchsia-600/70
-                      shadow-2xl shadow-violet-950/50 hover:shadow-fuchsia-900/70
-                      transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2 backdrop-blur-md
-                    "
-                    >
-                      {/* Logo / immagine server */}
-                      <div 
-                        class="h-48 bg-gradient-to-br from-violet-900/40 to-black relative overflow-hidden cursor-pointer"
-                            onClick={() => navigate(`/server/${server.id}`)} // Usa ID non name!
-                      >
-                        <Show when={server.logo_url}>
-                          <img
-                            src={server.logo_url}
-                            alt={server.name}
-                            class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" 
-                          />
-                        </Show>
-                        <Show when={!server.logo_url}>
-                          <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-30">
-                            {server.name?.[0]?.toUpperCase() || "?"}
-                          </div>
-                        </Show>
+
+                <div class="flex-1 text-center md:text-left">
+                  <div class="text-green-700/45 text-xs tracking-widest mb-1">&gt; USER_AUTHENTICATED</div>
+                  <h2
+                    class="text-2xl font-black text-white mb-1"
+                    style={{ "font-family": "'Orbitron', monospace" }}
+                  >
+                    {auth.user()?.global_name || auth.user()?.username}
+                  </h2>
+                  <div class="text-green-800/50 text-xs mb-4">@{auth.user()?.username} // ID: {auth.user()?.id?.slice(0, 8)}...</div>
+
+                  <div
+                    class="h-px mb-4"
+                    style={{ background: "linear-gradient(90deg, rgba(0,255,65,0.15), transparent)" }}
+                  />
+
+                  <div class="flex flex-wrap gap-4 text-xs">
+                    {[
+                      { label: "SERVER_OWNED", value: servers().length },
+                      { label: "TOTAL_VOTES", value: servers().reduce((acc, s) => acc + (s.votes || 0), 0) },
+                    ].map((stat) => (
+                      <div class="flex items-center gap-2">
+                        <span class="text-green-700/45">◈</span>
+                        <span class="text-green-800/60">{stat.label}:</span>
+                        <span class="text-green-400 font-bold">{stat.value}</span>
                       </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                      <div class="p-6">
-                    
+            {/* Section label */}
+            <div class="flex items-center gap-3 mb-6">
+              <span class="text-green-700/45 text-xs tracking-[0.25em] uppercase">// SERVER_LIST</span>
+              <div class="h-px flex-1 bg-green-900/25" />
+            </div>
 
-                        <p class="font-mono text-violet-300 mb-3">
-                          {server.ip}:{server.port}
-                        </p>
+            {/* ── SERVER LIST ── */}
+            <Suspense fallback={
+              <div class="text-center py-20">
+                <div class="w-7 h-7 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <div class="text-xs text-green-700/50 tracking-widest animate-pulse">◎ LOADING_SERVERS...</div>
+              </div>
+            }>
+              <Show
+                when={!myServersData.loading && servers().length > 0}
+                fallback={
+                  <div class="relative border border-green-900/25 bg-black/40 text-center py-16 px-8">
+                    <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-green-500/25 pointer-events-none" />
+                    <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-green-500/25 pointer-events-none" />
+                    <div class="text-3xl text-green-800/30 mb-4">?</div>
+                    <div class="text-sm text-green-800/50 tracking-widest uppercase mb-2">NO_SERVERS_FOUND</div>
+                    <div class="text-xs text-green-900/40 tracking-widest">
+                      &gt; Clicca DEPLOY_NEW_SERVER.exe per iniziare
+                    </div>
+                    <br>
+                    </br>
+                  <br>
+                  </br>
 
-                        <Show when={server.description}>
-                          <p class="text-zinc-300 text-sm mb-5 line-clamp-3">
-                            {server.description}
-                          </p>
-                        </Show>
+                              <button
+                onClick={() => navigate("/servers/add")}
+                class="relative inline-flex items-center gap-3 px-8 py-3.5 text-sm font-bold text-green-400 uppercase tracking-widest border border-green-700/50 bg-green-900/20 hover:bg-green-900/35 hover:border-green-500/60 transition-all"
+                style={{ "font-family": "'Share Tech Mono', monospace" }}
+              >
+                <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-green-500/50 pointer-events-none" />
+                <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-green-500/50 pointer-events-none" />
+                + DEPLOY_NEW_SERVER.exe
+              </button>
+                  </div>
+                }
+              >
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <For each={servers()}>
+                    {(server) => (
+                      <div class="relative border border-green-900/30 bg-black/50 hover:border-green-700/45 transition-all group"
+                        style={{ "box-shadow": "0 0 0 rgba(0,255,65,0)", transition: "box-shadow 0.3s" }}
+                        onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 0 25px rgba(0,255,65,0.05)"}
+                        onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 0 0 rgba(0,255,65,0)"}
+                      >
+                        <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-green-500/30 pointer-events-none z-10" />
+                        <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-green-500/30 pointer-events-none z-10" />
 
-                        {/* Tags */}
-                        <div class="flex flex-wrap gap-2 mb-6">
-                          <For each={StringArrayUtils.toArray(server.tags.toString())}>
-                            {(tag, i) => (
-                              <span
-                                class="flex items-center gap-2 px-3 py-1.5"
-                                style={{
-                                  background: "linear-gradient(135deg, rgba(60,35,10,0.7) 0%, rgba(40,22,5,0.9) 100%)",
-                                  border: "1px solid #4a3520",
-                                  "border-top": "1px solid #6a4c28",
-                                  "border-bottom": "1px solid #2a1a08",
-                                  "font-family": "'Palatino Linotype', Palatino, Georgia, serif",
-                                  "font-size": "0.72rem",
-                                  color: "#c8a050",
-                                  "letter-spacing": "0.06em",
-                                  "text-shadow": "0 0 8px rgba(200,160,80,0.25), 0 1px 0 rgba(0,0,0,0.8)",
-                                  "box-shadow": "0 2px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(200,160,80,0.06)",
-                                  "clip-path": "polygon(6px 0%, calc(100% - 6px) 0%, 100% 50%, calc(100% - 6px) 100%, 6px 100%, 0% 50%)",
-                                  "padding-left": "14px",
-                                  "padding-right": "14px",
-                                }}
-                              >
-                                <span style={{
-                                  color: "#7a5c2e",
-                                  "font-size": "0.55rem",
-                                  "font-family": "serif"
-                                }}>
-                                  {/* Roman numeral style index */}
-                                  {['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', 'Ⅵ', 'Ⅶ', 'Ⅷ', 'Ⅸ', 'Ⅹ'][i()] ?? `${i() + 1}`}
-                                </span>
-                                {tag}
-                              </span>
-                            )}
-                          </For>
-
+                        {/* Logo / banner */}
+                        <div
+                          class="h-36 bg-black/70 relative overflow-hidden cursor-pointer border-b border-green-900/25"
+                          onClick={() => navigate(`/server/${server.id}`)}
+                        >
+                          <Show when={server.logo_url}>
+                            <img
+                              src={server.logo_url}
+                              alt={server.name}
+                              class="w-full h-full object-cover opacity-60 group-hover:opacity-75 transition-opacity"
+                              style={{ filter: "saturate(0.6)" }}
+                            />
+                          </Show>
+                          <Show when={!server.logo_url}>
+                            <div class="absolute inset-0 flex items-center justify-center text-7xl font-black text-green-900/20"
+                              style={{ "font-family": "'Orbitron', monospace" }}
+                            >
+                              {server.name?.[0]?.toUpperCase() || "?"}
+                            </div>
+                          </Show>
+                          {/* Overlay */}
+                          <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+                          <div class="absolute bottom-2 left-3 text-xs text-green-700/50 tracking-widest">
+                            ID_{server.id}
+                          </div>
                         </div>
 
+                        <div class="p-5">
+                          {/* Nome */}
+                          <div
+                            class="text-white font-black text-lg mb-1 truncate"
+                            style={{ "font-family": "'Orbitron', monospace" }}
+                          >
+                            {server.name}
+                          </div>
 
-                        {/* Secret Key */}
-                        <div class="mt-4 pt-4 border-t border-violet-800/40">
-                          <p class="text-xs text-violet-400 mb-2 flex items-center gap-2">
-                            <span>🔑</span> Secret Key (per il plugin)
-                          </p>
-                          <div class="flex items-center gap-2 bg-black/70 rounded-lg p-2.5 border border-violet-800/50">
-                            <code class="flex-1 font-mono text-emerald-300/90 text-xs break-all select-all">
-                              {server.secret_key}
-                            </code>
+                          {/* IP */}
+                          <div class="text-green-800/60 text-xs mb-3 tracking-wide">
+                            &gt; {server.ip}{server.port ? `:${server.port}` : ""}
+                          </div>
+
+                          <Show when={server.description}>
+                            <p class="text-green-900/55 text-xs mb-4 line-clamp-2 leading-relaxed">
+                              {server.description}
+                            </p>
+                          </Show>
+
+                          {/* Tags */}
+                          <div class="flex flex-wrap gap-1.5 mb-4">
+                            <For each={StringArrayUtils.toArray(server.tags.toString())}>
+                              {(tag) => (
+                                <span class="text-xs px-2 py-0.5 border border-green-900/40 text-green-800/60 tracking-wide">
+                                  #{tag}
+                                </span>
+                              )}
+                            </For>
+                          </div>
+
+                          {/* Secret key */}
+                          <div
+                            class="mb-4 p-3 border border-green-900/25 bg-black/40"
+                            style={{ "border-top": "1px solid rgba(0,255,65,0.1)" }}
+                          >
+                            <div class="text-green-800/45 text-xs tracking-widest mb-1.5">&gt; SECRET_KEY</div>
+                            <div class="flex items-center gap-2">
+                              <code class="flex-1 text-green-600/70 text-xs break-all select-all font-mono truncate">
+                                {server.secret_key}
+                              </code>
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(server.secret_key);
+                                  notify("KEY_COPIED // clipboard", "success");
+                                }}
+                                class="text-xs px-2 py-1 border border-green-900/40 text-green-800/50 hover:text-green-400 hover:border-green-700/50 transition-all flex-shrink-0"
+                              >
+                                ◈
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Azioni */}
+                          <div class="flex gap-2">
                             <button
-                              onClick={() => {
-                                navigator.clipboard.writeText(server.secret_key);
-                                notify("Copiata bro! 📋", "success");
-                              }}
-                              class="p-1.5 rounded hover:bg-violet-900/80 transition-colors"
+                              onClick={() => navigate(`/servers/edit/${server.id}`)}
+                              class="flex-1 py-2.5 text-xs border border-green-800/40 text-green-600/70 hover:border-green-600/55 hover:text-green-400 transition-all tracking-widest uppercase"
+                              style={{ "font-family": "'Share Tech Mono', monospace" }}
                             >
-                              📋
+                              ✏ MODIFICA
+                            </button>
+                            <button
+                              onClick={() => { setSelectedServer(server); setDeleteModalOpen(true); }}
+                              class="flex-1 py-2.5 text-xs border border-red-900/40 text-red-700/60 hover:border-red-700/55 hover:text-red-400 transition-all tracking-widest uppercase"
+                              style={{ "font-family": "'Share Tech Mono', monospace" }}
+                            >
+                              ⚠ DELETE
                             </button>
                           </div>
                         </div>
-
-                        {/* Pulsanti azioni */}
-                        <div class="flex gap-4 mt-6">
-                          <button
-                            onClick={() => navigate(`/servers/edit/${server.id}`)} // Usa ID non name!
-                            class="
-                              flex-1 py-3 px-6 rounded-xl text-base font-semibold
-                              bg-gradient-to-r from-violet-800 to-fuchsia-800
-                              hover:from-violet-700 hover:to-fuchsia-700
-                              text-white border border-violet-700/60 hover:border-violet-500/80
-                              transition-all duration-300 active:scale-95 shadow-md
-                            "
-                          >
-                            ✏️ Modifica
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              setSelectedServer(server);
-                              setDeleteModalOpen(true);
-                            }}
-                            class="
-                              flex-1 py-3 px-6 rounded-xl text-base font-semibold
-                              bg-gradient-to-r from-red-900 to-rose-900
-                              hover:from-red-800 hover:to-rose-800
-                              text-red-200 border border-red-800/60 hover:border-red-600/80
-                              transition-all duration-300 active:scale-95 shadow-md
-                            "
-                          >
-                            🗑️ Elimina
-                          </button>
-                        </div>
                       </div>
-                    </div>
-                  )}
-                </For>
-              </div>
-            </Show>
-          </Suspense>
+                    )}
+                  </For>
+                </div>
+              </Show>
+            </Suspense>
         </div>
 
-        {/* Modal conferma eliminazione */}
         <ConfirmDeleteModal
           isOpen={deleteModalOpen()}
           serverName={selectedServer()?.name || ""}

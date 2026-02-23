@@ -3,58 +3,61 @@ import { Component, For, Show } from "solid-js";
 
 interface BreadcrumbItem {
   label: string;
-  href?: string;       // se undefined → è l'ultimo elemento (attivo, non cliccabile)
-  isActive?: boolean;  // opzionale, ma utile per maggiore controllo
+  href?: string;
+  isActive?: boolean;
 }
 
 interface BreadcrumbProps {
   items: BreadcrumbItem[];
-  class?: string;      // per override/customizzazioni extra
-  separator?: string;  // default: ›   puoi passare → / • / ecc...
+  class?: string;
+  separator?: string;
 }
 
 const Breadcrumb: Component<BreadcrumbProps> = (props) => {
-  const separator = () => props.separator ?? "›";
+  const separator = () => props.separator ?? ">";
 
   return (
-    <nav 
-      aria-label="Breadcrumb" 
-      class={`
-        flex items-center flex-wrap gap-x-3 gap-y-1.5 
-        text-sm text-violet-400 
-        ${props.class ?? "mb-6"}
-      `}
+    <nav
+      aria-label="Breadcrumb"
+      class={`flex items-center flex-wrap gap-x-2 gap-y-1 ${props.class ?? "mb-6"}`}
+      style={{ "font-family": "'Share Tech Mono', monospace" }}
     >
+      <span class="text-green-700/40 text-xs mr-1">~/</span>
+
       <For each={props.items}>
         {(item, index) => (
           <>
             <Show when={index() > 0}>
-              <span class="text-violet-600/70 select-none">{separator()}</span>
+              <span class="text-green-900/50 text-xs select-none">{separator()}</span>
             </Show>
 
             <Show
               when={item.href && !item.isActive}
               fallback={
-                <span 
-                  class={`
-                    font-medium transition-colors
-                    ${item.isActive 
-                      ? "text-white" 
-                      : "text-violet-300/90"}
-                  `}
+                <span
+                  class="text-xs tracking-wide"
+                  style={{
+                    color: item.isActive ? "#00ff41" : "rgba(0,255,65,0.45)",
+                    "text-shadow": item.isActive ? "0 0 8px rgba(0,255,65,0.3)" : "none",
+                  }}
                 >
+                  {item.isActive && <span class="mr-1" style={{ color: "rgba(0,255,65,0.3)" }}>◈</span>}
                   {item.label}
                 </span>
               }
             >
               <A
                 href={item.href!}
-                class="
-                  hover:text-fuchsia-300 
-                  transition-colors 
-                  hover:underline 
-                  underline-offset-4
-                "
+                class="text-xs tracking-wide transition-all hover:underline underline-offset-4"
+                style={{ color: "rgba(0,255,65,0.4)" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#00ff41";
+                  e.currentTarget.style.textShadow = "0 0 8px rgba(0,255,65,0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "rgba(0,255,65,0.4)";
+                  e.currentTarget.style.textShadow = "none";
+                }}
               >
                 {item.label}
               </A>

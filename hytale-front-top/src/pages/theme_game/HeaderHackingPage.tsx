@@ -18,7 +18,6 @@ const STYLES = `
   }
 
   .hk-header {
-    position: sticky;
     top: 0;
     z-index: 100;
     font-family: 'Share Tech Mono', monospace;
@@ -48,7 +47,7 @@ const STYLES = `
     display: inline-block;
     white-space: nowrap;
     animation: hk-marquee 25s linear infinite;
-    font-size: 0.6rem;
+    font-size: 1.2em;
     color: var(--g-dim);
     letter-spacing: 0.1em;
   }
@@ -56,10 +55,7 @@ const STYLES = `
   /* ── MAIN BAR ── */
   .hk-bar {
     background: linear-gradient(180deg, #010d01 0%, #020d02 60%, #010801 100%);
-    border-bottom: 1px solid var(--g-border);
     box-shadow: 0 4px 20px rgba(0,0,0,0.95), 0 0 40px rgba(0,255,0,0.02);
-    position: relative;
-    overflow: hidden;
   }
 
   /* Scanlines */
@@ -148,7 +144,7 @@ const STYLES = `
     align-items: center;
     gap: 0.4rem;
     padding: 0.4rem 0.8rem;
-    font-size: 0.62rem;
+    font-size: 0.8em;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--g-dim);
@@ -177,7 +173,7 @@ const STYLES = `
   }
   .hk-nav-index {
     color: var(--g-dimmer);
-    font-size: 0.5rem;
+    font-size: 1em;
   }
 
   /* ── ICON BUTTONS ── */
@@ -188,7 +184,7 @@ const STYLES = `
     background: rgba(0,20,0,0.6);
     border: 1px solid var(--g-border);
     color: var(--g-dim);
-    font-size: 0.9rem;
+    font-size: 1em;
     cursor: pointer;
     transition: all 0.15s;
     z-index: 1;
@@ -205,7 +201,7 @@ const STYLES = `
     width: 14px; height: 14px;
     background: #2a0000;
     border: 1px solid #550000;
-    font-size: 0.45rem;
+    font-size: 1em;
     color: #ff4444;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Orbitron', monospace;
@@ -313,6 +309,7 @@ const STYLES = `
     background: transparent;
     width: 100%;
     text-align: left;
+    
   }
   .hk-dropdown-item:last-child { border-bottom: none; }
   .hk-dropdown-item:hover {
@@ -326,7 +323,7 @@ const STYLES = `
     font-size: 0.5rem;
   }
   .hk-dropdown-item-danger {
-    color: #330000;
+    color: #c7c7c7;
     border-top: 1px solid rgba(80,0,0,0.3);
   }
   .hk-dropdown-item-danger:hover {
@@ -482,8 +479,8 @@ const NAV_ITEMS = [
 ];
 
 const NOTIFICATIONS = [
-  { id: 1, text: "Nuovo evento PvP questo weekend!", icon: "⚔️", time: "2h fa", unread: true },
-  { id: 2, text: "Il tuo server ha ricevuto 5 nuovi voti", icon: "🔥", time: "5h fa", unread: true },
+  { id: 1, text: "Nuovo evento PvP questo weekend!", icon: "⚔️", time: "2h fa", unread: false },
+  { id: 2, text: "Il tuo server ha ricevuto 5 nuovi voti", icon: "🔥", time: "5h fa", unread: false },
   { id: 3, text: "Risposta al tuo topic nel forum", icon: "💬", time: "1gg fa", unread: false },
 ];
 
@@ -516,11 +513,6 @@ const HeaderHacking: Component = () => {
       <style>{STYLES}</style>
       <header class="hk-header">
 
-        {/* Ticker */}
-        <div class="hk-ticker-wrap">
-          <span class="hk-ticker">{TICKER_TEXT.repeat(4)}</span>
-        </div>
-
         {/* Main bar */}
         <div class="hk-bar" style={{ opacity: scrolled() ? "0.97" : "1" }}>
           <div style="max-width: 1400px; margin: 0 auto; padding: 0 1rem; position: relative; z-index: 1;">
@@ -528,7 +520,7 @@ const HeaderHacking: Component = () => {
 
               {/* LOGO */}
               <A href="/" class="hk-logo">
-                <span class="hk-logo-main">H-YTALE<span style="color: var(--g-dimmer); font-size: 0.9rem;">.top</span></span>
+                <span class="hk-logo-main">H-Y-TALE.top<span style="color: var(--g-dimmer); font-size: 0.9rem;">.top</span></span>
                 <span class="hk-logo-sub">root@h-ytale:~$ <span class="hk-blink">_</span></span>
               </A>
 
@@ -633,19 +625,13 @@ const HeaderHacking: Component = () => {
                           <span class="hk-dropdown-cmd">{'>'}</span>
                           <span>ls ./my-servers</span>
                         </A>
-                        <A href="/favorites" class="hk-dropdown-item">
-                          <span class="hk-dropdown-cmd">{'>'}</span>
-                          <span>cat ./favorites</span>
-                        </A>
-                        <A href="/settings" class="hk-dropdown-item">
-                          <span class="hk-dropdown-cmd">{'>'}</span>
-                          <span>nano ./config</span>
-                        </A>
+        
+
                         <button
                           class="hk-dropdown-item hk-dropdown-item-danger"
                           onClick={() => { logout(); setShowUserMenu(false); }}
                         >
-                          <span class="hk-dropdown-cmd" style="color: #330000">{'>'}</span>
+                          <span class="hk-dropdown-cmd" style="color: #c3c3c3">{'>'}</span>
                           <span>sudo logout --force</span>
                         </button>
                       </div>
@@ -706,7 +692,8 @@ const HeaderHacking: Component = () => {
         {/* Overlay */}
         <Show when={showUserMenu() || notificationsOpen()}>
           <div
-            style="position: fixed; inset: 0; z-index: 40;"
+            style="position: fixed; inset: 1; z-index: 59;"
+
             onClick={() => { setShowUserMenu(false); setNotificationsOpen(false); }}
           />
         </Show>

@@ -1,729 +1,36 @@
-import { Component, createSignal, For, Show, createMemo, onMount, onCleanup } from "solid-js";
+import { Component, createSignal, For, Show, createResource } from "solid-js";
 import { A } from "@solidjs/router";
-import { createResource } from "solid-js";
 import { ServerService } from "../services/server.service";
 import { ServerResponse } from "../types/ServerResponse";
 
-// ═══════════════════════════════════════════════
-// 🕹️ LANG CONFIG
-// ═══════════════════════════════════════════════
 const LANG = {
-  ticker: "⬡ CLASSIFICA SERVER ONLINE ◈ VOTA I MIGLIORI ◎ SCALA LA LEADERBOARD ⬟ UNISCITI ALLA RETE ",
   hero: {
     title: "LEADERBOARD",
     subtitle: "SCALA LA RETE. DOMINA IL SISTEMA.",
     tag: "// CLASSIFICHE IN TEMPO REALE",
   },
-  stats: {
-    votes: { label: "VOTI TOTALI", icon: "⬡" },
-    servers: { label: "SERVER ATTIVI", icon: "◈" },
-    active: { label: "GIOCATORI ONLINE", icon: "◎" },
-  },
-  periods: [
-    { value: "today", label: "OGGI" },
-    { value: "week", label: "SETTIMANA" },
-    { value: "month", label: "MESE" },
-    { value: "alltime", label: "ALL TIME" },
-  ],
-  types: [
-    { value: "votes", label: "⬡ VOTI" },
-    { value: "players", label: "◈ PLAYER" },
-    { value: "trending", label: "◎ TRENDING" },
-    { value: "new", label: "⬟ NUOVI" },
-  ],
-  search: { placeholder: "◈ CERCA NELLA RETE...", label: "SCAN SERVER" },
-  table: {
-    pos: "POS.",
-    trend: "DELTA",
-    server: "SERVER",
-    value: "SCORE",
-    actions: "AZIONI",
-    footer: (n: number) => `◈ ${n} SERVER IN CLASSIFICA // AGGIORNAMENTO IN TEMPO REALE`,
-  },
-  podium: {
-    ranks: ["◈ #1", "◈ #2", "◈ #3"],
-    visit: "ENTRA →",
-  },
   notFound: {
     title: "NESSUN SEGNALE TROVATO",
     sub: "Modifica i parametri di ricerca",
-  },
-  info: {
-    title: "◈ COME FUNZIONA LA CLASSIFICA",
-    body: "Le classifiche vengono aggiornate in tempo reale basandosi sui voti ricevuti. Più voti ha un server, più sale in classifica!",
-    up: "◎ Server in ascesa nel ranking",
-    down: "◎ Server in discesa nel ranking",
-    medals: "◈ Medaglie per i primi 3 posti",
-    vote: "⬡ Vota per spingere i tuoi server",
-  },
-  cta: {
-    title: "HAI UN SERVER MINECRAFT?",
-    sub: "Aggiungilo alla rete e scala le classifiche!",
-    btn: "⬡ INSERISCI NELLA RETE",
-  },
-  valueLabels: {
-    votes: "VOTI",
-    players: "PLAYER",
-    trending: "PUNTI",
-    new: "GIORNI FA",
   },
   trend: { up: "▲", down: "▼", same: "—" },
   loading: "◎ INIZIALIZZAZIONE SISTEMA...",
 };
 
-// ═══════════════════════════════════════════════
-// STYLES
-// ═══════════════════════════════════════════════
-const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-
-  :root {
-    --neon-pink:   #ff2d78;
-    --neon-cyan:   #00f5ff;
-    --neon-yellow: #ffe600;
-    --neon-green:  #39ff14;
-    --neon-purple: #bf5fff;
-    --bg:          #020408;
-    --bg-card:     #060d18;
-  }
-
-  .lb-root {
-    min-height: 100vh;
-    background: var(--bg);
-    background-image:
-      linear-gradient(rgba(0,245,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,245,255,0.025) 1px, transparent 1px);
-    background-size: 32px 32px;
-    font-family: 'Share Tech Mono', monospace;
-    color: #fff;
-    position: relative;
-  }
-
-  /* scanlines */
-  .lb-root::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg, transparent, transparent 2px,
-      rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
-    );
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  /* ── TICKER ── */
-  .ticker-wrap {
-    overflow: hidden;
-    border-bottom: 1px solid rgba(255,45,120,0.4);
-    box-shadow: 0 0 12px rgba(255,45,120,0.2);
-    background: rgba(255,45,120,0.04);
-    padding: 0.4rem 0;
-    position: relative;
-    z-index: 100;
-  }
-  .ticker {
-    display: inline-block;
-    white-space: nowrap;
-    animation: marquee 25s linear infinite;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--neon-pink);
-    text-shadow: 0 0 8px var(--neon-pink);
-    letter-spacing: 0.08em;
-  }
-
-  /* ── HERO ── */
-  .lb-hero {
-    position: relative;
-    overflow: hidden;
-    border-bottom: 2px solid rgba(0,245,255,0.15);
-    padding: 3.5rem 1rem 2.5rem;
-    text-align: center;
-  }
-  .lb-hero-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 60% at 50% 0%, rgba(0,245,255,0.06) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 40% at 20% 100%, rgba(255,45,120,0.06) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 40% at 80% 100%, rgba(191,95,255,0.06) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .lb-hero-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
-    pointer-events: none;
-  }
-
-  .lb-title {
-    font-family: 'Press Start 2P', monospace;
-    font-size: clamp(1.8rem, 6vw, 4rem);
-    color: var(--neon-cyan);
-    text-shadow: 0 0 10px var(--neon-cyan), 0 0 30px var(--neon-cyan), 0 0 60px rgba(0,245,255,0.4);
-    margin-bottom: 0.5rem;
-    animation: flicker 5s ease-in-out infinite;
-    position: relative;
-    z-index: 1;
-  }
-
-  .lb-subtitle {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(0.6rem, 2vw, 0.9rem);
-    font-weight: 700;
-    letter-spacing: 0.3em;
-    color: rgba(255,255,255,0.5);
-    margin-bottom: 0.4rem;
-    position: relative;
-    z-index: 1;
-  }
-
-  .lb-tag {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    color: rgba(0,245,255,0.4);
-    letter-spacing: 0.15em;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ── STAT CARDS ── */
-  .lb-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    max-width: 900px;
-    margin: 2rem auto 0;
-    position: relative;
-    z-index: 1;
-    padding: 0 1rem;
-  }
-
-  .lb-stat {
-    background: var(--bg-card);
-    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-    padding: 0.85rem 1rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .lb-stat::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .lb-stat-val {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 1.3rem;
-    animation: counter-up 0.6s ease-out;
-  }
-  .lb-stat-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem;
-    color: rgba(255,255,255,0.3);
-    letter-spacing: 0.2em;
-    margin-top: 0.2rem;
-  }
-  .c-pink   { color: var(--neon-pink);   text-shadow: 0 0 10px var(--neon-pink);   border: 1px solid rgba(255,45,120,0.35);   box-shadow: 0 0 12px rgba(255,45,120,0.12); }
-  .c-cyan   { color: var(--neon-cyan);   text-shadow: 0 0 10px var(--neon-cyan);   border: 1px solid rgba(0,245,255,0.35);    box-shadow: 0 0 12px rgba(0,245,255,0.12); }
-  .c-yellow { color: var(--neon-yellow); text-shadow: 0 0 10px var(--neon-yellow); border: 1px solid rgba(255,230,0,0.35);    box-shadow: 0 0 12px rgba(255,230,0,0.12); }
-  .c-green  { color: var(--neon-green);  text-shadow: 0 0 10px var(--neon-green);  border: 1px solid rgba(57,255,20,0.35);    box-shadow: 0 0 12px rgba(57,255,20,0.12); }
-  .c-purple { color: var(--neon-purple); text-shadow: 0 0 10px var(--neon-purple); border: 1px solid rgba(191,95,255,0.35);   box-shadow: 0 0 12px rgba(191,95,255,0.12); }
-
-  /* ── CONTROLS ── */
-  .lb-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .ctrl-group {
-    display: flex;
-    gap: 0.3rem;
-    flex-wrap: wrap;
-  }
-
-  .ctrl-btn {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.55rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    padding: 0.45rem 0.75rem;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.35);
-    clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .ctrl-btn:hover {
-    color: rgba(255,255,255,0.7);
-    border-color: rgba(0,245,255,0.3);
-    background: rgba(0,245,255,0.05);
-  }
-  .ctrl-btn.active-period {
-    background: rgba(0,245,255,0.1);
-    border-color: var(--neon-cyan);
-    color: var(--neon-cyan);
-    text-shadow: 0 0 8px var(--neon-cyan);
-    box-shadow: 0 0 10px rgba(0,245,255,0.15);
-  }
-  .ctrl-btn.active-type {
-    background: rgba(255,45,120,0.1);
-    border-color: var(--neon-pink);
-    color: var(--neon-pink);
-    text-shadow: 0 0 8px var(--neon-pink);
-    box-shadow: 0 0 10px rgba(255,45,120,0.15);
-  }
-
-  .ctrl-sep {
-    width: 1px;
-    height: 24px;
-    background: rgba(255,255,255,0.08);
-    align-self: center;
-  }
-
-  .ctrl-search {
-    flex: 1;
-    min-width: 180px;
-    background: rgba(0,245,255,0.03);
-    border: 1px solid rgba(0,245,255,0.2);
-    color: var(--neon-cyan);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
-    padding: 0.45rem 0.75rem 0.45rem 1.8rem;
-    outline: none;
-    clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
-    transition: all 0.2s;
-  }
-  .ctrl-search::placeholder { color: rgba(0,245,255,0.25); }
-  .ctrl-search:focus {
-    border-color: var(--neon-cyan);
-    box-shadow: 0 0 15px rgba(0,245,255,0.15);
-    background: rgba(0,245,255,0.06);
-  }
-  .ctrl-search-wrap { position: relative; flex: 1; min-width: 180px; }
-  .ctrl-search-icon {
-    position: absolute;
-    left: 0.6rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: rgba(0,245,255,0.4);
-    font-size: 0.7rem;
-    pointer-events: none;
-  }
-
-  /* ── PODIUM ── */
-  .podium-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  @media (max-width: 768px) {
-    .podium-grid { grid-template-columns: 1fr; }
-    .lb-stats { grid-template-columns: 1fr; }
-  }
-
-  .podium-card {
-    background: var(--bg-card);
-    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-    padding: 1.25rem;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-  }
-  .podium-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.025) 0%, transparent 50%);
-    pointer-events: none;
-  }
-  .podium-card:hover { transform: translateY(-4px); }
-
-  .podium-card-1 {
-    border: 2px solid rgba(255,230,0,0.5);
-    box-shadow: 0 0 20px rgba(255,230,0,0.12), inset 0 0 20px rgba(255,230,0,0.03);
-    grid-column: 1 / -1;
-  }
-  .podium-card-1:hover { box-shadow: 0 0 35px rgba(255,230,0,0.2), inset 0 0 25px rgba(255,230,0,0.05); }
-  .podium-card-2 {
-    border: 2px solid rgba(192,192,192,0.4);
-    box-shadow: 0 0 15px rgba(192,192,192,0.08);
-  }
-  .podium-card-2:hover { box-shadow: 0 0 25px rgba(192,192,192,0.15); }
-  .podium-card-3 {
-    border: 2px solid rgba(205,127,50,0.4);
-    box-shadow: 0 0 15px rgba(205,127,50,0.08);
-  }
-  .podium-card-3:hover { box-shadow: 0 0 25px rgba(205,127,50,0.15); }
-
-  .podium-rank {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-  .podium-rank-1 { color: var(--neon-yellow); text-shadow: 0 0 15px var(--neon-yellow); animation: float 2.5s ease-in-out infinite; }
-  .podium-rank-2 { color: #c0c0c0; text-shadow: 0 0 10px #c0c0c0; }
-  .podium-rank-3 { color: #cd7f32; text-shadow: 0 0 10px #cd7f32; }
-
-  .podium-name {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 0.85rem;
-    color: #fff;
-    margin-bottom: 0.3rem;
-    letter-spacing: 0.03em;
-    transition: color 0.2s, text-shadow 0.2s;
-  }
-  .podium-card:hover .podium-name { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,245,255,0.5); }
-
-  .podium-ip {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    color: rgba(0,245,255,0.4);
-    margin-bottom: 1rem;
-  }
-
-  .podium-bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(255,255,255,0.06);
-  }
-
-  .podium-score {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 1.4rem;
-  }
-  .podium-score-label { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; color: rgba(255,255,255,0.3); margin-top: 0.1rem; }
-
-  .podium-btn {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    padding: 0.5rem 1rem;
-    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-    text-decoration: none;
-    transition: all 0.15s;
-    display: inline-block;
-  }
-  .podium-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
-  .podium-btn-1 { background: rgba(255,230,0,0.15); border: 1px solid rgba(255,230,0,0.5); color: var(--neon-yellow); }
-  .podium-btn-2 { background: rgba(192,192,192,0.1); border: 1px solid rgba(192,192,192,0.4); color: #c0c0c0; }
-  .podium-btn-3 { background: rgba(205,127,50,0.1); border: 1px solid rgba(205,127,50,0.4); color: #cd7f32; }
-
-  .trend-badge {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.55rem;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
-    clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-  .trend-up   { background: rgba(57,255,20,0.1);  border: 1px solid rgba(57,255,20,0.4);  color: var(--neon-green); }
-  .trend-down { background: rgba(255,45,120,0.1); border: 1px solid rgba(255,45,120,0.4); color: var(--neon-pink); }
-
-  /* ── TABLE ── */
-  .lb-table {
-    background: var(--bg-card);
-    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-    border: 1px solid rgba(0,245,255,0.18);
-    box-shadow: 0 0 20px rgba(0,245,255,0.05);
-    overflow: hidden;
-  }
-
-  .lb-table-header {
-    background: rgba(0,245,255,0.04);
-    border-bottom: 1px solid rgba(0,245,255,0.12);
-    padding: 0.65rem 1rem;
-    display: grid;
-    grid-template-columns: 60px 70px 1fr 100px 180px;
-    gap: 0.75rem;
-    font-family: 'Orbitron', monospace;
-    font-size: 0.55rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: rgba(0,245,255,0.5);
-  }
-
-  @media (max-width: 768px) {
-    .lb-table-header { display: none; }
-    .lb-table-row { grid-template-columns: 1fr !important; }
-  }
-
-  .lb-table-row {
-    display: grid;
-    grid-template-columns: 60px 70px 1fr 120px 0px;
-    gap: 0.75rem;
-    padding: 0.7rem 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    align-items: center;
-    transition: background 0.15s, transform 0.15s;
-    cursor: pointer;
-  }
-  .lb-table-row:last-child { border-bottom: none; }
-  .lb-table-row:hover {
-    background: rgba(0,245,255,0.03);
-    transform: translateX(3px);
-  }
-
-  .row-rank {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 1em;
-    color: rgba(255,255,255,0.5);
-  }
-
-  .row-name {
-    font-family: 'Orbitron', monospace;
-    font-size: 1em;
-    font-weight: 700;
-    color: rgba(255,255,255,0.8);
-    margin-bottom: 0.2rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: color 0.15s;
-  }
-  .lb-table-row:hover .row-name { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,245,255,0.4); }
-
-  .row-ip {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem;
-    color: rgba(0,245,255,0.35);
-  }
-
-  .row-score {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 1rem;
-    color: var(--neon-pink);
-    text-shadow: 0 0 8px rgba(255,45,120,0.4);
-    text-align: center;
-  }
-
-  .row-actions { display: flex; gap: 0.4rem; justify-content: flex-end; }
-
-  .row-btn {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.55rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    padding: 0.45rem 0.75rem;
-    clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
-    border: none;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .row-btn:hover { filter: brightness(1.2); transform: scale(1.04); }
-  .row-btn-visit { background: rgba(0,245,255,0.1); border: 1px solid rgba(0,245,255,0.3); color: var(--neon-cyan); }
-  .row-btn-vote  { background: rgba(255,45,120,0.1); border: 1px solid rgba(255,45,120,0.3); color: var(--neon-pink); }
-
-  .lb-table-footer {
-    background: rgba(0,245,255,0.03);
-    border-top: 1px solid rgba(0,245,255,0.08);
-    padding: 0.6rem 1rem;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    color: rgba(0,245,255,0.3);
-    text-align: center;
-    letter-spacing: 0.08em;
-  }
-
-  /* ── INFO BOX ── */
-  .lb-info {
-    background: var(--bg-card);
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-    border: 1px solid rgba(191,95,255,0.3);
-    box-shadow: 0 0 15px rgba(191,95,255,0.07);
-    padding: 1.25rem;
-    margin-top: 1.5rem;
-  }
-
-  .lb-info-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.65rem;
-    font-weight: 900;
-    letter-spacing: 0.15em;
-    color: var(--neon-purple);
-    text-shadow: 0 0 8px var(--neon-purple);
-    margin-bottom: 0.6rem;
-    display: block;
-  }
-
-  .lb-info-body {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.45);
-    line-height: 1.6;
-    margin-bottom: 0.75rem;
-  }
-
-  .lb-info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-  }
-
-  .lb-info-item {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    color: rgba(255,255,255,0.35);
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  /* ── CTA ── */
-  .lb-cta {
-    margin-top: 1.5rem;
-    text-align: center;
-  }
-  .lb-cta-inner {
-    display: inline-block;
-    background: var(--bg-card);
-    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-    border: 2px solid rgba(57,255,20,0.3);
-    box-shadow: 0 0 20px rgba(57,255,20,0.08);
-    padding: 1.5rem 2rem;
-  }
-  .lb-cta-title {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 0.85rem;
-    color: var(--neon-green);
-    text-shadow: 0 0 10px var(--neon-green);
-    letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
-  }
-  .lb-cta-sub {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    color: rgba(57,255,20,0.45);
-    margin-bottom: 1rem;
-  }
-  .lb-cta-btn {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    padding: 0.75rem 1.75rem;
-    background: rgba(57,255,20,0.12);
-    border: 2px solid rgba(57,255,20,0.5);
-    color: var(--neon-green);
-    text-shadow: 0 0 8px var(--neon-green);
-    box-shadow: 0 0 15px rgba(57,255,20,0.12);
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.2s;
-  }
-  .lb-cta-btn:hover {
-    background: rgba(57,255,20,0.2);
-    box-shadow: 0 0 25px rgba(57,255,20,0.25);
-    transform: scale(1.04);
-  }
-
-  /* ── NOT FOUND ── */
-  .lb-empty {
-    background: var(--bg-card);
-    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-    border: 1px solid rgba(255,230,0,0.25);
-    padding: 4rem 2rem;
-    text-align: center;
-  }
-  .lb-empty-icon {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 3rem;
-    color: var(--neon-yellow);
-    text-shadow: 0 0 15px var(--neon-yellow);
-    display: block;
-    margin-bottom: 1rem;
-    animation: float 2.5s ease-in-out infinite;
-  }
-  .lb-empty-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.85rem;
-    font-weight: 900;
-    color: var(--neon-yellow);
-    letter-spacing: 0.15em;
-    margin-bottom: 0.4rem;
-  }
-  .lb-empty-sub {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.3);
-  }
-
-  /* ── KEYFRAMES ── */
-  @keyframes marquee {
-    0%   { transform: translateX(100vw); }
-    100% { transform: translateX(-100%); }
-  }
-  @keyframes flicker {
-    0%,100% { opacity:1; }
-    92%     { opacity:1; }
-    93%     { opacity:0.4; }
-    94%     { opacity:1; }
-    96%     { opacity:0.6; }
-    97%     { opacity:1; }
-  }
-  @keyframes float {
-    0%,100% { transform: translateY(0); }
-    50%     { transform: translateY(-6px); }
-  }
-  @keyframes counter-up {
-    from { transform: translateY(16px); opacity:0; }
-    to   { transform: translateY(0);    opacity:1; }
-  }
-  @keyframes blink {
-    0%,100% { opacity:1; }
-    50%     { opacity:0; }
-  }
-  .blink { animation: blink 1s step-end infinite; }
-`;
-
-// ─────────────────────────────────────────
-type LeaderboardPeriod = "today" | "week" | "month" | "alltime";
-type LeaderboardType   = "votes" | "players" | "trending" | "new";
-type ServerRanking = {
-  rank: number; server: ServerResponse;
-  value: number; change: number;
-  trend: "up" | "down" | "same";
+// Medaglie top 3
+const RANK_COLORS: Record<number, { border: string; text: string; glow: string; medal: string }> = {
+  0: { border: "border-yellow-500/60", text: "text-yellow-400", glow: "rgba(234,179,8,0.15)", medal: "◈" },
+  1: { border: "border-zinc-400/50", text: "text-zinc-300", glow: "rgba(161,161,170,0.1)", medal: "◈" },
+  2: { border: "border-orange-700/50", text: "text-orange-500", glow: "rgba(194,65,12,0.1)", medal: "◈" },
 };
 
 const LeaderboardPage: Component = () => {
+  const [allServers, setAllServers] = createSignal<ServerResponse[]>([]);
+  const [searchQuery, setSearchQuery] = createSignal("");
 
-    const [allServers, setAllServers] = createSignal<ServerResponse[]>([]);
-
-   const [initialData] = createResource(async () => {
+  const [initialData] = createResource(async () => {
     try {
-      const result = await ServerService.getServerParams({
-        page: 1,
-        limit: 100,
-        sort: "voti_totali:desc"
-      });
+      const result = await ServerService.getServerParams({ page: 1, limit: 100, sort: "voti_totali:desc" });
       setAllServers(result.data);
       return result;
     } catch (error) {
@@ -732,71 +39,260 @@ const LeaderboardPage: Component = () => {
     }
   });
 
+  const filtered = () =>
+    allServers().filter((s) =>
+      s.name?.toLowerCase().includes(searchQuery().toLowerCase()) ||
+      s.ip?.toLowerCase().includes(searchQuery().toLowerCase())
+    );
+
   return (
-    <>
-      <style>{STYLES}</style>
-      <div class="lb-root">
+    <div
+      class="min-h-screen text-white"
+      style={{
+        background: "linear-gradient(160deg, #000300 0%, #000a02 40%, #000500 100%)",
+        "font-family": "'Share Tech Mono', monospace",
+      }}
+    >
+      {/* Grid bg */}
+      <div
+        class="fixed inset-0 pointer-events-none"
+        style={{
+          "z-index": "0",
+          "background-image": `
+            linear-gradient(rgba(0,255,65,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,255,65,0.025) 1px, transparent 1px)
+          `,
+          "background-size": "40px 40px",
+        }}
+      />
+      {/* Scanlines */}
+      <div
+        class="fixed inset-0 pointer-events-none"
+        style={{
+          "z-index": "1",
+          background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,65,0.008) 3px, rgba(0,255,65,0.008) 4px)",
+        }}
+      />
 
-        {/* TICKER */}
-        <div class="ticker-wrap">
-          <span class="ticker">{LANG.ticker.repeat(6)}</span>
+      {/* ── HERO ── */}
+      <div class="relative overflow-hidden border-b border-green-900/30 py-16 px-6 text-center">
+        <div
+          class="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse 70% 80% at 50% 0%, rgba(0,255,65,0.07) 0%, transparent 70%)" }}
+        />
+        {/* Glow centrale */}
+        <div
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[200px] pointer-events-none"
+          style={{ background: "radial-gradient(ellipse, rgba(0,255,65,0.05) 0%, transparent 70%)" }}
+        />
+
+        <div class="relative z-10 max-w-3xl mx-auto">
+          <div class="flex items-center justify-center gap-2 mb-4">
+            <div class="h-px w-16 bg-green-800/50" />
+            <span class="text-green-700/60 text-xs tracking-[0.3em] uppercase">
+              {LANG.hero.tag} <span class="animate-pulse text-green-500">_</span>
+            </span>
+            <div class="h-px w-16 bg-green-800/50" />
+          </div>
+
+          <h1
+            class="text-5xl sm:text-6xl md:text-7xl font-black text-white leading-none mb-3"
+            style={{
+              "font-family": "'Orbitron', monospace",
+              "text-shadow": "0 0 60px rgba(0,255,65,0.2)",
+            }}
+          >
+            {LANG.hero.title}
+          </h1>
+
+          <p class="text-sm text-green-700/50 tracking-[0.3em] uppercase mt-3">
+            {LANG.hero.subtitle}
+          </p>
+        </div>
+      </div>
+
+      {/* ── MAIN ── */}
+      <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        {/* Search + count bar */}
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">
+          {/* Search */}
+          <div class="relative flex-1">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 text-xs">▶</span>
+            <input
+              type="text"
+              placeholder="◈ CERCA NELLA RETE..."
+              value={searchQuery()}
+              onInput={(e) => setSearchQuery(e.currentTarget.value)}
+              class="w-full pl-7 pr-4 py-2.5 text-sm bg-black/60 border border-green-900/50 text-green-300 placeholder-green-900/50 focus:outline-none focus:border-green-600/60 transition-colors"
+              style={{ "font-family": "'Share Tech Mono', monospace" }}
+            />
+          </div>
+
+          {/* Count */}
+          <div class="relative border border-green-800/40 bg-black/60 px-4 py-2.5 flex items-center gap-3 flex-shrink-0">
+            <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-green-500/40 pointer-events-none" />
+            <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-green-500/40 pointer-events-none" />
+            <span class="text-white/30 text-xs">TOTALE</span>
+            <span class="text-green-400 font-bold text-sm">{filtered().length}</span>
+            <span class="text-white/30 text-xs">SERVER</span>
+            <span class="text-pink-400 animate-pulse text-xs ml-1">◈ LIVE</span>
+          </div>
         </div>
 
-        {/* HERO */}
-        <div class="lb-hero">
-          <div class="lb-hero-bg" />
-          <div class="lb-hero-grid" />
-          <div class="lb-tag">{LANG.hero.tag} <span class="blink">_</span></div>
-          <div class="lb-title">{LANG.hero.title}</div>
-          <div class="lb-subtitle">{LANG.hero.subtitle}</div>
-        </div>
+        {/* Loading */}
+        <Show when={initialData.loading}>
+          <div class="text-center py-20">
+            <div class="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div class="text-xs text-green-700/50 tracking-widest animate-pulse">{LANG.loading}</div>
+          </div>
+        </Show>
 
-        {/* MAIN */}
-        <div style="max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem;">
+        {/* Error */}
+        <Show when={initialData.error}>
+          <div class="text-center py-20 text-red-500/60 text-sm tracking-widest">
+            ⚠ ERRORE_CONNESSIONE // RIPROVA
+          </div>
+        </Show>
 
-          {/* CONTENT */}
+        {/* Content */}
+        <Show when={!initialData.loading && !initialData.error}>
           <Show
-            when={allServers().length > 0}
+            when={filtered().length >0}
             fallback={
-              <div class="lb-empty">
-                <span class="lb-empty-icon">?</span>
-                <div class="lb-empty-title">{LANG.notFound.title}</div>
-                <div class="lb-empty-sub">{LANG.notFound.sub}</div>
+              <div class="relative border border-yellow-800/40 bg-black/60 text-center py-16 px-8">
+                <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-yellow-600/40 pointer-events-none" />
+                <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-yellow-600/40 pointer-events-none" />
+                <div class="text-4xl text-yellow-500/40 mb-4">?</div>
+                <div class="text-base text-yellow-500/70 tracking-widest uppercase mb-2" style={{ "font-family": "'Orbitron', monospace" }}>
+                  {LANG.notFound.title}
+                </div>
+                <div class="text-xs text-white/25 tracking-widest">{LANG.notFound.sub}</div>
               </div>
             }
           >
+            {/* ── PODIUM TOP 3 ── */}
+            <Show when={filtered().length >= 3 && searchQuery() === ""}>
+              <div class="grid grid-cols-3 gap-4 mb-10">
+                {[1, 0, 2].map((rankIdx) => {
+                  const server = filtered()[rankIdx];
+                  const colors = RANK_COLORS[rankIdx];
+                  const isFirst = rankIdx === 0;
+                  return (
+                    <div
+                      class={`relative border ${colors.border} bg-black/70 p-4 text-center flex flex-col items-center gap-2 transition-all ${isFirst ? "py-6" : ""}`}
+                      style={{ "box-shadow": `0 0 25px ${colors.glow}` }}
+                    >
+                      <div class="absolute top-0 left-0 w-3 h-3 border-t border-l pointer-events-none" style={{ "border-color": colors.glow.replace("0.15", "0.5").replace("0.1", "0.4") }} />
+                      <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r pointer-events-none" style={{ "border-color": colors.glow.replace("0.15", "0.5").replace("0.1", "0.4") }} />
 
+                      <span class={`text-xs tracking-widest ${colors.text} font-bold`}>
+                        {colors.medal} #{rankIdx + 1}
+                      </span>
+                      <div
+                        class="text-sm font-black text-white truncate w-full"
+                        style={{ "font-family": "'Orbitron', monospace" }}
+                      >
+                        {server?.name}
+                      </div>
+                      <div class={`text-lg font-black ${colors.text}`}>
+                        {server?.voti_totali ?? 0}
+                        <span class="text-xs ml-1 opacity-60">VOTI</span>
+                      </div>
+                      <A
+                        href={`/server/${server?.id}`}
+                        class={`text-xs px-3 py-1.5 border ${colors.border} ${colors.text} hover:bg-white/5 transition-all tracking-widest uppercase w-full text-center`}
+                      >
+                        ENTRA →
+                      </A>
+                    </div>
+                  );
+                })}
+              </div>
 
-            {/* TABLE RANKS  */}
-            <div class="lb-table">
-              <For each={allServers()}>
-                {(r, i) => (
-                  <div class="lb-table-row">
-                    <div class="row-rank">#{i() + 1}</div>
-                    <div>
-                         <div class="lb-info-item">
-                          <div class={LANG.info.body}>
-                          <span style="font-size:0.7rem;">{r.voti_totali} voti</span>
-                          </div>
-                        </div>
+              {/* Divider */}
+              <div class="flex items-center gap-3 mb-6">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-green-900/30" />
+                <span class="text-green-800/50 text-xs tracking-widest">// RANK_4_AND_BELOW</span>
+                <div class="h-px flex-1 bg-gradient-to-l from-transparent to-green-900/30" />
+              </div>
+            </Show>
+
+            {/* ── TABLE ── */}
+            <div class="relative border border-green-900/30 bg-black/40">
+              <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-green-500/30 pointer-events-none" />
+              <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-green-500/30 pointer-events-none" />
+
+              {/* Table header */}
+              <div class="grid grid-cols-12 gap-2 px-4 py-2 border-b border-green-900/30 text-green-800/50 text-xs tracking-widest uppercase">
+                <div class="col-span-1">POS</div>
+                <div class="col-span-5">SERVER</div>
+                <div class="col-span-3">IP</div>
+                <div class="col-span-1 text-right">VOTI</div>
+                <div class="col-span-2 text-right">AZIONI</div>
+              </div>
+
+              {/* Rows */}
+              <For each={searchQuery() !== "" ? filtered() : filtered().slice(3)}>
+                {(server, i) => {
+                  const absRank = searchQuery() !== "" ? i() : i() + 3;
+                  const isTop = absRank < 3;
+                  const colors = isTop ? RANK_COLORS[absRank] : null;
+
+                  return (
+                    <div
+                      class={`grid grid-cols-12 gap-2 px-4 py-3 border-b border-green-900/20 items-center hover:bg-green-900/5 transition-colors ${isTop ? "bg-black/20" : ""}`}
+                    >
+                      {/* Rank */}
+                      <div class={`col-span-1 text-sm font-bold ${colors ? colors.text : "text-green-700/50"}`}>
+                        #{absRank + 1}
+                      </div>
+
+                      {/* Name */}
+                      <div class="col-span-5 flex items-center gap-2 min-w-0">
+                        <span class="text-green-600/40 text-xs">▶</span>
+                        <span
+                          class="text-white text-sm font-bold truncate"
+                          style={{ "font-family": absRank < 3 ? "'Orbitron', monospace" : "inherit" }}
+                        >
+                          {server.name}
+                        </span>
+                      </div>
+
+                      {/* IP */}
+                      <div class="col-span-3 text-green-800/50 text-xs truncate font-mono">
+                        {server.ip}
+                      </div>
+
+                      {/* Voti */}
+                      <div class={`col-span-1 text-right text-sm font-bold ${colors ? colors.text : "text-green-400/70"}`}>
+                        {server.voti_totali ?? 0}
+                      </div>
+
+                      {/* Actions */}
+                      <div class="col-span-2 flex items-center justify-end gap-1.5">
+                        <A
+                          href={`/server/${server.id}`}
+                          class="text-xs px-2 py-1 border border-green-800/40 text-green-600/70 hover:border-green-600/60 hover:text-green-400 transition-all tracking-widest uppercase"
+                        >
+                          ENTRA
+                        </A>
+                      </div>
                     </div>
-                    <div>
-                      <div class="row-name">{r.name}</div>
-                      <div class="row-ip">{r.ip}</div>
-                    </div>
-                    <div class="row-actions">
-                      <A href={`/server/${r.id}`} class="row-btn row-btn-visit">ENTRA</A>
-                      <button class="row-btn row-btn-vote">⬡ VOTA</button>
-                    </div>
-                  </div>
-                )}
+                  );
+                }}
               </For>
-            </div>
-          </Show>
 
-        </div>
+              {/* Footer */}
+              <div class="px-4 py-2 text-xs text-green-900/40 tracking-widest text-center">
+                ◈ {filtered().length} SERVER IN CLASSIFICA // AGGIORNAMENTO IN TEMPO REALE
+              </div>
+            </div>
+
+          </Show>
+        </Show>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -96,7 +96,7 @@ export class ServerService {
       qs.set('page', String(page));
       qs.set('limit', String(limit));
       if (sort) qs.set('sort', sort);
-      if (search) qs.set('search', search); 
+      if (search) qs.set('search', search);
 
       const url = `${this.baseUrl}?${qs}`;
       const res = await fetch(url);
@@ -155,24 +155,33 @@ export class ServerService {
   }
 
   static async getServerById(serverId: number): Promise<ServerResponse> {
-    const response = await fetch(`${this.baseUrl}/${serverId}`, {
-      credentials: 'include'
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5 secondi max
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("Server non trovato fra!");
+    try {
+      const response = await fetch(`${this.baseUrl}/${serverId}`, {
+        credentials: 'include',
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error("Server non trovato!");
+        }
+        throw new Error("Errore nel caricamento!");
       }
-      throw new Error("Errore nel caricamento del server bro!");
+
+      const result = await response.json();
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Dati server mancanti");
+      }
+
+      return result.data;
+    } catch (err) {
+      clearTimeout(timeout);
+      throw err;
     }
-
-    const result = await response.json();
-
-    if (!result.success || !result.data) {
-      throw new Error(result.error || "Dati server mancanti");
-    }
-
-    return result.data;
   }
 
 }

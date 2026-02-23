@@ -16,12 +16,9 @@ const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 
   .top5-card {
-    background: #060d18;
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-    border: 2px solid rgba(22, 255, 5, 0.7);
-    box-shadow: 0 0 15px rgba(255,230,0,0.08), inset 0 0 15px rgba(255,230,0,0.02);
     padding: 1rem;
     margin-bottom: 1rem;
+    background: "linear-gradient(160deg, #000300 0%, #000a02 40%, #000500 100%)";
   }
 
   .top5-title {

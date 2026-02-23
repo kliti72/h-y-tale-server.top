@@ -3,8 +3,6 @@ import { Component, createEffect, createResource, Match, Switch } from "solid-js
 import { useNavigate } from "@solidjs/router";
 import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
 import { ServerService } from "../../services/server.service";
-import GamingCard from "../card/ServerCard/GamingCard";
-import ServerCardHacking from "../card/ServerCard/ServerCardHacking";
 
 // --- Glitch Text Component ---
 const GlitchText: Component<{ text: string; class?: string }> = (props) => {
@@ -121,7 +119,7 @@ const Scanlines: Component = () => (
 );
 
 // --- Main Component ---
-const HeroMain: Component = () => {
+const HeroServerMain: Component = () => {
   const navigate = useNavigate();
   const [featuredd] = createResource(() => ServerService.getServers());
   const featured = () => featuredd()?.data ?? [];
@@ -145,10 +143,10 @@ const HeroMain: Component = () => {
   const [bootLines, setBootLines] = createSignal<string[]>([]);
 
   const bootSequence = [
-    "> INITIALIZING HYTALE_REALM_OS v2.4.1...",
-    "> LOADING kernel modules... [OK]",
-    "> Mounting server database... [OK]",
-    "> Scanning active realms... [FOUND 247 SERVERS]",
+    "> Server area read.",
+    "> LOADING Hero modules... [OK]",
+    "> Mounting Hero... [OK]",
+    "> Check active realms... ",
     "> Establishing secure connection... [OK]",
     "> ACCESS GRANTED. Welcome, traveler.",
   ];
@@ -324,7 +322,7 @@ const HeroMain: Component = () => {
       <Scanlines />
 
       <section
-        class="hero-root relative w-full min-h-screen flex flex-col items-center justify-center py-16 overflow-hidden"
+        class=""
         style={{
           background: "linear-gradient(160deg, #000300 0%, #000a00 40%, #000500 70%, #000200 100%)",
           "background-color": "#000300",
@@ -383,7 +381,7 @@ const HeroMain: Component = () => {
               style={{ "font-family": "'Orbitron', monospace" }}
             >
               <span class="block text-green-400 mb-2" style={{ "font-size": "0.9em" }}>
-                <GlitchText text="HYTALE" />
+                <GlitchText text="HYTALE SERVER \ List" />
               </span>
               <span class="block text-white/90" style={{ "font-size": "0.55em", "letter-spacing": "0.15em", "font-family": "'Share Tech Mono', monospace" }}>
                 SERVER DISCOVERY PROTOCOL
@@ -402,115 +400,10 @@ const HeroMain: Component = () => {
               ]} />
             </p>
 
-            <p class="text-green-700/50 text-sm font-mono mb-10 tracking-widest">
-              [ 247 SERVER ATTIVI // LATENZA MEDIA: 23ms // STATUS: ONLINE ]
-            </p>
 
             {/* CTA BUTTONS */}
-            <div class="flex flex-wrap justify-center gap-4 mb-16">
-              <button
-                onClick={() => navigate("/servers")}
-                class="btn-hack inline-flex items-center gap-3 px-8 py-4 text-base font-bold text-green-400 terminal-border bg-black/80 rounded-sm tracking-widest uppercase"
-              >
-                <div class="corner-decoration" />
-                <span class="text-green-500">▶</span>
-                ESPLORA_TUTTI.exe
-              </button>
+            
 
-              <button
-                onClick={() => window.open(DISCORD_INVITE, "_blank")}
-                class="btn-discord-hack inline-flex items-center gap-3 px-8 py-4 text-base font-bold text-indigo-300 bg-black/80 rounded-sm tracking-widest uppercase"
-                style={{
-                  border: "1px solid rgba(99,102,241,0.4)",
-                  "box-shadow": "0 0 20px rgba(99,102,241,0.08)",
-                }}
-              >
-                <span class="text-indigo-400">⬡</span>
-                DISCORD_LINK
-
-                <Switch fallback={null}>
-                  <Match when={onlineCount.loading}>
-                    <span class="text-xs bg-indigo-900/40 border border-indigo-700/40 px-2 py-0.5 rounded-sm animate-pulse">
-                      SYNC...
-                    </span>
-                  </Match>
-                  <Match when={onlineCount() != null}>
-                    <span class="text-xs bg-green-900/30 border border-green-700/40 px-2 py-0.5 rounded-sm text-green-400">
-                      {onlineCount()?.toLocaleString() || 0} ONLINE
-                    </span>
-                  </Match>
-                  <Match when={onlineCount() === null}>
-                    <span class="text-xs bg-red-900/30 border border-red-700/40 px-2 py-0.5 rounded-sm text-red-400">
-                      N/A
-                    </span>
-                  </Match>
-                </Switch>
-              </button>
-            </div>
-
-            {/* FEATURED SERVERS */}
-            <div class="relative w-full">
-              {/* Section header */}
-              <div class="flex items-center gap-4 mb-6">
-                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-green-800/40 to-transparent" />
-                <div class="terminal-border px-4 py-1 relative">
-                  <div class="corner-decoration" />
-                  <span class="text-green-500/80 text-xs tracking-[0.25em] uppercase font-mono">
-                    // SERVER_IN_EVIDENZA
-                  </span>
-                </div>
-                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-green-800/40 to-transparent" />
-              </div>
-
-              {/* Cards scroll */}
-              <div class="overflow-x-auto pb-4 scroll-track">
-                <div class="flex gap-4 min-w-max px-2">
-                  <Show
-                    when={!featuredd.loading}
-                    fallback={
-                      <div class="flex gap-4">
-                        <For each={Array(6)}>
-                          {() => (
-                            <div
-                              class="w-64 h-40 rounded-sm animate-pulse"
-                              style={{
-                                background: "rgba(0,255,65,0.03)",
-                                border: "1px solid rgba(0,255,65,0.1)",
-                              }}
-                            >
-                              <div class="p-3 space-y-2">
-                                <div class="h-3 bg-green-900/40 rounded-sm w-3/4" />
-                                <div class="h-2 bg-green-900/30 rounded-sm w-1/2" />
-                              </div>
-                            </div>
-                          )}
-                        </For>
-                      </div>
-                    }
-                  >
-                    <Show
-                      when={featured()?.length >= 0}
-                      fallback={
-                        <p class="text-green-700/60 font-mono text-sm w-full text-center">
-                          &gt; NO_SERVERS_FOUND // DATABASE VUOTO
-                        </p>
-                      }
-                    >
-                      <For each={featured()?.slice(0, 12)}>
-                        {(server) => (
-                          <ServerCardHacking server={server} onVoteRequest={() => ""} nascondiPulsanti={true} />
-                        )}
-                      </For>
-                    </Show>
-                  </Show>
-                </div>
-              </div>
-
-              {/* Scroll hint */}
-              <div class="text-center mt-3 text-green-800/50 text-xs font-mono tracking-widest">
-                [ SCROLL_RIGHT → LOAD_MORE_SERVERS ]
-              </div>
-            </div>
           </div>
         </Show>
       </section>
@@ -518,4 +411,4 @@ const HeroMain: Component = () => {
   );
 };
 
-export default HeroMain;
+export default HeroServerMain;

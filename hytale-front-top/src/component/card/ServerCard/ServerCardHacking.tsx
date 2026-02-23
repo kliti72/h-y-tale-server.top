@@ -248,7 +248,7 @@ const ServerCardHacking: Component<ServerCardProps> = (props) => {
             
                  <Show when={!status.loading} fallback={
             <div class="px-1 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-xs">
-                <span class="text-yellow-300 font-bold"> Non hai integrato H-Y-TaleVerifier.jar</span>
+                <span class="text-yellow-300 font-bold"> Quest server non integrato H-Y-TaleVerifier.jar</span>
                 
                 <br />
                <span class="text-violet-400 text-xs">

@@ -1,15 +1,24 @@
-// src/components/Footer.tsx
-import { Component, createSignal, onMount } from "solid-js";
-import { A } from "@solidjs/router"; // se usi solid-router
-import ThemeToggle from "../card/widget/ThemeToggle";
+import { Component, createSignal, onMount, onCleanup } from "solid-js";
+import { A } from "@solidjs/router";
 
 const Footer: Component = () => {
   const [copied, setCopied] = createSignal(false);
-  const [email, setEmail] = createSignal("");
-  const [subscribed, setSubscribed] = createSignal(false);
+  const [currentTime, setCurrentTime] = createSignal("");
 
   const siteUrl = "https://h-y-tale.top";
-  const discordInvite = "https://discord.gg/tuoinvitelink"; // ← cambia!
+  const discordInvite = "https://discord.gg/tuoinvitelink";
+
+  onMount(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(
+        `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    onCleanup(() => clearInterval(interval));
+  });
 
   const handleCopyLink = async () => {
     try {
@@ -22,121 +31,369 @@ const Footer: Component = () => {
   };
 
   const handleShareX = () => {
-    const text = encodeURIComponent(
-      "Scopri Etherwood – la community italiana di Hytale! 🌌 Server, voti, guide e tanto altro →"
-    );
+    const text = encodeURIComponent("Scopri H-Y-Tale – la community italiana di Hytale! Server, voti, guide e tanto altro →");
     const url = encodeURIComponent(siteUrl);
     window.open(`https://x.com/intent/tweet?text=${text}&url=${url}`, "_blank");
   };
 
-  const handleSubscribe = (e: Event) => {
-    e.preventDefault();
-    if (email().trim() && email().includes("@")) {
-      // Qui potresti fare una fetch reale a backend/Mailchimp
-      console.log("Iscrizione newsletter:", email());
-      setSubscribed(true);
-      setTimeout(() => setSubscribed(false), 4000);
-      setEmail("");
-    }
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer class="relative mt-auto w-full border-t border-emerald-900/40 bg-gradient-to-b from-black to-indigo-950/90 text-zinc-400 text-sm overflow-hidden">
-      {/* Background subtle particles / glow */}
-      <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(34,197,94,0.08),transparent_40%)]" />
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(168,85,247,0.06),transparent_50%)]" />
-      </div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap');
 
-      <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-12 lg:py-16">
-        {/* Grid principale - 4 colonne su desktop */}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-12">
-          {/* Colonna 1: Brand + descrizione */}
-          <div class="space-y-5">
-            <h3 class="text-2xl font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-              H-Y-TALE.top
-            </h3>
-            <p class="leading-relaxed text-zinc-300 max-w-xs">
-              La community italiana dedicata a Hytale. Scopri server, vota i tuoi preferiti, unisciti agli eventi e fai parte del regno floating!
-            </p>
-            <div class="flex items-center gap-4 pt-2">
-              <a
-                href={discordInvite}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-emerald-400 hover:text-emerald-300 transition text-2xl hover:scale-110"
-                aria-label="Discord"
+        .footer-root {
+          font-family: 'Share Tech Mono', monospace;
+        }
+
+        .ft-link {
+          position: relative;
+          color: rgba(0,255,65,0.45);
+          text-decoration: none;
+          transition: all 0.2s;
+          font-size: 13px;
+          letter-spacing: 0.05em;
+        }
+        .ft-link::before {
+          content: '> ';
+          opacity: 0;
+          transition: opacity 0.2s;
+          color: rgba(0,255,65,0.7);
+        }
+        .ft-link:hover {
+          color: #00ff41;
+          padding-left: 4px;
+        }
+        .ft-link:hover::before { opacity: 1; }
+
+        .ft-btn {
+          font-family: 'Share Tech Mono', monospace;
+          position: relative;
+          overflow: hidden;
+          transition: all 0.3s;
+          font-size: 12px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+        .ft-btn:hover {
+          color: #00ff41 !important;
+          border-color: rgba(0,255,65,0.5) !important;
+          box-shadow: 0 0 20px rgba(0,255,65,0.15);
+        }
+
+        .ft-corner {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        .ft-corner::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0;
+          width: 14px; height: 14px;
+          border-top: 1px solid rgba(0,255,65,0.4);
+          border-left: 1px solid rgba(0,255,65,0.4);
+        }
+        .ft-corner::after {
+          content: '';
+          position: absolute;
+          bottom: 0; right: 0;
+          width: 14px; height: 14px;
+          border-bottom: 1px solid rgba(0,255,65,0.4);
+          border-right: 1px solid rgba(0,255,65,0.4);
+        }
+
+        .ft-scanline {
+          background: repeating-linear-gradient(
+            0deg, transparent, transparent 3px,
+            rgba(0,255,65,0.008) 3px, rgba(0,255,65,0.008) 4px
+          );
+        }
+
+        .ft-social {
+          width: 36px; height: 36px;
+          display: flex; align-items: center; justify-content: center;
+          border: 1px solid rgba(0,255,65,0.2);
+          background: rgba(0,0,0,0.6);
+          transition: all 0.3s;
+          position: relative;
+        }
+        .ft-social:hover {
+          border-color: rgba(0,255,65,0.6);
+          box-shadow: 0 0 18px rgba(0,255,65,0.2);
+          color: #00ff41;
+        }
+
+        .ft-section-label {
+          font-size: 10px;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: rgba(0,255,65,0.4);
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .ft-section-label::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: rgba(0,255,65,0.1);
+        }
+
+        .ft-divider {
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(0,255,65,0.2) 30%, rgba(0,255,65,0.2) 70%, transparent);
+        }
+
+        .blink { animation: blink 1s steps(1) infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        .ft-ascii {
+          font-size: 9px;
+          line-height: 1.3;
+          color: rgba(0,255,65,0.12);
+          letter-spacing: 0.05em;
+          user-select: none;
+        }
+
+        .ft-scroll-btn {
+          font-family: 'Share Tech Mono', monospace;
+          position: relative;
+          overflow: hidden;
+          transition: all 0.3s;
+        }
+        .ft-scroll-btn:hover {
+          color: #00ff41;
+          letter-spacing: 0.15em;
+        }
+        .ft-scroll-btn:hover .ft-arrow {
+          transform: translateY(-3px);
+        }
+        .ft-arrow {
+          display: inline-block;
+          transition: transform 0.3s;
+        }
+      `}</style>
+
+      <footer
+        class="footer-root ft-scanline relative mt-auto w-full overflow-hidden"
+        style={{
+          background: "linear-gradient(180deg, #000300 0%, #000502 60%, #000200 100%)",
+          "border-top": "1px solid rgba(0,255,65,0.12)",
+        }}
+      >
+        {/* Grid bg */}
+        <div
+          class="absolute inset-0 pointer-events-none"
+          style={{
+            "background-image": `
+              linear-gradient(rgba(0,255,65,0.025) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,255,65,0.025) 1px, transparent 1px)
+            `,
+            "background-size": "40px 40px",
+          }}
+        />
+
+        {/* Glow top */}
+        <div
+          class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-32 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse, rgba(0,255,65,0.05) 0%, transparent 70%)" }}
+        />
+
+        {/* Top status bar */}
+        <div
+          class="relative z-10 border-b px-6 sm:px-10 py-2 flex items-center justify-between"
+          style={{ "border-color": "rgba(0,255,65,0.1)" }}
+        >
+          <div class="flex items-center gap-2 text-xs" style={{ color: "rgba(0,255,65,0.35)" }}>
+            <span class="blink" style={{ color: "rgba(0,255,65,0.6)" }}>◉</span>
+            SYSTEM_STATUS: ONLINE
+          </div>
+          <div class="text-xs font-mono" style={{ color: "rgba(0,255,65,0.25)" }}>
+            SYS_TIME: {currentTime()}
+          </div>
+          <div class="text-xs" style={{ color: "rgba(0,255,65,0.25)" }}>
+            NODE: H-Y-TALE_PROD
+          </div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-12">
+
+          {/* Grid 4 colonne */}
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-12">
+
+            {/* Col 1: Brand */}
+            <div>
+              <div class="ft-section-label">// SYSTEM_ID</div>
+              <h3
+                class="text-2xl font-black mb-3"
+                style={{
+                  "font-family": "'Orbitron', monospace",
+                  background: "linear-gradient(135deg, #00ff41, #00cc33)",
+                  "-webkit-background-clip": "text",
+                  "-webkit-text-fill-color": "transparent",
+                  "background-clip": "text",
+                }}
               >
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8851 1.515.0699.0699 0 00-.032.0277C.5336 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0775.0105c.1202.099.246.1981.372.2914a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6061 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" />
-                </svg>
-              </a>
-              <button onClick={handleShareX} class="text-zinc-300 hover:text-white transition text-2xl hover:scale-110" aria-label="Condividi su X">
-                𝕏
-              </button>
-              {/* Aggiungi altri social se vuoi: YouTube, TikTok, Instagram... */}
+                H-Y-TALE
+                <span class="blink" style={{ "-webkit-text-fill-color": "rgba(0,255,65,0.6)", "font-size": "18px" }}>_</span>
+              </h3>
+              <p class="text-xs leading-relaxed mb-5" style={{ color: "rgba(0,255,65,0.4)", "line-height": "1.8" }}>
+                <span style={{ color: "rgba(0,255,65,0.25)" }}>&gt;&gt; </span>
+                Community italiana dedicata a Hytale. Scopri server, vota i preferiti, unisciti agli eventi.
+              </p>
+
+              {/* Socials */}
+              <div class="flex items-center gap-2">
+                <a
+                  href={discordInvite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="ft-social"
+                  aria-label="Discord"
+                  style={{ color: "rgba(0,255,65,0.5)" }}
+                >
+                  <div class="ft-corner" />
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8851 1.515.0699.0699 0 00-.032.0277C.5336 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0775.0105c.1202.099.246.1981.372.2914a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6061 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" />
+                  </svg>
+                </a>
+                <button
+                  onClick={handleShareX}
+                  class="ft-social"
+                  aria-label="X"
+                  style={{ color: "rgba(0,255,65,0.5)", "font-size": "14px", "font-weight": "bold" }}
+                >
+                  <div class="ft-corner" />
+                  𝕏
+                </button>
+              </div>
             </div>
+
+            {/* Col 2: Esplora */}
+            <div>
+              <div class="ft-section-label">// ESPLORA</div>
+              <ul class="space-y-3">
+                {[
+                  { href: "/servers", label: "SERVER_LIST" },
+                  { href: "/leaderboard", label: "TOP_VOTATI" },
+                  { href: "/forum", label: "FORUM" },
+                  { href: "/guide", label: "GUIDE_HYTALE" },
+                ].map((item) => (
+                  <li>
+                    <A href={item.href} class="ft-link">{item.label}</A>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Col 3: Community */}
+            <div>
+              <div class="ft-section-label">// COMMUNITY</div>
+              <ul class="space-y-3">
+                {[
+                  { href: discordInvite, label: "DISCORD_SERVER", external: true },
+                  { href: "/contatti", label: "CONTATTACI", external: false },
+                  { href: "/privacy", label: "TERMINI_SERVIZIO", external: false },
+                ].map((item) => (
+                  <li>
+                    {item.external
+                      ? <a href={item.href} target="_blank" rel="noopener" class="ft-link">{item.label}</a>
+                      : <A href={item.href} class="ft-link">{item.label}</A>
+                    }
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Col 4: ASCII art + stats */}
+            <div>
+              <div class="ft-section-label">// SYS_INFO</div>
+              <pre class="ft-ascii mb-4">{`
+ ██╗  ██╗██╗   ██╗
+ ██║  ██║╚██╗ ██╔╝
+ ███████║ ╚████╔╝ 
+ ██╔══██║  ╚██╔╝  
+ ██║  ██║   ██║   
+ ╚═╝  ╚═╝   ╚═╝  
+              `}</pre>
+              <div class="space-y-1 text-xs" style={{ color: "rgba(0,255,65,0.3)" }}>
+                <div>&gt; BUILT_WITH: SolidJS + Tailwind</div>
+                <div>&gt; VERSION: 2.4.1</div>
+                <div>&gt; ENV: PRODUCTION</div>
+                <div class="mt-2" style={{ color: "rgba(0,255,65,0.15)" }}>
+                  NOT_AFFILIATED: Hytale™ / Hypixel Studios™
+                </div>
+              </div>
+            </div>
+
           </div>
 
-          {/* Colonna 2: Links rapidi */}
-          <div class="space-y-4">
-            <h4 class="text-lg font-semibold text-emerald-300">Esplora</h4>
-            <ul class="space-y-2.5">
-              <li><A href="/servers" class="hover:text-emerald-300 transition">Server</A></li>
-              <li><A href="/leaderboard" class="hover:text-emerald-300 transition">Top Votati</A></li>
-              <li><A href="/forum" class="hover:text-emerald-300 transition">Forum</A></li>
-              <li><A href="/guide" class="hover:text-emerald-300 transition">Guide Hytale</A></li>
-            </ul>
-          </div>
+          <div class="ft-divider mb-6" />
 
-          {/* Colonna 3: Community & Support */}
-          <div class="space-y-4">
-            <h4 class="text-lg font-semibold text-emerald-300">Community</h4>
-            <ul class="space-y-2.5">
-              <li><a href={discordInvite} target="_blank" rel="noopener" class="hover:text-emerald-300 transition">Discord</a></li>
-              <li><A href="/contatti" class="hover:text-emerald-300 transition" >Contattaci</A></li>
-              <li><A href="/privacy" class="hover:text-emerald-300 transition">Termini di Servizio</A></li>
-            </ul>
-          </div>
+          {/* Bottom bar */}
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
 
-          {/* Colonna 4: Newsletter */}
-         
-        </div>
+            {/* Left: actions */}
+            <div class="flex items-center gap-3 order-2 sm:order-1">
+              <button
+                onClick={handleCopyLink}
+                class="ft-btn relative px-4 py-2 flex items-center gap-2"
+                style={{
+                  border: "1px solid rgba(0,255,65,0.2)",
+                  background: "rgba(0,0,0,0.5)",
+                  color: copied() ? "#00ff41" : "rgba(0,255,65,0.45)",
+                  "border-color": copied() ? "rgba(0,255,65,0.5)" : "rgba(0,255,65,0.2)",
+                  "box-shadow": copied() ? "0 0 15px rgba(0,255,65,0.2)" : "none",
+                }}
+              >
+                <div class="ft-corner" />
+                {copied() ? "✓ COPIATO" : "⬡ COPIA_LINK"}
+              </button>
 
-        {/* Barra inferiore con share + copyright */}
-        <div class="border-t border-emerald-900/30 pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-zinc-500 text-xs sm:text-sm">
-          <div class="flex items-center gap-5 order-2 sm:order-1">
+              <button
+                onClick={handleShareX}
+                class="ft-btn px-4 py-2 flex items-center gap-2"
+                style={{
+                  border: "1px solid rgba(0,255,65,0.2)",
+                  background: "rgba(0,0,0,0.5)",
+                  color: "rgba(0,255,65,0.45)",
+                }}
+              >
+                𝕏 CONDIVIDI
+              </button>
+            </div>
+
+            {/* Center: copyright */}
+            <div class="text-center order-1 sm:order-2" style={{ color: "rgba(0,255,65,0.2)" }}>
+              <span>// © {new Date().getFullYear()} H-Y-TALE.top — ALL_RIGHTS_RESERVED</span>
+            </div>
+
+            {/* Right: scroll top */}
             <button
-              onClick={handleCopyLink}
-              class={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${copied() ? "bg-emerald-900/40 text-emerald-300" : "hover:bg-emerald-950/40"}`}
+              onClick={scrollToTop}
+              class="ft-scroll-btn order-3 flex items-center gap-2 text-xs uppercase tracking-widest"
+              style={{ color: "rgba(0,255,65,0.4)" }}
             >
-              {copied() ? "✅ Copiato!" : "🔗 Copia link"}
+              TORNA_SU <span class="ft-arrow">↑</span>
             </button>
 
-            <button onClick={handleShareX} class="flex items-center gap-2 hover:text-white transition">
-              <span>𝕏</span> Condividi
-            </button>
           </div>
-
-          <div class="text-center order-1 sm:order-2">
-            © {new Date().getFullYear()} H-Y-Tale.top • Non affiliato ufficialmente con Hytale o Hypixel Studios. 
-            <br class="sm:hidden" />
-            <span class="inline-block mt-1 sm:mt-0"> Made with ❤️ + SolidJS + Tailwind</span>
-          </div>
-
-          <button
-            onClick={scrollToTop}
-            class="order-3 flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition"
-          >
-            Torna su <span class="text-lg">↑</span>
-          </button>
         </div>
-      </div>
-    </footer>
+
+        {/* Bottom terminal line */}
+        <div
+          class="relative z-10 border-t px-6 py-2 flex items-center justify-center"
+          style={{ "border-color": "rgba(0,255,65,0.06)" }}
+        >
+          <span class="text-xs font-mono" style={{ color: "rgba(0,255,65,0.1)", "letter-spacing": "0.2em" }}>
+            [ END_OF_FILE // H-Y-TALE_OS // SESSION_ACTIVE ]
+          </span>
+        </div>
+      </footer>
+    </>
   );
 };
 
