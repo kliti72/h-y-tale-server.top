@@ -11,9 +11,8 @@ export default defineConfig({
       allowedHosts: [
       'play.pvpshield.com',      // esatto dominio che usi
       '.pvpshield.com',          // opzionale: permette tutti i subdomain (*.pvpshield.com)
-      'h-y-tale-server.com',
-      'www.h-y-tale-server.com',
-      '.h-y-tale-server.com'
+      'h-y-tale-server.top',
+      '.h-y-tale-server.top'
     ],
   },
 
