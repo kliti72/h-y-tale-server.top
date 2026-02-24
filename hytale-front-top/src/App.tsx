@@ -6,7 +6,7 @@ import ServerDetail from './pages/details/ServerDetailPage';
 import Panel from './pages/todo/ManagePanelPage';
 import Home from './pages/HomePage';
 import Contatti from './pages/about/ContattiPage';
-import { ServerEditWrapper} from './component/modal/ServerEditWrapper';
+import { ServerEditWrapper } from './component/modal/ServerEditWrapper';
 import { ServerAddWrapper } from './component/modal/ServerAddWrapper';
 import ServerPage from './pages/ServerPage';
 import LeaderboardHacking from './pages/LeaderboardPage';
@@ -15,17 +15,20 @@ import LeaderboardStonePage from './pages/theme_game/LeaderboardStonePage';
 import Earn from './pages/todo/Earn';
 import HeaderHacking from './pages/theme_game/HeaderHackingPage';
 import DocsPage from './pages/DocsPage';
-
+import { MetaProvider, Link } from "@solidjs/meta";
 
 function App() {
   return (
     <Router
       root={(props) => (
-        <AuthProvider>
-          <HeaderHacking />
-          {props.children}
-          <Footer />
-        </AuthProvider>
+        <MetaProvider >
+          <Link rel="icon" href="../favicon/icon.svg" />
+          <AuthProvider>
+            <HeaderHacking />
+            {props.children}
+            <Footer />
+          </AuthProvider>
+        </MetaProvider>
       )}
     >
       <Route path="/" component={Home} />
@@ -41,7 +44,7 @@ function App() {
       <Route path="/contatti" component={Contatti} />
       <Route path="/privacy" component={PrivacyPolicyPage} />
       <Route path="*" component={NotFound} />
-    </Router> 
+    </Router>
   );
 }
 
