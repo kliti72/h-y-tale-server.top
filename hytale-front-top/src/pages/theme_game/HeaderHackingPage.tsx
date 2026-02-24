@@ -469,13 +469,12 @@ const STYLES = `
   .hk-blink { animation: hk-blink 1s step-end infinite; }
 `;
 
-const TICKER_TEXT = "> SYSTEM_ONLINE // SRV_COUNT: 247 // UPTIME: 99.8% // ACCESS_GRANTED // h-ytale.top v2.0 // INITIALIZING... ";
 
 const NAV_ITEMS = [
   { path: "/",            label: "HOME",       cmd: "cd ~"        },
   { path: "/servers",     label: "SERVERS",    cmd: "ls /srv"     },
   { path: "/leaderboard", label: "TOP",        cmd: "sort --rank" },
-  { path: "/docs",        label: "DOCS",       cmd: "man pages"   },
+  { path: "/docs",        label: "PLUGIn & API",       cmd: "man pages"   },
 ];
 
 const NOTIFICATIONS = [
@@ -692,7 +691,7 @@ const HeaderHacking: Component = () => {
         {/* Overlay */}
         <Show when={showUserMenu() || notificationsOpen()}>
           <div
-            style="position: fixed; inset: 1; z-index: 59;"
+            style="position: fixed; inset: 10; z-index: 50009;"
 
             onClick={() => { setShowUserMenu(false); setNotificationsOpen(false); }}
           />

@@ -1,4 +1,4 @@
-const producation = true;
+const producation = false;
 
 export function isProduction() {
     return producation;

@@ -25,7 +25,7 @@ const ServerDetail: Component = () => {
   const [timedOut, setTimedOut] = createSignal(false);
   const auth = useAuth();
   const discord_id_user = auth.user()?.id ?? '';
-  const [server] = createResource<ServerResponse | null>(() => ServerService.getServerById(serverId()));
+  const [server, { refetch }] = createResource<ServerResponse | null>(() => ServerService.getServerById(serverId()));
   const [selectedServer, setSelectedServer] = createSignal<ServerResponse | null>(null);
 
   onMount(() => {
@@ -40,10 +40,19 @@ const ServerDetail: Component = () => {
   };
 
   const handlePlayerVote = () => {
-    const voteRes = VoteService.addVote(discord_id_user, selectedServer()?.id ?? 0, playerGameName() ?? '');
-    if (voteRes != null) notify(`Complimenti ${playerGameName()} hai votato ${selectedServer()?.name}`);
-    setIsModalOpen(false);
+      const voteRes = VoteService.addVote(discord_id_user, selectedServer()?.id ?? 0, playerGameName() ?? '');
+      voteRes.then((res) => {
+        if(res.success) {
+          notify(res.message);
+          refetch();
+          setIsModalOpen(false);
+        } else {
+          notify(res.message);
+        }
+      })
+      
   };
+
 
   return (
     <div
@@ -142,26 +151,13 @@ const ServerDetail: Component = () => {
                   { label: serverData().name ?? '', isActive: true },
                 ]} />
 
-  <div class="flex flex-row gap-6 mt-4 mb-8">
-  
-  {/* Top: nome/logo/status — full width */}
-  <ServerCardStatus server={serverData()} />
-
-  {/* Bottom: IP + azioni allineate */}
-  <div class="flex flex-col sm:flex-row items-start gap-3">
-    <div class="flex-1 w-full">
-      <ServerIpBox server={serverData()} />
-    </div>
-    <div class="flex flex-row sm:flex-col gap-3 flex-shrink-0">
-      <ShareButton server={serverData()} />
-    </div>
-
-  </div>
-      <VoteButton server={serverData()} onVoteRequest={handleVoteRequest} />
-
-</div>
-</div>
-
+                <div class="flex flex-col lg:flex-row items-start justify-between gap-3 mt-4 mb-8">
+                  <ServerCardStatus server={serverData()} />
+                  <ServerIpBox server={serverData()} />
+                  {/* Actions */}
+                </div>
+                <VoteButton server={serverData()} onVoteRequest={handleVoteRequest}/>
+              </div>
             )}
           </Show>
 

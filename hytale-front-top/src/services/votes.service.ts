@@ -7,6 +7,12 @@ interface Vote {
     voted_at: string
 }
 
+interface VoteAPI {
+    message : string,
+    success: boolean
+}
+
+
 interface Aviable {
     success: boolean,
     wait_time: string,
@@ -43,9 +49,8 @@ export class VoteService {
     }
 
     // Aggiungi un voto
-    static async addVote(discord_user_id : string, server_id: number, playerGameName: string): Promise<Vote> {
+    static async addVote(discord_user_id : string, server_id: number, playerGameName: string): Promise<VoteAPI> {
 
-        try {
             const res = await fetch(`${VoteService.baseUrl}/vote`, {
               method: "POST",
               credentials: 'include',
@@ -53,16 +58,9 @@ export class VoteService {
               body: JSON.stringify({discord_user_id, server_id, playerGameName}),
             });
 
-            if(!res.ok) {
-                throw new Error(`Return error ${res.status}`);
-            }
+            const wrapperResponse: VoteAPI = await res.json();
+            return wrapperResponse;
 
-            const vote = await res.json();
-            return vote;
-
-        } catch(err) {
-            throw new Error(`[VoteService] Errore durante addVote: ${err}`);
-        }
     };
 
     // Verifica se puoi votare

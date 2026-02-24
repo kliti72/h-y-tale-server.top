@@ -128,7 +128,7 @@ export function registerAuthRoutes(
             );
 
             // Setta cookie
-            const isProd = Bun.env.NODE_ENV === 'production';
+            const isProd = true;
             set.headers['set-cookie'] = `session=${sessionId}; HttpOnly; ${isProd ? 'Secure; ' : ''}SameSite=Lax; Path=/; Max-Age=604800`;
 
             frontendRedirect = `${Bun.env.FRONTEND_URL}/?auth=success`;

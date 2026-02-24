@@ -33,7 +33,7 @@ export default function VoteButton(props: VoteButtonProps) {
       fallback={
         <button
           disabled
-          class="relative flex items-center justify-center gap-3 px-6 py-3 text-xs tracking-widest uppercase cursor-not-allowed opacity-40"
+          class="relative flex justify-center gap-3 px-6 py-3 text-xs tracking-widest uppercase cursor-not-allowed opacity-40"
           style={{
             "font-family": "'Share Tech Mono', monospace",
             border: "1px solid rgba(0,255,65,0.15)",
@@ -49,11 +49,11 @@ export default function VoteButton(props: VoteButtonProps) {
       <Show
         when={canVote()}
         fallback={
-          <div class="flex flex-col items-center gap-2">
+          <div class="flex flex-col gap-2">
             {/* Cannot vote */}
             <button
               disabled
-              class="relative flex items-center justify-center gap-3 px-6 py-3 text-xs tracking-widest uppercase cursor-not-allowed"
+              class="relative flex justify-center gap-3 px-6 py-3 text-xs tracking-widest uppercase cursor-not-allowed"
               style={{
                 "font-family": "'Share Tech Mono', monospace",
                 border: "1px solid rgba(255,80,80,0.25)",
@@ -68,7 +68,7 @@ export default function VoteButton(props: VoteButtonProps) {
 
             {/* Cooldown badge */}
             <div
-              class="flex items-center gap-2 px-3 py-1.5 text-xs"
+              class="flex gap-2 px-3 py-1.5 text-xs"
               style={{
                 "font-family": "'Share Tech Mono', monospace",
                 border: "1px solid rgba(255,140,0,0.2)",
@@ -84,33 +84,24 @@ export default function VoteButton(props: VoteButtonProps) {
           </div>
         }
       >
-        {/* Can vote */}
-        <button
+        <div
           onClick={handleClick}
-          class="relative flex items-center justify-center gap-3 px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all"
+          class="relative gap-3 px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all"
           style={{
             "font-family": "'Share Tech Mono', monospace",
-            border: "1px solid rgba(0,255,65,0.45)",
-            color: "#00ff41",
-            background: "rgba(0,255,65,0.08)",
-            "box-shadow": "0 0 20px rgba(0,255,65,0.08)",
+            "font-size": "1em",
+            border: "2px solid rgba(61, 208, 16, 0.72)",
+            cursor: "pointer",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(0,255,65,0.14)";
-            e.currentTarget.style.boxShadow = "0 0 30px rgba(0,255,65,0.2)";
-            e.currentTarget.style.letterSpacing = "0.15em";
+            e.currentTarget.style.boxShadow = "0 0 30px rgba(7, 179, 27, 0.67)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(0,255,65,0.08)";
             e.currentTarget.style.boxShadow = "0 0 20px rgba(0,255,65,0.08)";
-            e.currentTarget.style.letterSpacing = "0.1em";
           }}
         >
-          <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-green-500/50 pointer-events-none" />
-          <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-green-500/50 pointer-events-none" />
-          <span style={{ color: "rgba(0,255,65,0.7)" }}>⬡</span>
-          ESEGUI_VOTO.exe
-        </button>
+          VOTA_QUI.EXE
+        </div>
       </Show>
     </Show>
   );

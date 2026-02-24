@@ -329,7 +329,6 @@ const HeroServerMain: Component = () => {
         }}
       >
         {/* Matrix rain background */}
-        <MatrixRain />
 
         {/* Hex pattern */}
         <div class="absolute inset-0 hex-bg opacity-100 pointer-events-none" style={{ "z-index": "0" }} />
@@ -345,25 +344,14 @@ const HeroServerMain: Component = () => {
         }} />
 
         {/* BOOT SEQUENCE */}
-        <Show when={!bootDone()}>
-          <div class="relative z-10 w-full max-w-2xl terminal-border bg-black/90 p-6 rounded-sm" style={{ "min-height": "220px" }}>
             <div class="corner-decoration" />
             <div class="flex items-center gap-2 mb-4 border-b border-green-900/50 pb-2">
               <div class="status-dot" />
               <span class="text-green-500 text-xs tracking-widest uppercase">HYTALE_OS TERMINAL</span>
             </div>
-            <For each={bootLines()}>
-              {(line) => (
-                <div class="boot-line text-green-400 text-sm font-mono mb-1">
-                  {line}
-                </div>
-              )}
-            </For>
-          </div>
-        </Show>
+     
 
         {/* MAIN CONTENT */}
-        <Show when={bootDone()}>
           <div class="relative z-10 max-w-5xl mx-auto text-center w-full">
 
             {/* System label */}
@@ -405,7 +393,6 @@ const HeroServerMain: Component = () => {
             
 
           </div>
-        </Show>
       </section>
     </>
   );

@@ -1,6 +1,7 @@
 import { createResource, Show } from "solid-js";
 import { ServerResponse, ServerStatus } from "../../../types/ServerResponse";
 import { StatusService } from "../../../services/status.service";
+import VoteButton from "../../button/VoteButton";
 
 export function ServerCardStatus(props: { server: ServerResponse }) {
   const [status] = createResource<ServerStatus | null>(
@@ -8,8 +9,12 @@ export function ServerCardStatus(props: { server: ServerResponse }) {
     { initialValue: null }
   );
 
+  function handleVoteRequest(server: ServerResponse): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
-    <div class="flex-1" style={{ "font-family": "'Share Tech Mono', monospace" }}>
+    <div class="" style={{ "font-family": "'Share Tech Mono', monospace" }}>
 
       {/* ── TOP ROW: logo + nome + badge ── */}
       <div class="flex items-start gap-6 mb-6">
@@ -77,7 +82,10 @@ export function ServerCardStatus(props: { server: ServerResponse }) {
             >
               {props.server.name?.charAt(0)?.toUpperCase() || "?"}
             </div>
+
           </Show>
+
+
 
           {/* Status dot sopra il logo */}
           <div class="absolute bottom-1 right-1">
@@ -98,6 +106,7 @@ export function ServerCardStatus(props: { server: ServerResponse }) {
           <div class="flex items-center gap-2 mb-2">
             <span class="text-green-700/40 text-xs tracking-[0.25em]">◎ SERVER_DETAIL</span>
             <div class="h-px flex-1 bg-green-900/30" />
+
           </div>
 
           <h1
@@ -126,9 +135,11 @@ export function ServerCardStatus(props: { server: ServerResponse }) {
                 <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" style={{ "box-shadow": "0 0 4px #00ff41" }} />
                 ONLINE // CONNESSIONE_ATTIVA
               </span>
+              
             </Show>
           </Show>
         </div>
+ 
       </div>
 
       {/* ── DIVIDER ── */}
