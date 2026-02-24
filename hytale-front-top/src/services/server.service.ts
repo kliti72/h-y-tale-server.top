@@ -1,4 +1,5 @@
 // src/services/server.service.ts
+import { isProduction } from '../auth/producation';
 import type { ServerApiResponse, ServerResponse } from '../types/ServerResponse';
 
 // Primo, crea un nuovo tipo per la risposta di "mine"
@@ -19,7 +20,7 @@ interface GetServerParams {
 
 export class ServerService {
 
-  static baseUrl = 'http://localhost:3000/servers';
+  static baseUrl = !isProduction() ? 'http://localhost:3000/servers' : 'https://h-y-tale-server.top/api/servers'
 
   /**
    * Ottiene un singolo server per nome

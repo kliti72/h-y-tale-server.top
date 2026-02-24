@@ -12,16 +12,13 @@ export function registerServerRoutes<TPrefix extends string = ''>(
   app: Elysia<TPrefix>,
   db: Database
 ): Elysia<TPrefix> {
-  console.log('📦 Registrazione route server...');
 
   registerServerCrudRoutes(app, db);
   registerServerStatusRoutes(app, db);
 
-  if (process.env.NODE_ENV !== 'production') {
-    registerServerDebugRoutes(app, db);
-  }
-
-  console.log('✅ Route server registrate');
+  // if (process.env.NODE_ENV !== 'production') {
+  //   registerServerDebugRoutes(app, db);
+  // }
 
   return app;
 }

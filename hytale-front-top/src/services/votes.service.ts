@@ -1,3 +1,5 @@
+import { isProduction } from "../auth/producation";
+
 interface Vote {
     id: string,
     server_id: number,
@@ -13,7 +15,8 @@ interface Aviable {
 
 export class VoteService {
 
-    static baseUrl = 'http://localhost:3000';
+    static baseUrl = !isProduction() ? 'http://localhost:3000' : 'https://h-y-tale-server.top/api'
+
 
     /**
      * Ottiene un singolo server per nome

@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [solid(), tailwindcss()],
   server: {
     host: true,          // oppure '0.0.0.0' se preferisci esplicito
-    port: 80,          // opzionale
+    port: 5173,          // opzionale
     open: false,         // non apre automaticamente il browser sulla VPS
       allowedHosts: [
       'play.pvpshield.com',      // esatto dominio che usi

@@ -1,4 +1,5 @@
 import { createContext, useContext, createSignal, onMount, ParentComponent } from 'solid-js';
+import { isProduction } from './producation';
 
 type User = {
   id: string;
@@ -25,6 +26,9 @@ export const AuthProvider: ParentComponent = (props) => {
   const [user, setUser] = createSignal<User | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
+  const logoutUrl = !isProduction() ? "http://localhost:3000/auth/logout" : "https://h-y-tale-server.top/api/auth/logout"
+  const loginUrl = !isProduction() ? 'http://localhost:3000/auth/discord/login' : 'https://h-y-tale-server.top/api/auth/discord/login';
+  const userUrl =  !isProduction() ? 'http://localhost:3000/auth/me' : 'https://h-y-tale-server.top/api/auth/me';
 
   // Funzione per caricare l'utente
   const fetchUser = async () => {
@@ -32,7 +36,7 @@ export const AuthProvider: ParentComponent = (props) => {
       setLoading(true);
       setError(null);
 
-      const res = await fetch('http://localhost:3000/auth/me', {
+      const res = await fetch(userUrl, {
         method: 'GET',
         credentials: 'include',
         headers: { Accept: 'application/json' },
@@ -60,12 +64,12 @@ export const AuthProvider: ParentComponent = (props) => {
   onMount(fetchUser);
 
   const login = () => {
-    window.location.href = 'http://localhost:3000/auth/discord/login';
+    window.location.href = loginUrl;
   };
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:3000/auth/logout', {
+      await fetch(logoutUrl, {
         method: 'POST',
         credentials: 'include',
       });

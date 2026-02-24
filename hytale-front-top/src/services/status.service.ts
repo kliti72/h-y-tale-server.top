@@ -1,9 +1,10 @@
 // src/services/server.service.ts
+import { isProduction } from '../auth/producation';
 import type { ServerStatus, ServerStatusApiResponse } from '../types/ServerResponse';
 
 export class StatusService {
 
-  static baseUrl = 'http://localhost:3000/servers';
+  static baseUrl = !isProduction() ? 'http://localhost:3000/servers' : 'https://h-y-tale-server.top/api/servers'
 
   /**
    * Ottiene un singolo server per nome
