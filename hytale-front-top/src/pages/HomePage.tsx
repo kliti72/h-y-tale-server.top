@@ -6,9 +6,8 @@ import { useAuth } from "../auth/AuthContext";
 
 
 const HomePage: Component = () => {
-
+  
   const auth = useAuth();
-
 
   return (
     <section>

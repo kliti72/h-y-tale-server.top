@@ -39,6 +39,7 @@ export function initDatabaseSchema(db: Database) {
         server_id       INTEGER NOT NULL,
         playerGameName  TEXT NOT NULL COLLATE NOCASE,
         voted_at        TEXT NOT NULL DEFAULT (datetime('now')),
+        is_claimed           BOOLEAN NOT NULL DEFAULT FALSE,
         FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE
     );
     `)
@@ -53,6 +54,7 @@ export function initDatabaseSchema(db: Database) {
         discriminator TEXT,
         email TEXT,
         last_vote_at TEXT,
+        player_game_name TEXT,
         created_at TEXT DEFAULT (datetime('now'))
     )
     `);

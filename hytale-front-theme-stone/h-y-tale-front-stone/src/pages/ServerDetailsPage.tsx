@@ -12,6 +12,7 @@ import GameServerAddressBoxComponent from '../component/card/GameServerAddressBo
 import GameServerCardRules from '../component/card/GameServerCardRules';
 import VoteButtonComponent from '../component/button/VoteButtonComponent';
 import GameServerDescriptionComponent from '../component/card/GameServerDescriptionComponent';
+
 const ServerDetailsPage: Component = () => {
   const params = useParams();
   const auth = useAuth();
@@ -79,10 +80,11 @@ const ServerDetailsPage: Component = () => {
 
                 <div class="flex flex-col lg:flex-row items-start justify-between gap-3 mt-4 mb-6">
                   <GameServerHeaderComponent server={s()} />
-                  <GameServerAddressBoxComponent server={s()} />
-                </div>
-
                 <VoteButtonComponent server={s()} onVoteRequest={handleVote} />
+
+                </div>
+                  <GameServerAddressBoxComponent server={s()} />
+
               </div>
             )}
           </Show>
@@ -97,12 +99,10 @@ const ServerDetailsPage: Component = () => {
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                 <aside class="lg:col-span-4 space-y-4">
-                  <SectionLabel label="📜 Info Panel" />
                   <StoneBox><GameServerCardRules rules={s().rules ?? ''} /></StoneBox>
                 </aside>
 
                 <div class="lg:col-span-8">
-                  <SectionLabel label="🏰 Contatti" />
                   <GameServerDescriptionComponent server={s()} />
                 </div>
 
@@ -117,7 +117,8 @@ const ServerDetailsPage: Component = () => {
         server_id={selected()?.id || 0} discord_id_user={auth.user()?.id ?? ''}
         server_secret_key={selected()?.secret_key || ''} server_name={selected()?.name || ''}
         server_ip={selected()?.ip || ''} player_game_name={playerName()}
-        onPlayerNameChange={() => setPlayerName("")} onPlayerVote={handlePlayerVote}
+        onPlayerNameChange={setPlayerName} 
+        onPlayerVote={handlePlayerVote}
       />
       <Notifications />
     </div>

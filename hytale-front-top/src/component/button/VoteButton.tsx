@@ -11,7 +11,7 @@ interface VoteButtonProps {
 
 export default function VoteButton(props: VoteButtonProps) {
   const auth = useAuth();
-  const [aviableVoteResource] = createResource(VoteService.aviableVote);
+  const [aviableVoteResource] = createResource(VoteService.aviableVote(auth.user()?.id ?? ''));
   const canVote = () => aviableVoteResource()?.success ?? false;
   const waitTime = () => aviableVoteResource()?.wait_time ?? "?";
 

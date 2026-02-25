@@ -8,13 +8,18 @@ interface Props { server: ServerResponse; onVoteRequest: (s: ServerResponse) => 
 
 export default function VoteButtonComponent(props: Props) {
   const auth = useAuth();
-  const [voteRes] = createResource(VoteService.aviableVote);
-  const canVote = () => voteRes()?.success ?? false;
-  const waitTime = () => voteRes()?.wait_time ?? "?";
+
+  const [voteRes] = createResource(
+    () => auth.user()?.id,  // source — si rivaluta quando cambia
+    (id) => VoteService.aviableVote(id)  // fetcher — parte solo se id è truthy
+  );
+
+  const canVote = () => voteRes()?.canVote ?? false;
+  const waitTime = () => voteRes()?.message  ?? "?";
 
   const handleClick = () => {
     if (!auth.isAuthenticated()) { notify("Accedi con Discord per votare", "error"); return; }
-    if (!canVote()) { notify(`Riprova tra ${waitTime()}h`, "error"); return; }
+    if (!canVote()) { notify(`Riprova tra ${waitTime()}`, "error"); return; }
     props.onVoteRequest(props.server);
   };
 
@@ -30,7 +35,7 @@ export default function VoteButtonComponent(props: Props) {
           <button disabled class="px-5 py-2.5 border border-red-900/40 bg-red-950/20 text-red-700 font-serif text-xs uppercase tracking-widest cursor-not-allowed">
             ⚠ Voto bloccato
           </button>
-          <span class="text-amber-700 font-serif text-xs">⏳ Riprova tra <strong>{waitTime()}h</strong></span>
+          <span class="text-amber-700 font-serif text-xs">⏳ Riprova tra <strong>{waitTime()}</strong></span>
         </div>
       }>
         <button

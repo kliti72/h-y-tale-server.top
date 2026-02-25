@@ -100,7 +100,7 @@ export function registerAuthRoutes(
             email: string
           };
 
-                      // 3. Salva / aggiorna utente (UPSERT)
+           // 3. Salva / aggiorna utente (UPSERT)
             db.run(
               `INSERT INTO discord_users (id, username, global_name, avatar, discriminator, email)
               VALUES (?, ?, ?, ?, ?, ?)

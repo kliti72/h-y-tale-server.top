@@ -2,18 +2,15 @@ import { Component, createSignal, onMount, onCleanup, createResource, For, Show 
 import { useNavigate } from "@solidjs/router";
 import { ServerService } from "../services/server.service";
 import GameServerCardComponent from "../component/card/GameServerCardComponent";
-// import ServerCardHacking from "../card/ServerCard/ServerCardHacking";
+import { Title, Meta } from "@solidjs/meta";
+import { useT } from "../lang/l18n";
+
 
 const DISCORD_INVITE = "https://discord.gg/tuoinvito";
 const DISCORD_GUILD_ID = "610190493862854676";
 
-const TAGLINES = [
-  "Esplora regni epici.",
-  "Vota i tuoi server preferiti.",
-  "Trova il tuo prossimo mondo.",
-];
 
-const TypingText: Component<{ texts: string[] }> = (props) => {
+const TypingText: Component<{ texts: readonly string[] }> = (props) => {
   const [displayed, setDisplayed] = createSignal("");
   const [idx, setIdx] = createSignal(0);
   const [charIdx, setCharIdx] = createSignal(0);
@@ -43,6 +40,9 @@ const HeroMain: Component = () => {
   const navigate = useNavigate();
   const [servers] = createResource(() => ServerService.getServers());
   const featured = () => servers()?.data ?? [];
+  const t = useT();
+
+  const TAGLINES = t().hero_tags;
 
   const [online] = createResource<number | null>(async () => {
     try {
@@ -64,7 +64,7 @@ const HeroMain: Component = () => {
         {/* eyebrow */}
         <div class="flex items-center justify-center gap-3 mb-6">
           <div class="h-px w-12 bg-amber-800/60" />
-          <span class="text-amber-700 text-xs font-serif uppercase tracking-[0.3em]">Community Italiana</span>
+          <span class="text-amber-700 text-xs font-serif uppercase tracking-[0.3em]">{t().community_region}</span>
           <div class="h-px w-12 bg-amber-800/60" />
         </div>
 
@@ -89,7 +89,7 @@ const HeroMain: Component = () => {
           >
             <span class="absolute -top-px -left-px w-2 h-2 border-t-2 border-l-2 border-amber-700" />
             <span class="absolute -bottom-px -right-px w-2 h-2 border-b-2 border-r-2 border-amber-700" />
-            ⚔️ Esplora Server
+            ⚔️ {t().explore_server}
           </button>
 
           <button
@@ -109,7 +109,7 @@ const HeroMain: Component = () => {
         <div class="w-full">
           <div class="flex items-center gap-3 mb-5">
             <div class="h-px flex-1 bg-amber-900/30" />
-            <span class="text-amber-800 text-xs font-serif uppercase tracking-[0.25em]">⚔ Server in Evidenza</span>
+            <span class="text-amber-800 text-xs font-serif uppercase tracking-[0.25em]">⚔ {t().evidence_server}</span>
             <div class="h-px flex-1 bg-amber-900/30" />
           </div>
 

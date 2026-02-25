@@ -34,12 +34,15 @@ const ServerDetail: Component = () => {
   });
 
   const handleVoteRequest = (server: ServerResponse) => {
+    console.log("Richiesta di voto iniziata");
     if (!auth.isAuthenticated()) { requireDiscordLogin(); return; }
     setIsModalOpen(true);
     setSelectedServer(server);
   };
 
+
   const handlePlayerVote = () => {
+    console.log("Player ha terminato di votare inizializzazione richiesta di voto nome giocatore", playerGameName());
       const voteRes = VoteService.addVote(discord_id_user, selectedServer()?.id ?? 0, playerGameName() ?? '');
       voteRes.then((res) => {
         if(res.success) {
@@ -230,8 +233,8 @@ const ServerDetail: Component = () => {
         server_name={selectedServer()?.name || ''}
         server_ip={selectedServer()?.ip || ''}
         player_game_name={playerGameName() ?? ''}
-        onPlayerNameChange={() => setPlayerGameName("")}
         onPlayerVote={handlePlayerVote}
+        onPlayerNameChange={setPlayerGameName}
       />
       <Notifications />
     </div>

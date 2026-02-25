@@ -11,7 +11,7 @@ type VoteServerProps = {
   isOpen: boolean;
   onClose: () => void;
   onPlayerVote: () => void;
-  onPlayerNameChange: (playerName: string) => void;
+  onPlayerNameChange: (playerName: string) => string;
 };
 
 const PlayersVoteModal = (props: VoteServerProps) => {
@@ -24,6 +24,7 @@ const PlayersVoteModal = (props: VoteServerProps) => {
     if (!name) { setError("⚠ NICKNAME_REQUIRED // campo obbligatorio"); return; }
     if (name.length < 3) { setError("⚠ NICKNAME_TOO_SHORT // minimo 3 caratteri"); return; }
     setError(null);
+    props.onPlayerNameChange(playerName());
     props.onPlayerVote();
   };
 

@@ -8,7 +8,7 @@ interface Vote {
 }
 
 interface VoteAPI {
-    message : string,
+    message: string,
     success: boolean
 }
 
@@ -16,6 +16,8 @@ interface VoteAPI {
 interface Aviable {
     success: boolean,
     wait_time: string,
+    canVote: string,
+    message: string
 }
 
 
@@ -33,7 +35,7 @@ export class VoteService {
         try {
             const res = await fetch(url, {
                 credentials: 'include',
-                headers: { 'Accept': 'application/json'},
+                headers: { 'Accept': 'application/json' },
             });
 
             if (!res.ok) {
@@ -49,24 +51,23 @@ export class VoteService {
     }
 
     // Aggiungi un voto
-    static async addVote(discord_user_id : string, server_id: number, playerGameName: string): Promise<VoteAPI> {
+    static async addVote(discord_user_id: string, server_id: number, playerGameName: string): Promise<VoteAPI> {
 
-            const res = await fetch(`${VoteService.baseUrl}/vote`, {
-              method: "POST",
-              credentials: 'include',
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({discord_user_id, server_id, playerGameName}),
-            });
+        const res = await fetch(`${VoteService.baseUrl}/vote/add/`, {
+            method: "POST",
+            credentials: 'include',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ discord_user_id, playerGameName, server_id  }),
+        });
 
-            const wrapperResponse: VoteAPI = await res.json();
-            return wrapperResponse;
+        const wrapperResponse: VoteAPI = await res.json();
+        return wrapperResponse;
 
     };
 
-    // Verifica se puoi votare
-    static async aviableVote(): Promise<Aviable> {
+    static async aviableVote(discordId: string): Promise<Aviable> {
         try {
-            const res = await fetch(`${VoteService.baseUrl}/vote/aviable`, {
+            const res = await fetch(`${VoteService.baseUrl}/vote/check/${discordId}`, {
                 method: "GET",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -75,7 +76,6 @@ export class VoteService {
         } catch (err) {
             throw new Error(`[VoteService] Errore durante aviableVote: ${err}`);
         }
-        
     }
 
     static async getVote(): Promise<Vote> {
@@ -89,7 +89,7 @@ export class VoteService {
         } catch (err) {
             throw new Error(`[VoteService] Errore durante aviableVote: ${err}`);
         }
-        
+
     }
 
 

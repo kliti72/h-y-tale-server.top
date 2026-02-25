@@ -27,6 +27,12 @@ export class VoteRepository {
         return vote;
     }
 
+
+    public static clearAll(db: Database) {
+        db.prepare(`DELETE FROM votes`).run();
+        db.prepare(`UPDATE discord_users SET last_vote_at = NULL`).run();
+    }
+
     public static getAll(db: Database) {
         const GET_VOTES = `
        SELECT * FROM votes
@@ -51,92 +57,36 @@ export class VoteRepository {
     }
 
 
-    // Esempio funzione che gestisce il voto
     public static async handleVote(db: Database, discordUserId: string, serverId: number, playerGameName: string) {
-        // 1. Cerchiamo quando ha votato l'ultima volta
-        const lastVote = db
-            .prepare('SELECT last_vote_at FROM discord_users WHERE id = ?')
-            .get(discordUserId) as { last_vote_at: string | null } | undefined;
-
         const now = new Date();
 
-        console.log("Arrivato discord user", discordUserId);
+        // Parte corretta
+        const recentVote = db
+            .prepare(`SELECT id FROM votes WHERE playerGameName = ? AND voted_at > datetime('now', '-24 hours')`)
+            .get(playerGameName) as { id: number } | undefined;
 
-        let canVote = true;
-        let reason = "";
-
-        if (lastVote?.last_vote_at) {
-            const lastVoteDate = new Date(lastVote.last_vote_at);
-            const diffMs = now.getTime() - lastVoteDate.getTime();
-            const hoursDiff = diffMs / (1000 * 60 * 60);
-
-            if (hoursDiff < 24) {
-                canVote = false;
-                reason = `Hai già votato nelle ultime 24 ore! Riprova tra ${Math.ceil(24 - hoursDiff)} ore.`;
-            }
+        if (recentVote) {
+            // Qui fermarsi coretto
+            return { success: false, message: "Hai già votato nelle ultime 24 ore!" };
         }
 
-        console.log("Verificato se l'utente può votare: ", canVote);
+        // Aggiornare ultimo voto dell'utente
+        db.prepare(`UPDATE discord_users SET last_vote_at = datetime('now') WHERE id = ?`).run(discordUserId);
 
-        if (!canVote) {
-            return { success: false, message: reason };
-        }
+        // Aggiornrare voti totali del server corretto
+        db.prepare(`UPDATE servers SET voti_totali = voti_totali + 1 WHERE id = ?`).run(serverId);
+        
+        const result = db.prepare(`INSERT INTO votes (server_id, playerGameName, voted_at) VALUES (?, ?, datetime('now'))`).run(serverId, playerGameName);
+        console.log("[VOTE] insert result:", result);
 
-        // 3. Incrementiamo il contatore totale sul server
-        db.prepare(`
-            UPDATE servers
-            SET voti_totali = voti_totali + 1
-            WHERE id = ?
-        `).run(serverId);
-
-        db.prepare(`
-        INSERT INTO votes (server_id, playerGameName, voted_at)
-        VALUES (?, ?, datetime('now'))
-        `).run(serverId, playerGameName);
-
-        // 3. IMPORTANTISSIMO → aggiorniamo l'ultima data di voto dell'utente
-        db.prepare(`
-        UPDATE discord_users
-        SET last_vote_at = datetime('now')
-        WHERE id = ?
-        `).run(discordUserId);
+        // verifica immediata
+        const inserted = db.prepare(`SELECT * FROM votes WHERE playerGameName = ?`).all(playerGameName);
+        console.log("[VOTE] voti nel db dopo insert:", inserted);
 
         return { success: true, message: "Voto registrato con successo! ⭐" };
     }
 
-        // Esempio funzione che gestisce il voto
-    public static async aviableVote(db: Database, discordUserId: string) {
-        // 1. Cerchiamo quando ha votato l'ultima volta
-        const lastVote = db
-            .prepare('SELECT last_vote_at FROM discord_users WHERE id = ?')
-            .get(discordUserId) as { last_vote_at: string | null } | undefined;
 
-        const now = new Date();
 
-        console.log("Arrivato discord user", discordUserId);
-
-        let canVote = true;
-        let reason = "";
-
-        if (lastVote?.last_vote_at) {
-            const lastVoteDate = new Date(lastVote.last_vote_at);
-            const diffMs = now.getTime() - lastVoteDate.getTime();
-            const hoursDiff = diffMs / (1000 * 60 * 60);
-
-            if (hoursDiff < 24) {
-                reason = `${Math.ceil(24 - hoursDiff)}`;
-                canVote = false;
-            }
-        }
- 
-        if (!canVote) {
-            return { success: false, wait_time: reason };
-        }
- 
-        return { success: true };
-
-    }
-
-    
 
 }

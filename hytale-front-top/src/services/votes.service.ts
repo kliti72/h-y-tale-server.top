@@ -63,10 +63,11 @@ export class VoteService {
 
     };
 
+    
     // Verifica se puoi votare
-    static async aviableVote(): Promise<Aviable> {
+    static async aviableVote(discordId : string): Promise<> {
         try {
-            const res = await fetch(`${VoteService.baseUrl}/vote/aviable`, {
+            const res = await fetch(`${VoteService.baseUrl}/check/${discordId}`, {
                 method: "GET",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
