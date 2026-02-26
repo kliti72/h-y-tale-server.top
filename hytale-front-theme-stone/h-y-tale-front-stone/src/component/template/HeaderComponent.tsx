@@ -5,7 +5,7 @@ import DiscordButtonComponent from "../button/DiscordButtonComponent";
 import { useT } from "../../lang/l18n";
 
 const NOTIFICATIONS = [
-  { id: 2, text: "Hai sbloccato la possibilità di pubblicare un server", icon: "🔥", time: "Vai nella sezione Aggiungi server", unread: true },
+  { id: 2, text: "Hai sbloccato la possibilità di pubblicare un server", icon: "🔥", time: "Vai nella sezione Aggiungi server", unread: false },
   { id: 1, text: "Benvenuto su H-Y-Tale.top", icon: "⚔️", time: "Puoi votare il tuo server preferito", unread: false },
 ];
 

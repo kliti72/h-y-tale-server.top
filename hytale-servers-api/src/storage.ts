@@ -23,7 +23,7 @@ export function initDatabaseSchema(db: Database) {
     )
     `)
 
-       db.run(`
+    db.run(`
         CREATE TABLE IF NOT EXISTS server_stats (
             server_id           BIGINT PRIMARY KEY REFERENCES servers(id) ON DELETE CASCADE,
             players_online      INTEGER NOT NULL DEFAULT 0,
@@ -68,6 +68,16 @@ export function initDatabaseSchema(db: Database) {
         expires_at INTEGER NOT NULL,           -- timestamp in millisecondi
         created_at TEXT DEFAULT (datetime('now')),
         FOREIGN KEY (user_id) REFERENCES discord_users(id)
+    )
+    `);
+
+    db.run(`CREATE TABLE IF NOT EXISTS server_secondary_status (
+        server_id    INTEGER NOT NULL,
+        secondary_id TEXT NOT NULL,
+        players_online INTEGER NOT NULL DEFAULT 0,
+        last_ping    TEXT NOT NULL,
+        PRIMARY KEY (server_id, secondary_id),  -- upsert funziona su questo
+        FOREIGN KEY (server_id) REFERENCES servers(id)
     )
     `);
 

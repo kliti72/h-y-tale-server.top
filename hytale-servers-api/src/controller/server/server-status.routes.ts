@@ -2,11 +2,12 @@
 import { Elysia, t } from 'elysia';
 import { Database } from 'bun:sqlite';
 import { ServerRepository } from '../../repository/serverRepository';
+import { statusRepository } from '../../repository/statusRepository';
 
 export function registerServerStatusRoutes<TPrefix extends string = ''>(
-  app : Elysia<TPrefix>,
+  app: Elysia<TPrefix>,
   db: Database
-) : Elysia<TPrefix> {
+): Elysia<TPrefix> {
 
   /**
    * GET /api/servers/status/:serverId
@@ -16,12 +17,12 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
     '/status/:serverId',
     ({ params, set }) => {
       const serverId = Number(params.serverId);
-      
+
       if (isNaN(serverId)) {
         set.status = 400;
-        return { 
-          success: false, 
-          message: "ID server non valido" 
+        return {
+          success: false,
+          message: "ID server non valido"
         };
       }
 
@@ -29,9 +30,9 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
 
       if (!status) {
         set.status = 404;
-        return { 
-          success: false, 
-          message: "Nessuno status disponibile per questo server" 
+        return {
+          success: false,
+          message: "Nessuno status disponibile per questo server"
         };
       }
 
@@ -63,6 +64,70 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
   });
 
   /**
+ * POST /api/servers/status/ping/secondary
+ * Endpoint per aggiornare lo status dei server secondari (network)
+ * I secondary si identificano con secondary_id e aggiornano solo la loro riga
+ * TTL implicito: il principale ignora i secondary con last_ping > 45s
+ */
+  app.post(
+    '/status/ping/secondary',
+    ({ body, set }) => {
+      const { secret_key, secondary_id, players_online } = body;
+
+      if (!secret_key) {
+        set.status = 400;
+        return {
+          success: false,
+          message: "secret_key mancante"
+        };
+      }
+
+      // Valida che il server principale esista con quella secret_key
+      const principalServer = ServerRepository.getServerBySecret(secret_key, db);
+
+      if (!principalServer) {
+        set.status = 403;
+        return {
+          success: false,
+          message: "Chiave segreta non valida"
+        };
+      }
+
+      try {
+        console.log(`Ping secondary [${secondary_id}] per server ${principalServer.id}`);
+
+        // Upsert della riga del secondary — crea se non esiste, aggiorna se esiste
+        const updatedSecondary = statusRepository.upsertSecondaryStatus(db, {
+          server_id: principalServer.id ?? 0,
+          secondary_id,
+          players_online,
+          last_ping: new Date().toISOString()
+        });
+
+        return {
+          success: true,
+          message: "Status secondary aggiornato",
+          data: updatedSecondary
+        };
+      } catch (err) {
+        console.error("❌ Errore upsert secondary status:", err);
+        set.status = 500;
+        return {
+          success: false,
+          message: "Errore durante l'aggiornamento status secondary"
+        };
+      }
+    },
+    {
+      body: t.Object({
+        secret_key: t.String(),
+        secondary_id: t.String(),       // es. "lobby-eu", "survival-1" — nome univoco del sub-server
+        players_online: t.Number(),     // valore assoluto, non delta
+      })
+    }
+  );
+
+  /**
    * POST /api/servers/status/ping
    * Endpoint per aggiornare lo status (chiamato dal plugin)
    */
@@ -73,31 +138,34 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
       console.log("Body in arrivo", body);
       if (!secret_key) {
         set.status = 400;
-        return { 
-          success: false, 
-          message: "secret_key mancante" 
+        return {
+          success: false,
+          message: "secret_key mancante"
         };
       }
 
       const server = ServerRepository.getServerBySecret(secret_key, db);
-      
+
       if (!server) {
         set.status = 403;
-        return { 
-          success: false, 
-          message: "Chiave segreta non valida" 
+        return {
+          success: false,
+          message: "Chiave segreta non valida"
         };
       }
 
+      const secondaryPlayers = statusRepository.getSecondaryPlayersSum(db, server.id ?? 0);
+
       const fullData = {
         server_id: server.id ?? 0,
-        ...statusData
+        ...statusData,
+        players_online: statusData.players_online + secondaryPlayers  // somma aggregata 🔥
       };
 
       try {
         console.log("Tentativo di update status tramite ping..");
         const updatedStatus = ServerRepository.upsertServerStatus(db, fullData);
-        
+
         return {
           success: true,
           message: "Status aggiornato",
@@ -106,9 +174,9 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
       } catch (err) {
         console.error("❌ Errore upsert status:", err);
         set.status = 500;
-        return { 
-          success: false, 
-          message: "Errore durante l'aggiornamento status" 
+        return {
+          success: false,
+          message: "Errore durante l'aggiornamento status"
         };
       }
     },
@@ -152,7 +220,7 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
    */
   app.get('/servers/online-count', () => {
     const count = ServerRepository.countOnlineServers(db);
-    
+
     return {
       success: true,
       count
