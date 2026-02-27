@@ -269,6 +269,10 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
     };
   });
 
+  app.get('/prova', () => {
+    return { true: "true" };
+  });
+
   /**
  * GET /api/servers/status/full/:serverId
  * Ritorna status principale + tutti i secondary attivi

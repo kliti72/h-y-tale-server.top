@@ -94,10 +94,6 @@ export function registerServerCrudRoutes<TPrefix extends string = ''>(
     };
   });
 
-  app.get('/autodepoly', () => {
-    return { true : "true" };
-  });
-
 
   /**
    * GET /api/servers/:id
