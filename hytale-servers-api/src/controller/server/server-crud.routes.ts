@@ -94,6 +94,11 @@ export function registerServerCrudRoutes<TPrefix extends string = ''>(
     };
   });
 
+  app.get('/autodepoly', () => {
+    return { true : "true" };
+  });
+
+
   /**
    * GET /api/servers/:id
    * Ottieni un server specifico per ID
@@ -156,7 +161,7 @@ export function registerServerCrudRoutes<TPrefix extends string = ''>(
         const sort = query.sort ?? 'asc';
 
         console.log("Arrivata all'api search", search);
-        
+
         if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
           set.status = 400;
           return {
@@ -377,7 +382,7 @@ export function registerServerCrudRoutes<TPrefix extends string = ''>(
           return {
             success: false,
             error: "Non autenticato bro!"
-          }; 
+          };
         }
 
         const servers = ServerRepository.getServersByUserID(user.userId, db);
