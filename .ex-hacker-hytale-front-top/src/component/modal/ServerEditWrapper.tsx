@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "@solidjs/router";
 import AddEditServerPage from "./AddEditServerPage";
 import { ServerResponse } from "../../types/ServerResponse";
 import { ServerService } from "../../services/server.service";
-import { notify } from "../../component/template/Notification";
+import { notify } from "../template/Notification";
 
 export const ServerEditWrapper: Component = () => {
   const params = useParams();

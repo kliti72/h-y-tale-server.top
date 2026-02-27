@@ -12,6 +12,9 @@ import ManagePanelPage from './pages/ManageServer';
 import LeaderboardPage from './pages/LeaderboardPage';
 import { ServerAddWrapper } from './pages/wrapper/ServerAddWrapper';
 import { ServerEditWrapper } from './pages/wrapper/ServerEditWrapper';
+import ServerTracker from './tracker/tracker';
+import TrackerLanding from './tracker/tracker';
+import DocsPage from './pages/DocsPage';
 
 // ── i18n context ──────────────────────────────────────────────────────────────
 export type Lang = "it" | "en";
@@ -73,6 +76,8 @@ function App() {
         <Route path="/servers/edit/:id" component={ServerEditWrapper} />
         <Route path="/leaderboard" component={LeaderboardPage} />
         <Route path="/panel" component={ManagePanelPage} />
+        <Route path="/tracker" component={TrackerLanding} />
+        <Route path="/docs" component={DocsPage} />
       </Route>
 
       {/* ── ENGLISH (/en/*) ── */}

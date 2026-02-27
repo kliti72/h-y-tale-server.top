@@ -9,6 +9,7 @@ export class statusRepository {
         players_online: number,
         last_ping: string
     }) {
+        console.log("Arrivati per l'ipsertSecondary", data.server_id, data.secondary_id, data.players_online, data.last_ping)
         // Upsert su tabella server_secondary_status
         return db.run(`
         INSERT INTO server_secondary_status 
@@ -25,14 +26,29 @@ export class statusRepository {
     // Somma i secondary "freschi" — TTL 45 secondi implicito
     public static getSecondaryPlayersSum(db: Database, server_id: number): number {
         const threshold = new Date(Date.now() - 45_000).toISOString();
-            const stmt = db.prepare(`
+        const stmt = db.prepare(`
                 SELECT COALESCE(SUM(players_online), 0) as total
                 FROM server_secondary_status
                 WHERE server_id = ? AND last_ping > ?`
-            );
+        );
 
         const row = stmt.get(server_id, threshold) as { total: number } | undefined;
         return row?.total ?? 0;
     };
+
+    public static getSecondaryServers(db: Database, server_id: number) {
+        const threshold = new Date(Date.now() - 120_000).toISOString();
+        const stmt = db.prepare(`
+    SELECT secondary_id, players_online, last_ping
+    FROM server_secondary_status
+    WHERE server_id = ? AND last_ping > ?
+    ORDER BY players_online DESC
+  `);
+        return stmt.all(server_id, threshold) as {
+            secondary_id: string,
+            players_online: number,
+            last_ping: string
+        }[];
+    }
 
 }

@@ -36,9 +36,14 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
         };
       }
 
+      const secondaryPlayers = statusRepository.getSecondaryPlayersSum(db, serverId);
+
       return {
         success: true,
-        data: status
+        data: {
+          ...status,
+          players_online: status.players_online + secondaryPlayers
+        }
       };
     },
     {
@@ -124,6 +129,43 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
         secondary_id: t.String(),       // es. "lobby-eu", "survival-1" — nome univoco del sub-server
         players_online: t.Number(),     // valore assoluto, non delta
       })
+    }
+  );
+
+  /**
+ * GET /api/servers/status/secondary/:secret_key
+ * Ritorna tutti i secondary attivi di un server principale
+ */
+  app.get(
+    '/status/secondary/:secret_key',
+    ({ params, set }) => {
+      const { secret_key } = params;
+
+      const principalServer = ServerRepository.getServerBySecret(secret_key, db);
+
+      if (!principalServer) {
+        set.status = 403;
+        return {
+          success: false,
+          message: "Chiave segreta non valida"
+        };
+      }
+
+      try {
+        const secondaries = statusRepository.getSecondaryServers(db, principalServer.id ?? 0);
+
+        return {
+          success: true,
+          data: secondaries
+        };
+      } catch (err) {
+        console.error("❌ Errore get secondary servers:", err);
+        set.status = 500;
+        return {
+          success: false,
+          message: "Errore durante il recupero dei secondary"
+        };
+      }
     }
   );
 
@@ -226,6 +268,52 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
       count
     };
   });
+
+  /**
+ * GET /api/servers/status/full/:serverId
+ * Ritorna status principale + tutti i secondary attivi
+ */
+  app.get(
+    '/status/full/:serverId',
+    ({ params, set }) => {
+      const serverId = Number(params.serverId);
+
+      if (isNaN(serverId)) {
+        set.status = 400;
+        return {
+          success: false,
+          message: "ID server non valido"
+        };
+      }
+
+      const status = ServerRepository.getLatestStatus(db, serverId);
+
+      if (!status) {
+        set.status = 404;
+        return {
+          success: false,
+          message: "Nessuno status disponibile per questo server"
+        };
+      }
+
+      const secondaries = statusRepository.getSecondaryServers(db, serverId);
+      const secondaryPlayers = secondaries.reduce((sum, s) => sum + s.players_online, 0);
+
+      return {
+        success: true,
+        data: {
+          ...status,
+          players_online: status.players_online + secondaryPlayers,
+          secondary_servers: secondaries
+        }
+      };
+    },
+    {
+      params: t.Object({
+        serverId: t.String({ pattern: '^[0-9]+$' })
+      })
+    }
+  );
 
   return app;
 }
