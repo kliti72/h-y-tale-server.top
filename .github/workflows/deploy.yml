@@ -22,7 +22,7 @@ jobs:
             cd /home/hytaleTOP/h-y-tale-server.top
 
             echo "📦 Pull latest code..."
-            git pull origin main
+            git pull
 
             echo "🔧 Install frontend deps..."
             cd hytale-front-top
