@@ -37,7 +37,7 @@ jobs:
             cd ..
           
             echo "🔄 Restart services..."
-            systemctl reload nginx
-            systemctl restart hytale-api
+            sudo systemctl reload nginx
+            sudo systemctl restart hytale-api
 
             echo "✅ Deploy done!"
