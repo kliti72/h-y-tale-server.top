@@ -1,0 +1,40 @@
+name: 🚀 Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔌 SSH & Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/hytaleTOP/h-y-tale-server.top
+
+            echo "📦 Pull latest code..."
+            git pull origin main
+
+            echo "🔧 Install frontend deps..."
+            cd hytale-front-top
+            npm install
+            cd ..
+
+            echo "🔧 Install backend deps..."
+            cd hytale-servers-api
+            /home/hytaleTOP/.bun/bin/bun install
+            cd ..
+          
+            echo "🔄 Restart services..."
+            sudo systemctl reload nginx
+            sudo systemctl restart hytale-api
+
+            echo "✅ Deploy done!"
