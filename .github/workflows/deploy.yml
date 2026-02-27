@@ -22,6 +22,7 @@ jobs:
             cd /home/hytaleTOP/h-y-tale-server.top
 
             echo "📦 Pull latest code..."
+            git stash
             git pull
 
             echo "🔧 Install frontend deps..."
