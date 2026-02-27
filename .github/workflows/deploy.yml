@@ -27,11 +27,13 @@ jobs:
             echo "🔧 Install frontend deps..."
             cd hytale-front-top
             npm install
+            echo "Create build frontend"
+            npm run build
             cd ..
-
+            
             echo "🔧 Install backend deps...."
             cd hytale-servers-api
-            /home/hytaleTOP/.bun/bin/bun install
+            /usr/local/bin/bun install
             cd ..
           
             echo "🔄 Restart services..."
