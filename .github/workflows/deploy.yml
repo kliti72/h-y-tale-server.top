@@ -9,6 +9,7 @@ jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
+    environment: "Configure Deploy to VPS"
 
     steps:
       - name: 🔌 SSH & Deploy
