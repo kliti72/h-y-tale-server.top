@@ -34,8 +34,10 @@ const HeaderComponent: Component = () => {
     { path: "/",            label: () => t().nav_home,        icon: "⚔️" },
     { path: "/servers",     label: () => t().nav_servers,     icon: "🏰" },
     { path: "/leaderboard", label: () => t().nav_leaderboard, icon: "👑" },
-    { path: "/docs",        label: () => t().nav_docs,        icon: "📜" },
+    { path: "/notizie", label: () => t().nav_notizie, icon: "🧧" },
     { path: "/tracker",        label: () => t().nav_tracker,        icon: "🤖" },
+    { path: "/forum",        label: () => t().nav_forum,        icon: "☕️" },
+    { path: "/docs",        label: () => t().nav_docs,        icon: "📜" },
   ];
 
   const hasUnread = NOTIFICATIONS.some(n => n.unread);

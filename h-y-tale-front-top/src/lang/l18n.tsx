@@ -15,6 +15,8 @@ const translations = {
     nav_leaderboard: "Top Server",
     nav_docs: "Plugin & Api",
     nav_tracker: "Tracker",
+    nav_forum: "Forum",
+    nav_notizie: "Notizie",
     nav_add: "Aggiungi server",
     nav_exit: "Esci",
 

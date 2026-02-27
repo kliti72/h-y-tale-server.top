@@ -11,7 +11,7 @@ const SECTIONS = [
 ];
 
 // ── Componente blocco codice ──────────────────────────────────────────────────
-const CodeBlock = (props) => {
+const CodeBlock = (props : any) => {
   const [copied, setCopied] = createSignal(false);
   const copy = () => {
     navigator.clipboard.writeText(props.code);
@@ -35,7 +35,7 @@ const CodeBlock = (props) => {
 };
 
 // ── Badge metodo HTTP ─────────────────────────────────────────────────────────
-const MethodBadge = (props) => {
+const MethodBadge = (props : any) => {
   const colors = {
     GET:    "text-emerald-400 border-emerald-900/60 bg-emerald-950/40",
     POST:   "text-amber-400  border-amber-900/60   bg-amber-950/40",
@@ -49,7 +49,7 @@ const MethodBadge = (props) => {
 };
 
 // ── Blocco API singola ────────────────────────────────────────────────────────
-const ApiBlock = (props) => (
+const ApiBlock = (props : any) => (
   <div class="border border-amber-900/20 bg-stone-900/30 p-4 mb-4">
     <div class="flex items-center gap-3 mb-2 flex-wrap">
       <MethodBadge method={props.method} />
@@ -69,7 +69,7 @@ const ApiBlock = (props) => (
 );
 
 // ── Divider runico ─────────────────────────────────────────────────────────────
-const RuneDivider = (props) => (
+const RuneDivider = (props : any) => (
   <div class="flex items-center gap-3 mb-6 mt-8">
     <div class="h-px flex-1 bg-amber-900/20" />
     <span class="text-amber-800/50 text-xs font-serif uppercase tracking-[0.3em]">{props.label}</span>

@@ -59,7 +59,7 @@ const SidebarContent: Component<{
   isAuth: boolean;
 }> = (p) => (
   <div class="space-y-3">
-    <Widget label="Cerca server" icon="">
+    <Widget label="Cerca server" icon="🕵🏾‍♂️">
       <input
         type="text" placeholder="Nome o IP..."
         value={p.search} onInput={e => p.onSearch(e.currentTarget.value)}

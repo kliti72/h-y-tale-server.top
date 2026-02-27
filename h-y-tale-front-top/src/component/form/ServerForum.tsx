@@ -41,7 +41,7 @@ const ServerForm: Component<Props> = (props) => {
 
   const [name, setName] = createSignal("");
   const [ip, setIp] = createSignal("");
-  const [port, setPort] = createSignal("25565");
+  const [port, setPort] = createSignal("5520");
   const [description, setDescription] = createSignal("");
   const [rules, setRules] = createSignal("");
   const [tags, setTags] = createSignal<string[]>([]);
@@ -64,7 +64,7 @@ const ServerForm: Component<Props> = (props) => {
   onMount(() => {
     if (isEdit() && props.initialData) {
       const d = props.initialData;
-      setName(d.name ?? ""); setIp(d.ip ?? ""); setPort(d.port ?? "25565");
+      setName(d.name ?? ""); setIp(d.ip ?? ""); setPort(d.port ?? "5520");
       setDescription(d.description ?? ""); setRules(d.rules ?? "");
       setTags(d.tags ?? []); setWebsite(d.website_url ?? "");
       setDiscord(d.discord_url ?? ""); setLogoUrl(d.logo_url ?? "");
@@ -162,7 +162,7 @@ const ServerForm: Component<Props> = (props) => {
               <div>
                 <FieldLabel label="Porta *" error={errors().port} />
                 <input value={port()} onInput={e => { setPort(e.currentTarget.value); clearErr("port"); }}
-                  placeholder="25565"
+                  placeholder="5520"
                   class={`${inp} ${hasErr("port") ? inpErr : inpOk}`} />
               </div>
             </div>

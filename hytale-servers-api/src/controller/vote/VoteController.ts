@@ -61,47 +61,48 @@ export function registerVoteService(
     });
 
     
- app.post(
-    '/claim/:secret_key/:playerGameName',
-    async ({ params }) => {
-        const { secret_key, playerGameName } = params;
+app.post(
+  '/claim/:secret_key/:playerGameName',
+  async ({ params }) => {
+    const { secret_key, playerGameName } = params;
 
-        const server = ServerRepository.getServerBySecret(secret_key, db);
-        console.log("[CLAIM] server trovato:", server);
-
-        if (!server) {
-            return { success: false, message: "Server non trovato" };
-        }
-
-        const validVote = db
-            .prepare(`
-                SELECT id FROM votes 
-                WHERE playerGameName = ? 
-                AND server_id = ?
-                AND voted_at > datetime('now', '-24 hours')
-                AND is_claimed = 0
-            `)
-            .get(playerGameName, server.id ?? 0) as { id: number } | undefined;
-        
-        console.log("[CLAIM] playerGameName:", playerGameName);
-        console.log("[CLAIM] server.id:", server.id);
-        console.log("[CLAIM] validVote:", validVote);
-
-        // debug voti raw
-        const allVotes = db.prepare(`SELECT * FROM votes WHERE playerGameName = ?`).all(playerGameName);
-        console.log("[CLAIM] tutti i voti del player:", allVotes);
-
-        if (!validVote) {
-            return { 
-                success: false, 
-                message: `Devi tornare sul portale h-y-tale-server.top/${server.id} per votare nuovamente`,
-                serverId: server.id
-            };
-        }
-
-        db.prepare(`UPDATE votes SET is_claimed = 1 WHERE id = ?`).run(validVote.id);
-        return { success: true, message: "Voto ritirato con successo", serverId: server.id };
+    const server = ServerRepository.getServerBySecret(secret_key, db);
+    if (!server) {
+      return { success: false, status: -1, message: "Server non trovato" };
     }
+
+    // Mai votato
+    const anyVote = db
+      .prepare(`SELECT voted_at FROM votes WHERE playerGameName = ? AND server_id = ? ORDER BY voted_at DESC LIMIT 1`)
+      .get(playerGameName, server.id ?? 0) as { voted_at: string } | undefined;
+
+    if (!anyVote) {
+      return { success: false, status: 0, serverId: server.id };
+    }
+
+    // Voto valido non ancora claimato
+    const validVote = db
+      .prepare(`
+        SELECT id, voted_at FROM votes
+        WHERE playerGameName = ?
+        AND server_id = ?
+        AND voted_at > datetime('now', '-24 hours')
+        AND is_claimed = 0
+      `)
+      .get(playerGameName, server.id ?? 0) as { id: number; voted_at: string } | undefined;
+
+    // Ha votato ma deve aspettare
+    if (!validVote) {
+      const lastVote = new Date(anyVote.voted_at + "Z").getTime();
+      const nextVote = lastVote + 24 * 60 * 60 * 1000;
+      const time_to_wait = Math.max(0, Math.ceil((nextVote - Date.now()) / 1000 / 60)); // minuti
+
+      return { success: false, status: 1, serverId: server.id, time_to_wait };
+    }
+
+    db.prepare(`UPDATE votes SET is_claimed = 1 WHERE id = ?`).run(validVote.id);
+    return { success: true, status: 2, serverId: server.id, serverName: server.name, voti_totali: server.voti_totali};
+  }
 );
 
   app.get(

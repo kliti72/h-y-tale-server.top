@@ -18,7 +18,7 @@ const AddEditServerPage: Component<AddEditServerPageProps> = (props) => {
 
   const [name, setName] = createSignal("");
   const [ip, setIp] = createSignal("");
-  const [port, setPort] = createSignal("25565");
+  const [port, setPort] = createSignal("5520");
   const [description, setDescription] = createSignal("");
   const [rules, setRules] = createSignal("");
   const [tags, setTags] = createSignal<string[]>([]);

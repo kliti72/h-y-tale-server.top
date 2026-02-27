@@ -13,7 +13,7 @@ export const ServerAddWrapper: Component = () => {
       const serverData: ServerResponse = {
         name: formData.name || '',
         ip: formData.ip || '',
-        port: formData.port || '25565',
+        port: formData.port || '5520',
         description: formData.description || '',
         rules: formData.rules || '',
         tags: formData.tags || [],
