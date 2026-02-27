@@ -34,7 +34,7 @@ export function registerVoteService(
    app.get(
     '/test',
     async ({ body, set, cookie }) => {
-      return {test: "ok deploy"};
+      return {test: "ok deploy2"};
     });
 
 
