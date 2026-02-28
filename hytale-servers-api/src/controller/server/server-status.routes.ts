@@ -43,7 +43,7 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
         success: true,
         data: {
           ...status,
-          is_online: isStale ? false : status.is_online,
+          is_online: isStale ? false : true,
           players_online: status.players_online + secondaryPlayers
         }
       };
