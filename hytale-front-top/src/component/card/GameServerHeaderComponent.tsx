@@ -15,7 +15,7 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
 
   const label = () => {
     if (status.loading) return "Sincronizzazione...";
-    return status() ? "● Online" : "● Offline";
+    return isOnline() ? "● Online" : "● Offline";
   };
 
   const isStale = () => {
