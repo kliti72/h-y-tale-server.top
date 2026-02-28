@@ -8,25 +8,24 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
     { initialValue: null }
   );
 
+  const isStale = () => {
+    const s = status();
+    if (!s?.last_updated) return false;
+    const diffMs = Date.now() - new Date(s.last_updated).getTime();
+    return diffMs > 2 * 60 * 1000;
+  };
+
+  const isOnline = () => !!status() && !isStale();
+
   const dot = () => {
     if (status.loading) return "bg-yellow-600 animate-pulse";
-    return status() ? "bg-green-500 animate-pulse" : "bg-red-600";
+    return isOnline() ? "bg-green-500 animate-pulse" : "bg-red-600";
   };
 
   const label = () => {
     if (status.loading) return "Sincronizzazione...";
     return isOnline() ? "● Online" : "● Offline";
   };
-
-  const isStale = () => {
-    const s = status();
-    if (!s?.last_updated) return false;
-    const diffMs = Date.now() - new Date(s.last_updated).getTime();
-    return diffMs > 2 * 60 * 1000; // 2 minuti in ms
-  };
-
-  const isOnline = () => status() && !isStale();
-
 
   return (
     <div class="flex items-start gap-5">
@@ -58,13 +57,13 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
           {label()}
         </p>
 
-        <Show when={!status.loading && isOnline() && status() }>
-          {(s) => (
+        <Show when={!status.loading && isOnline()}>
+          {(_) => (
             <div class="flex gap-4">
               <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
                 <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-amber-800/60" />
                 <p class="text-stone-500 font-serif text-xs uppercase tracking-wide">Giocatori</p>
-                <p class="text-amber-400 font-serif font-bold text-lg">{s().players_online}/{s().players_max}</p>
+                <p class="text-amber-400 font-serif font-bold text-lg">{status()?.players_online}/{status()?.players_max}</p>
               </div>
               <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
                 <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-amber-800/60" />
@@ -75,7 +74,7 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
           )}
         </Show>
 
-        <Show when={!status.loading && !status()}>
+        <Show when={!status.loading && !isOnline()}>
           <div class="relative border border-yellow-900/40 bg-yellow-950/20 px-3 py-2 max-w-xs">
             <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-yellow-800/60" />
             <p class="text-yellow-700 font-serif text-xs">Plugin non installato —{" "}
