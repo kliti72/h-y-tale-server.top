@@ -54,13 +54,15 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
           {props.server.name}
         </h1>
 
-        <p class={`font-serif text-xs uppercase tracking-widest mb-3 ${status() ? "text-green-600" : "text-red-700"}`}>
-          {label()}
-        </p>
 
-        <Show when={!status.loading && isOnline() && status() }>
+        <Show when={!status.loading && isOnline() && status()}>
           {(s) => (
+
             <div class="flex gap-4">
+
+              <p class={`font-serif text-xs uppercase tracking-widest mb-3 ${status() ? "text-green-600" : "text-red-700"}`}>
+                {label()}
+              </p>
               <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
                 <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-amber-800/60" />
                 <p class="text-stone-500 font-serif text-xs uppercase tracking-wide">Giocatori</p>
