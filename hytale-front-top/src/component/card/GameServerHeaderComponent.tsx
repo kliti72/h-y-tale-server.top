@@ -18,6 +18,16 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
     return status() ? "● Online" : "● Offline";
   };
 
+  const isStale = () => {
+    const s = status();
+    if (!s?.last_updated) return false;
+    const diffMs = Date.now() - new Date(s.last_updated).getTime();
+    return diffMs > 2 * 60 * 1000; // 2 minuti in ms
+  };
+
+  const isOnline = () => status() && !isStale();
+
+
   return (
     <div class="flex items-start gap-5">
 
@@ -48,7 +58,7 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
           {label()}
         </p>
 
-        <Show when={!status.loading && status()}>
+        <Show when={!status.loading && isOnline() && status() }>
           {(s) => (
             <div class="flex gap-4">
               <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
