@@ -75,7 +75,7 @@ app.post(
 
     const server = ServerRepository.getServerBySecret(secret_key, db);
     if (!server) {
-      return { success: false, status: -1, message: "Server non trovato" };
+      return { success: false, status: -1, message: "This secret is not valid." };
     }
 
     // Mai votato
@@ -84,7 +84,7 @@ app.post(
       .get(playerGameName, server.id ?? 0) as { voted_at: string } | undefined;
 
     if (!anyVote) {
-      return { success: false, status: 0, serverId: server.id };
+      return { success: false, status: 0, serverId: server.id, serverName: server.name};
     }
 
     // Voto valido non ancora claimato
@@ -104,7 +104,7 @@ app.post(
       const nextVote = lastVote + 24 * 60 * 60 * 1000;
       const time_to_wait = Math.max(0, Math.ceil((nextVote - Date.now()) / 1000 / 60)); // minuti
 
-      return { success: false, status: 1, serverId: server.id, time_to_wait };
+      return { success: false, status: 1, serverId: server.id, time_to_wait, serverName: server.name };
     }
 
     db.prepare(`UPDATE votes SET is_claimed = 1 WHERE id = ?`).run(validVote.id);
