@@ -35,6 +35,7 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
           message: "Nessuno status disponibile per questo server"
         };
       }
+      const isStale = Date.now() - new Date(status.last_updated ?? '').getTime() > 2 * 60 * 1000;
 
       const secondaryPlayers = statusRepository.getSecondaryPlayersSum(db, serverId);
 
@@ -42,6 +43,7 @@ export function registerServerStatusRoutes<TPrefix extends string = ''>(
         success: true,
         data: {
           ...status,
+          is_online: isStale ? false : status.is_online,
           players_online: status.players_online + secondaryPlayers
         }
       };
