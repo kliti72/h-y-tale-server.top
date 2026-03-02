@@ -11,7 +11,6 @@ import { ConsoleLogWriter } from 'drizzle-orm';
 const db = new Database('servers.db', { create: true })
 
 initDatabaseSchema(db);
-// seedDatabase(db)
 
 const crossProduction = ['http://h-y-tale-server.top', 'http://www.h-y-tale-server.top', 'https://h-y-tale-server.top', 'https://www.h-y-tale-server.top']
 const crossDevelopment = ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173']
