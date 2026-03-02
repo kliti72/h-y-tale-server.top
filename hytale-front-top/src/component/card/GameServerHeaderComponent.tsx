@@ -93,10 +93,10 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
           </div>
         }>
 
-          <Show when={!props.server?.is_online}>
+      <Show when={!props.server?.is_online && status()}>
         <div class="relative border border-yellow-900/40 bg-yellow-950/20 px-3 py-2 max-w-xs">
             <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-yellow-800/60" />
-            <p class="text-yellow-700 font-serif text-xs"> Nessuna conessione {" "}
+            <p class="text-yellow-700 font-serif text-xs"> Server offline {" "}
               <a  class="text-amber-600 hover:text-amber-400 underline transition-colors">{props.server?.last_updated}</a>
             </p>
           </div>
@@ -104,7 +104,7 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
 
         </Show>
 
-        <Show when={!status.loading}>
+        <Show when={props.server.is_online && status()} >
           {(_) => (
             <div class="flex gap-4 mt-2">
               <Show when={props.server.is_online}> 
