@@ -95,11 +95,11 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
           </div>
         }>
 
-          <Show when={!status()?.is_online}>
+          <Show when={!props.server?.is_online}>
         <div class="relative border border-yellow-900/40 bg-yellow-950/20 px-3 py-2 max-w-xs">
             <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-yellow-800/60" />
             <p class="text-yellow-700 font-serif text-xs"> Nessuna conessione {" "}
-              <a  class="text-amber-600 hover:text-amber-400 underline transition-colors">{status()?.last_updated}</a>
+              <a  class="text-amber-600 hover:text-amber-400 underline transition-colors">{props.server?.last_updated}</a>
             </p>
           </div>
           </Show>
@@ -113,7 +113,7 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
               <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
                 <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-amber-800/60" />
                 <p class="text-stone-500 font-serif text-xs uppercase tracking-wide">Giocatori</p>
-                <p class="text-amber-400 font-serif font-bold text-lg">{status()?.players_online}/{status()?.players_max}</p>
+                <p class="text-amber-400 font-serif font-bold text-lg">{props.server.players_online}/{props.server?.players_max}</p>
               </div>
               </Show>
               <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
