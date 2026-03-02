@@ -109,7 +109,7 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
         <Show when={!status.loading}>
           {(_) => (
             <div class="flex gap-4 mt-2">
-              <Show when={status()?.is_online}> 
+              <Show when={props.server.is_online}> 
               <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
                 <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-amber-800/60" />
                 <p class="text-stone-500 font-serif text-xs uppercase tracking-wide">Giocatori</p>
