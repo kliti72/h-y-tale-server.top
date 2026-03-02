@@ -23,7 +23,7 @@ const hostname = isProduction ? '0.0.0.0' : '127.0.0.1'
 
 const app = new Elysia()
   .use(
-    cors({
+    cors({ 
       origin: origin,
       methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
       allowedHeaders: ['Content-Type', "Authorization"],
