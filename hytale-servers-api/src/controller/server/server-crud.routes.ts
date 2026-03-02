@@ -4,6 +4,7 @@ import { Database } from 'bun:sqlite';
 import { generateSecretKey } from '../../helper/generateSecretKey';
 import { ServerRepository } from '../../repository/serverRepository';
 import { SessioneRepository } from '../../repository/sessionRepository';
+import { statusRepository } from '../../repository/statusRepository';
 
 export function registerServerCrudRoutes<TPrefix extends string = ''>(
   app: Elysia<TPrefix>,
@@ -167,7 +168,6 @@ export function registerServerCrudRoutes<TPrefix extends string = ''>(
         }
 
         const servers = ServerRepository.getAllQuery(db, { page, limit, sort, search });
-
         return {
           success: true,
           data: servers
@@ -186,7 +186,7 @@ export function registerServerCrudRoutes<TPrefix extends string = ''>(
         page: t.Optional(t.String()),
         limit: t.Optional(t.String()),
         sort: t.Optional(t.String()),
-        search: t.Optional(t.String())
+        search: t.Optional(t.String()),
       })
     }
   );

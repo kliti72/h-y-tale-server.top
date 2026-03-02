@@ -16,7 +16,10 @@ const DiscordButtonComponent: Component = () => {
       <button
         type="button"
         disabled={auth.loading()}
-        onClick={() => auth.isAuthenticated() ? auth.logout() : auth.login()}
+        onClick={(e) => {
+        auth.isAuthenticated() ? auth.logout() : auth.login();
+        e.stopPropagation();
+        }}
         class="group relative inline-flex items-center gap-3 px-5 py-2.5
           border-2 border-amber-900/60 bg-stone-900
           hover:bg-stone-800 hover:border-amber-700/80

@@ -9,11 +9,6 @@ export default function GameServerDescriptionComponent(props: { server: ServerRe
       <span class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-amber-800/60" />
       <span class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-amber-800/60" />
 
-      <div class="flex items-center gap-2 mb-4 pb-3 border-b border-stone-800">
-        <span class="text-amber-700 font-serif text-xs uppercase tracking-widest">⚔️ Panoramica</span>
-        <div class="h-px flex-1 bg-stone-800" />
-      </div>
-
       <Show when={props.server.description} fallback={
         <p class="text-stone-600 font-serif text-sm text-center py-8">Nessuna descrizione disponibile.</p>
       }>

@@ -3,8 +3,9 @@ import { useAuth } from "../../auth/AuthContext";
 import { notify } from "../notify/NotificationComponent";
 import { VoteService } from "../../services/votes.service";
 import { ServerResponse } from "../../types/ServerResponse";
+import DiscordButtonComponent from "./DiscordButtonComponent";
 
-interface Props { server: ServerResponse; onVoteRequest: (s: ServerResponse) => void; }
+interface Props { server: ServerResponse; onVoteRequest: (s: ServerResponse) => void; value: string }
 
 export default function VoteButtonComponent(props: Props) {
   const auth = useAuth();
@@ -15,11 +16,12 @@ export default function VoteButtonComponent(props: Props) {
   );
 
   const canVote = () => voteRes()?.canVote ?? false;
-  const waitTime = () => voteRes()?.message  ?? "?";
+  const waitTime = () => voteRes()?.message ?? "?";
 
   const handleClick = () => {
     if (!auth.isAuthenticated()) { notify("Accedi con Discord per votare", "error"); return; }
     if (!canVote()) { notify(`Riprova tra ${waitTime()}`, "error"); return; }
+    console.log("Il bottone lo manda al padre");
     props.onVoteRequest(props.server);
   };
 
@@ -32,10 +34,31 @@ export default function VoteButtonComponent(props: Props) {
     }>
       <Show when={canVote()} fallback={
         <div class="flex items-center gap-3">
-          <button disabled class="px-5 py-2.5 border border-red-900/40 bg-red-950/20 text-red-700 font-serif text-xs uppercase tracking-widest cursor-not-allowed">
-            ⚠ Voto bloccato
-          </button>
-          <span class="text-amber-700 font-serif text-xs">⏳ Riprova tra <strong>{waitTime()}</strong></span>
+          <Show when={auth.isAuthenticated()} fallback={
+            <DiscordButtonComponent />
+          }>
+            <button
+              disabled
+              style={{
+                padding: "0.5rem 1.2rem",
+                background: "rgba(0, 0, 0, 0.46)",
+                border: "1px solid #c54b23",
+                "font-family": "'Cinzel', serif",
+                "font-size": "0.55rem",
+                "letter-spacing": "0.2em",
+                "text-transform": "uppercase",
+                color: "#ffeae1",
+                cursor: "not-allowed",
+                opacity: "0.86",
+                "line-height": "1.8",
+                "text-align": "center",
+              }}
+            >
+              ᚦ Voto Bloccato {waitTime()}
+            </button>
+          </Show>
+
+
         </div>
       }>
         <button
@@ -44,7 +67,7 @@ export default function VoteButtonComponent(props: Props) {
         >
           <span class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-amber-600" />
           <span class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-amber-600" />
-          ⚔ Vota
+          ⚔ {props.value}
         </button>
       </Show>
     </Show>

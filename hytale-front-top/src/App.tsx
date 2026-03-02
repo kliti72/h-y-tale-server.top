@@ -17,6 +17,7 @@ import TrackerLanding from './tracker/tracker';
 import DocsPage from './pages/DocsPage';
 import NewsPage from './pages/NewsPage';
 import ForumPage from './pages/ForumPage';
+import { DisclaimerModal } from './component/modal/DisclaimerModal';
 
 // ── i18n context ──────────────────────────────────────────────────────────────
 export type Lang = "it" | "en";
@@ -54,6 +55,7 @@ const Layout: ParentComponent<{ lang: Lang }> = (props) => {
 
         <AuthProvider>
           <HeaderComponent />
+          <DisclaimerModal />
           {props.children}
           <FooterComponent />
         </AuthProvider>

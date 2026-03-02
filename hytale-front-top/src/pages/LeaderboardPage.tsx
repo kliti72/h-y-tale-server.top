@@ -1,12 +1,13 @@
 import { Component, createSignal, For, Show, createResource } from "solid-js";
 import { A } from "@solidjs/router";
 import { ServerService } from "../services/server.service";
-import { ServerResponse } from "../types/ServerResponse";
+import { ServerResponse, ServerStatus } from "../types/ServerResponse";
+import { StatusService } from "../services/status.service";
 
 const MEDALS = [
-  { icon: "👑", border: "border-amber-600/60",  score: "text-amber-400" },
-  { icon: "🥈", border: "border-stone-600/40",  score: "text-stone-300" },
-  { icon: "🥉", border: "border-amber-800/50",  score: "text-amber-700" },
+  { icon: "👑", border: "border-amber-600/60", score: "text-amber-400" },
+  { icon: "🥈", border: "border-stone-600/40", score: "text-stone-300" },
+  { icon: "🥉", border: "border-amber-800/50", score: "text-amber-700" },
 ];
 
 // ── Divider ───────────────────────────────────────────────────────────────────
@@ -28,7 +29,7 @@ const LeaderboardPage: Component = () => {
     return r;
   });
 
-  const podium  = () => servers().slice(0, 3);
+  const podium = () => servers().slice(0, 3);
   const theRest = () => servers().slice(3);
 
   return (
@@ -54,7 +55,7 @@ const LeaderboardPage: Component = () => {
             Leaderboard
           </h1>
           <p class="text-stone-600 text-xs font-serif uppercase tracking-[0.3em]">
-            I più valorosi del regno
+            I 100 più valorosi server di hytale.
           </p>
         </div>
 
@@ -79,6 +80,12 @@ const LeaderboardPage: Component = () => {
 
                   <span class="text-2xl block mb-2">{MEDALS[i()].icon}</span>
                   <p class="font-serif font-bold text-stone-200 text-sm truncate mb-0.5">{s.name}</p>
+                  <Show when={s.is_online} fallback={
+                    <p class="font-serif font-bold text-stone-500 text-sm truncate mb-0.5">Offline</p>
+                  }>
+                    <p class="font-serif font-bold text-green-500 text-sm truncate mb-0.5">{s.players_online} / {s.players_max} giocatori.</p>
+                    <p class="font-serif font-bold text-green-500 text-sm truncate mb-0.5"></p>
+                  </Show>
                   <p class="text-stone-600 text-xs italic mb-4">{s.ip}</p>
                   <div class="flex items-end justify-between border-t border-stone-800 pt-3">
                     <div>
@@ -96,6 +103,7 @@ const LeaderboardPage: Component = () => {
               )}</For>
             </div>
           </Show>
+
 
           {/* table */}
           <Show when={theRest().length > 0}>
@@ -115,6 +123,19 @@ const LeaderboardPage: Component = () => {
                     <span class="font-serif font-bold text-amber-600 text-base">{s.voti_totali ?? 0}</span>
                     <span class="block text-[9px] uppercase tracking-wider text-stone-600">voti</span>
                   </div>
+
+                  <Show when={s.is_online} fallback={
+                    <div class="text-right shrink-0">
+                      <span class="font-serif font-bold text-amber-600 text-base">Off</span>
+                      <span class="block text-[9px] uppercase tracking-wider text-stone-600">offline</span>
+                    </div>
+                  }>
+                    <div class="text-right shrink-0">
+                      <span class="font-serif font-bold text-amber-600 text-base">{s.players_online ?? 0}/ {s.players_max ?? 1000} </span>
+                      <span class="block text-[9px] uppercase tracking-wider text-stone-600">giocatori online.</span>
+                    </div>
+                  </Show>
+
                 </A>
               )}</For>
               <div class="px-4 py-2 border-t border-stone-800/50 text-center">

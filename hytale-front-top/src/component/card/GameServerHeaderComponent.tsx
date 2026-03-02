@@ -1,4 +1,4 @@
-import { createResource, Show } from "solid-js";
+import { createResource, createSignal, Show } from "solid-js";
 import { ServerResponse, ServerStatus } from "../../types/ServerResponse";
 import { StatusService } from "../../services/status.service";
 
@@ -27,21 +27,52 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
     return isOnline() ? "● Online" : "● Offline";
   };
 
+  const [logoValid, setLogoValid] = createSignal(false);
+
+  // controlla se l'immagine esiste
+  const url = props.server?.logo_url;
+  if (url) {
+    const img = new Image();
+    img.onload = () => setLogoValid(true);
+    img.onerror = () => setLogoValid(false);
+    img.src = url;
+  }
+
+
   return (
     <div class="flex items-start gap-5">
 
       {/* Logo */}
       <div class="relative flex-shrink-0">
         <Show when={props.server.logo_url} fallback={
-          <div class="w-20 h-20 border-2 border-stone-700 bg-stone-900 flex items-center justify-center font-serif font-black text-3xl text-amber-600">
+          <div class="w-20 h-20-700 bg-stone-900 flex items-center justify-center font-serif font-black text-3xl text-amber-600">
             {props.server.name?.charAt(0)?.toUpperCase() ?? "?"}
           </div>
         }>
+          <Show when={logoValid()} fallback={
+                        <div
+                class="w-14 h-14 flex items-center justify-center"
+                style={{
+                  background: "linear-gradient(145deg, #1a1410, #0d0b09)",
+                  border: "1px solid #2e2318",
+                  "box-shadow": "inset 0 1px 3px rgba(0,0,0,0.8)",
+                  "font-family": "'Cinzel', serif",
+                  "font-size": "1.5rem",
+                  "font-weight": "900",
+                  color: "#92400e",
+                  "letter-spacing": "0.05em",
+                }}
+              >
+                {props.server.name?.charAt(0)?.toUpperCase() ?? "?"}
+              </div>
+          }>
           <img
             src={props.server.logo_url}
             alt={props.server.name}
-            class="w-20 h-20 object-cover border-2 border-stone-700"
+            class="w-20 h-20 object-cover  overlfow-hidden"
+          
           />
+          </Show>
         </Show>
         {/* status dot */}
         <span class={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-stone-950 ${dot()}`} />
@@ -53,35 +84,47 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
           {props.server.name}
         </h1>
 
-        <p class={`font-serif text-xs uppercase tracking-widest mb-3 ${isOnline() ? "text-green-600" : "text-red-700"}`}>
-          {label()}
-        </p>
 
-        <Show when={!status.loading && isOnline()}>
-          {(_) => (
-            <div class="flex gap-4">
-              <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
-                <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-amber-800/60" />
-                <p class="text-stone-500 font-serif text-xs uppercase tracking-wide">Giocatori</p>
-                <p class="text-amber-400 font-serif font-bold text-lg">{status()?.players_online}/{status()?.players_max}</p>
-              </div>
-              <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
-                <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-amber-800/60" />
-                <p class="text-stone-500 font-serif text-xs uppercase tracking-wide">Voti</p>
-                <p class="text-amber-400 font-serif font-bold text-lg">{props.server.voti_totali ?? 0}</p>
-              </div>
-            </div>
-          )}
-        </Show>
 
-        <Show when={!status.loading && !isOnline()}>
+        <Show when={!status.loading} fallback={
           <div class="relative border border-yellow-900/40 bg-yellow-950/20 px-3 py-2 max-w-xs">
             <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-yellow-800/60" />
             <p class="text-yellow-700 font-serif text-xs">Plugin non installato —{" "}
               <a href="/docs" class="text-amber-600 hover:text-amber-400 underline transition-colors">scaricalo</a>
             </p>
           </div>
+        }>
+
+          <Show when={!status()?.is_online}>
+        <div class="relative border border-yellow-900/40 bg-yellow-950/20 px-3 py-2 max-w-xs">
+            <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-yellow-800/60" />
+            <p class="text-yellow-700 font-serif text-xs"> Nessuna conessione {" "}
+              <a  class="text-amber-600 hover:text-amber-400 underline transition-colors">{status()?.last_updated}</a>
+            </p>
+          </div>
+          </Show>
+
         </Show>
+
+        <Show when={!status.loading}>
+          {(_) => (
+            <div class="flex gap-4 mt-2">
+              <Show when={status()?.is_online}> 
+              <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
+                <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-amber-800/60" />
+                <p class="text-stone-500 font-serif text-xs uppercase tracking-wide">Giocatori</p>
+                <p class="text-amber-400 font-serif font-bold text-lg">{status()?.players_online}/{status()?.players_max}</p>
+              </div>
+              </Show>
+              <div class="relative border border-stone-700 bg-stone-900 px-3 py-2">
+                <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-amber-800/60" />
+                <p class="text-stone-500 font-serif text-xs uppercase tracking-wide">Voti Totali </p>
+                <p class="text-amber-400 font-serif font-bold text-lg">{props.server.voti_totali ?? 0}</p>
+              </div>
+            </div>
+          )}
+        </Show>
+
       </div>
 
     </div>

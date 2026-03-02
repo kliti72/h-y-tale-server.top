@@ -94,14 +94,34 @@ export class ServerRepository {
     console.log(`Search query ${limit}`)
 
     console.log(` ORder by ${safeField} ${safeOrder} `)
-    const rawRows = db
-      .prepare(
-        `SELECT * FROM servers 
-       ${whereClause}
-       ORDER BY ${safeField} ${safeOrder} 
-       LIMIT ? OFFSET ?`
-      )
-      .all(...params);
+const rawRows = db
+  .prepare(
+    `SELECT 
+       s.*,
+       ss.players_online,
+       ss.players_max,
+       ss.last_updated,
+       CASE 
+         WHEN ss.last_updated IS NULL THEN 0
+         WHEN (strftime('%s', 'now') - strftime('%s', ss.last_updated)) > 120 THEN 0
+         ELSE ss.is_online
+       END AS is_online,
+       COALESCE(SUM(
+         CASE 
+           WHEN (strftime('%s', 'now') - strftime('%s', sss.last_ping)) <= 120
+           THEN sss.players_online 
+           ELSE 0 
+         END
+       ), 0) AS secondary_players_online
+     FROM servers s
+     LEFT JOIN server_stats ss ON ss.server_id = s.id
+     LEFT JOIN server_secondary_status sss ON sss.server_id = s.id
+     ${whereClause}
+     GROUP BY s.id
+     ORDER BY ${safeField} ${safeOrder}
+     LIMIT ? OFFSET ?`
+  )
+  .all(...params);
 
     return rawRows.map(row => row as ServerResponse);
   }

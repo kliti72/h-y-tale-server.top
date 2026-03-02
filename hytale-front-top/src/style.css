@@ -21,7 +21,7 @@
 
   --amber-950:  #1c0f00;
   --amber-900:  #451a03;
-  --amber-800:  #78350f;
+  --amber-800:  #f06211;
   --amber-700:  #92400e;
   --amber-600:  #b45309;
   --amber-500:  #d97706;
@@ -37,10 +37,7 @@
   --green-700:  #15803d;
   --green-500:  #22c55e;
 
-  --font-display: 'Cinzel Decorative', 'Cinzel', serif;
-  --font-serif:   'IM Fell English', 'Georgia', serif;
-  --font-mono:    'Fira Code', 'Courier New', monospace;
-
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   --grain-opacity: 0.04;
   --cursor-size: 18px;
 }

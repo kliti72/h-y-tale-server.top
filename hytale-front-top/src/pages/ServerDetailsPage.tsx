@@ -1,4 +1,4 @@
-import { Component, createResource, createSignal, Show, Suspense, onMount, onCleanup } from 'solid-js';
+import { Component, createResource, createSignal, Show, Suspense, onMount, onCleanup, createEffect } from 'solid-js';
 import { useParams } from '@solidjs/router';
 import { useAuth } from '../auth/AuthContext';
 import { ServerService } from '../services/server.service';
@@ -42,17 +42,31 @@ const ServerDetailsPage: Component = () => {
     });
   };
 
+const [bannerValid, setBannerValid] = createSignal(false);
+
+createEffect(() => {
+  const url = server()?.banner_url; // ← solid traccia questa dipendenza
+  if (!url) return;
+
+  const img = new Image();
+  img.onload = () => setBannerValid(true);
+  img.onerror = () => setBannerValid(false);
+  img.src = url;
+});
+
   return (
     <div class="min-h-screen bg-stone-950 text-stone-300">
 
       {/* Hero Banner */}
+      <Show when={server()}> 
+
       <div
         class="relative border-b-2 border-amber-900/40 overflow-hidden"
         style={{
-          "background-image": server()?.banner_url ? `url(${server()?.banner_url})` : "none",
-          "background-size": "cover", "background-position": "center", "min-height": "260px"
-        }}
-      >
+          "background-image": `url(${bannerValid() ? server()?.banner_url : '../src/favicon/banner_server.png'})`,
+          "background-size": "cover",
+          "background-position": "center",
+        }}      >
         <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/80 to-stone-950/50" />
         <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-800/50 to-transparent" />
 
@@ -80,10 +94,10 @@ const ServerDetailsPage: Component = () => {
 
                 <div class="flex flex-col lg:flex-row items-start justify-between gap-3 mt-4 mb-6">
                   <GameServerHeaderComponent server={s()} />
-                <VoteButtonComponent server={s()} onVoteRequest={handleVote} />
+                  <VoteButtonComponent server={s()} onVoteRequest={handleVote} value='Vota Sereer' />
 
                 </div>
-                  <GameServerAddressBoxComponent server={s()} />
+                <GameServerAddressBoxComponent server={s()} />
 
               </div>
             )}
@@ -117,10 +131,11 @@ const ServerDetailsPage: Component = () => {
         server_id={selected()?.id || 0} discord_id_user={auth.user()?.id ?? ''}
         server_secret_key={selected()?.secret_key || ''} server_name={selected()?.name || ''}
         server_ip={selected()?.ip || ''} player_game_name={playerName()}
-        onPlayerNameChange={setPlayerName} 
+        onPlayerNameChange={setPlayerName}
         onPlayerVote={handlePlayerVote}
       />
       <Notifications />
+      </Show>
     </div>
   );
 };
@@ -130,13 +145,6 @@ const StoneBox = (props: { children: any }) => (
     <span class="absolute top-0 left-0 w-2 h-2 border-t border-l border-amber-800/60" />
     <span class="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-amber-800/60" />
     {props.children}
-  </div>
-);
-
-const SectionLabel = (props: { label: string }) => (
-  <div class="flex items-center gap-3 mb-3">
-    <span class="text-amber-800 text-xs font-serif uppercase tracking-widest">{props.label}</span>
-    <div class="h-px flex-1 bg-amber-900/30" />
   </div>
 );
 

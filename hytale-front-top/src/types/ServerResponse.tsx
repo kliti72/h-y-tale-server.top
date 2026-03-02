@@ -12,26 +12,29 @@ export interface ServerStatusApiResponse {
 
 
 export type ServerResponse = {
-    created_at?: string,
-    id?: number,
-    ip?: string,
-    name?: string,
-    port?: string,
-    tags: string[],
-    description?: string,
-    ServerResponse?: string,
-    logo_url?: string
-    discord_url?: string,
-    website_url?: string,
-    banner_url?: string,
-    rules?: string,
-    secret_key: string,
-    role?: string,
-    updated_at?: string;
-    players_online? : number,
-    max_players? : number;
-    votes?: number;
-    voti_totali?: number;
+  created_at?: string,
+  id?: number,
+  ip?: string,
+  name?: string,
+  port?: string,
+  tags: string[],
+  description?: string,
+  ServerResponse?: string,
+  logo_url?: string
+  discord_url?: string,
+  website_url?: string,
+  banner_url?: string,
+  rules?: string,
+  secret_key: string,
+  role?: string,
+  updated_at?: string;
+  players_online?: number,
+  max_players?: number;
+  votes?: number;
+  voti_totali?: number;
+  players_max?: number;
+  is_online?: boolean;
+  last_updated?: string;
 }
 
 export interface MyServersResponse {
@@ -46,7 +49,7 @@ export interface GetServerParams {
   page?: number;
   limit?: number;
   sort?: string;
-  search?: string; 
+  search?: string;
 }
 
 
@@ -57,4 +60,5 @@ export interface ServerStatus {
   players_max: number;
   is_online: boolean;
   last_updated?: string;
+
 }

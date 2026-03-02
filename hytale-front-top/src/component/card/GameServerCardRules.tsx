@@ -13,10 +13,6 @@ export default function GameServerCardRules(props: { rules: string }) {
         <span class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-amber-800/60" />
         <span class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-amber-800/60" />
 
-        <div class="flex items-center gap-2 mb-4 pb-3 border-b border-stone-800">
-          <span class="text-amber-700 font-serif text-xs uppercase tracking-widest">📜 Regole del Server</span>
-          <div class="h-px flex-1 bg-stone-800" />
-        </div>
 
         <div innerHTML={DOMPurify.sanitize(marked(props.rules) as string)} class="rules-md" />
       </div>

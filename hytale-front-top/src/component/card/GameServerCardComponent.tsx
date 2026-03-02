@@ -1,9 +1,10 @@
 import { useNavigate } from "@solidjs/router";
-import { Component, createResource, Show } from "solid-js";
+import { Component, createEffect, createResource, createSignal, Show } from "solid-js";
 import { notify } from "../notify/NotificationComponent";
 import { ServerResponse, ServerStatus } from "../../types/ServerResponse";
 import { VoteService } from "../../services/votes.service";
 import { StatusService } from "../../services/status.service";
+import VoteButtonComponent from "../button/VoteButtonComponent";
 
 type Props = { server: ServerResponse; onVoteRequest: (s: ServerResponse) => void; nascondiPulsanti?: boolean; };
 
@@ -13,19 +14,10 @@ const GameServerCardComponent: Component<Props> = (props) => {
     () => StatusService.getStatusById(props.server.id ?? 1),
     { initialValue: null }
   );
-  const [voteRes] = createResource(VoteService.aviableVote);
 
-  const canVote  = () => voteRes()?.success ?? false;
-  const waitTime = () => voteRes()?.wait_time ?? "?";
-  const logo     = () => props.server.logo_url || "https://via.placeholder.com/80/1c1917/92400e?text=SRV";
-  const isOnline = () => !status.loading && status() != null;
-  const players  = () => `${status()?.players_online ?? 0}/${status()?.players_max ?? 0}`;
-  const votes    = () => props.server.voti_totali ?? 0;
-
-  const handleVote = (e: MouseEvent) => {
-    e.stopPropagation();
-    canVote() ? props.onVoteRequest(props.server) : notify(`Prossimo voto tra ${waitTime()} ore`);
-  };
+  const isOnline = () => !status.loading && status() != null && !!status()?.is_online;
+  const players = () => `${status()?.players_online ?? 0} / ${status()?.players_max ?? 0}`;
+  const votes = () => props.server.voti_totali ?? 0;
 
   const copyIp = (e: MouseEvent) => {
     e.stopPropagation();
@@ -33,105 +25,224 @@ const GameServerCardComponent: Component<Props> = (props) => {
     notify("IP copiato negli appunti!");
   };
 
+  const [logoValid, setLogoValid] = createSignal(false);
+
+  // controlla se l'immagine esiste
+  const url = props.server?.logo_url;
+  if (url) {
+    const img = new Image();
+    img.onload = () => setLogoValid(true);
+    img.onerror = () => setLogoValid(false);
+    img.src = url;
+  }
+
+
+  function nohandle(s: ServerResponse): void { }
+
   return (
     <div
       onClick={() => navigate(`/server/${props.server.id}`)}
-      class="group relative bg-stone-900 border border-stone-700/80 hover:border-amber-800/70 cursor-pointer transition-all duration-200 hover:bg-stone-900/80 overflow-hidden"
+      class="runic-card group relative cursor-pointer select-none"
+      style={{
+        background: "linear-gradient(160deg, #0f0d0b 0%, #141210 60%, #0a0908 100%)",
+        border: "1px solid #3a2e1e",
+        padding: "1px",
+        position: "relative",
+        transition: "border-color 0.3s",
+      }}
     >
-      {/* subtle glow on hover */}
-      <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-r from-amber-950/10 via-transparent to-transparent" />
+      {/* rune glow overlay on hover */}
+      <div
+        class="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500"
+        style={{
+          background: "radial-gradient(ellipse at 30% 50%, rgba(180,100,20,0.07) 0%, transparent 70%)",
+        }}
+      />
 
-      {/* corner accents */}
-      <span class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-amber-800/50 pointer-events-none" />
-      <span class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-amber-800/50 pointer-events-none" />
-      <span class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-amber-800/50 pointer-events-none" />
-      <span class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-amber-800/50 pointer-events-none" />
+      {/* top rune line */}
+      <div
+        class="absolute top-0 inset-x-0 h-px"
+        style={{
+          background: isOnline()
+            ? "linear-gradient(90deg, transparent, rgba(180,120,30,0.6), transparent)"
+            : "linear-gradient(90deg, transparent, rgba(80,60,40,0.4), transparent)",
+          transition: "background 0.4s",
+        }}
+      />
 
-      {/* online status bar (top edge) */}
-      <div class={`absolute top-0 inset-x-0 h-0.5 transition-colors duration-300 ${isOnline() ? "bg-gradient-to-r from-transparent via-red-700/60 to-transparent" : "bg-gradient-to-r from-transparent via-stone-700/40 to-transparent"}`} />
+      {/* corner runes — ᚱ simboli */}
+      <span class="absolute top-1 left-1.5 text-[8px] text-amber-900/50 group-hover:text-amber-700/70 transition-colors font-mono leading-none pointer-events-none">ᚱ</span>
+      <span class="absolute top-1 right-1.5 text-[8px] text-amber-900/50 group-hover:text-amber-700/70 transition-colors font-mono leading-none pointer-events-none">ᚦ</span>
+      <span class="absolute bottom-1 left-1.5 text-[8px] text-amber-900/30 font-mono leading-none pointer-events-none">ᛟ</span>
+      <span class="absolute bottom-1 right-1.5 text-[8px] text-amber-900/30 font-mono leading-none pointer-events-none">ᚾ</span>
 
-      <div class="flex items-stretch gap-0 p-3">
+      <div class="relative flex items-center gap-3 px-4 py-3">
 
-        {/* ── Logo ── */}
-        <div class="relative flex-shrink-0 mr-3">
-          <img
-            src={logo()} alt={props.server.name}
-            class="w-16 h-16 object-cover border border-stone-700 group-hover:border-amber-900/60 transition-colors"
+        {/* ── Logo / Iniziale ── */}
+        <div class="relative flex-shrink-0">
+          <Show
+            when={logoValid()}
+            fallback={
+              <div
+                class="w-14 h-14 flex items-center justify-center"
+                style={{
+                  background: "linear-gradient(145deg, #1a1410, #0d0b09)",
+                  border: "1px solid #2e2318",
+                  "box-shadow": "inset 0 1px 3px rgba(0,0,0,0.8)",
+                  "font-size": "1.5rem",
+                  "font-weight": "900",
+                  color: "#92400e",
+                  "letter-spacing": "0.05em",
+                }}
+              >
+                {props.server.name?.charAt(0)?.toUpperCase() ?? "?"}
+              </div>
+            }
+          >
+            <img
+              src={props.server.logo_url}
+              alt={props.server.name}
+              class="w-14 h-14 object-cover"
+              style={{ border: "1px solid #2e2318" }}
+            />
+          </Show>
+
+          {/* status gem */}
+          <span
+            class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5"
+            style={{
+              background: status.loading
+                ? "#78350f"
+                : isOnline()
+                  ? "#15803d"
+                  : "#7f1d1d",
+              border: "1px solid #0f0d0b",
+              "box-shadow": isOnline() ? "0 0 6px rgba(34,197,94,0.4)" : "none",
+              transition: "all 0.4s",
+              "clip-path": "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)", // diamond shape
+            }}
           />
-          {/* online dot badge */}
         </div>
 
         {/* ── Info ── */}
-        <div class="flex-1 min-w-0 flex flex-col justify-center gap-1">
+        <div class="flex-1 min-w-0 flex flex-col gap-0.5">
 
-          {/* name + version badge */}
-          <div class="flex items-center gap-2 min-w-0">
-            <p class="font-serif font-bold text-amber-400 group-hover:text-amber-300 truncate text-sm uppercase tracking-wide transition-colors leading-tight">
-              {props.server.name}
-            </p>
-            <Show when={(props.server as any).version}>
-              <span class="flex-shrink-0 text-[10px] font-serif px-1.5 py-0.5 border border-stone-700 text-stone-500 bg-stone-950/60 leading-none">
-                {(props.server as any).version}
-              </span>
-            </Show>
-          </div>
+          {/* nome */}
+          <p
+            class="truncate leading-tight group-hover:text-amber-300 transition-colors"
+            style={{
+
+              "font-size": "0.8rem",
+              "font-weight": "700",
+              color: "#d97706",
+              "letter-spacing": "0.08em",
+              "text-transform": "uppercase",
+            }}
+          >
+            {props.server.name}
+          </p>
 
           {/* ip */}
-          <p class="text-stone-600 font-serif text-xs truncate font-mono leading-tight">
+          <p
+            class="truncate"
+            style={{
+              "font-size": "0.65rem",
+              color: "#44403c",
+            }}
+          >
             {props.server.ip}:{props.server.port}
           </p>
 
-          {/* stats row */}
-          <div class="flex items-center gap-2.5 mt-0.5">
+          {/* status riga */}
+          <div class="mt-1">
             <Show
-              when={isOnline()}
+              when={!status.loading && status() != null}
               fallback={
-                <span class="text-[11px] font-serif text-stone-600 italic">
+                <span style={{ "font-size": "0.65rem", color: "#57534e", "font-style": "italic" }}>
                   Plugin non installato —{" "}
-                  <a href="/docs" onClick={e => e.stopPropagation()} class="text-amber-800 hover:text-amber-600 transition-colors not-italic">
+                  <a
+                    href="/docs"
+                    onClick={e => e.stopPropagation()}
+                    style={{ color: "#92400e", "text-decoration": "none" }}
+                    onMouseOver={e => (e.currentTarget.style.color = "#b45309")}
+                    onMouseOut={e => (e.currentTarget.style.color = "#92400e")}
+                  >
                     scaricalo
                   </a>
                 </span>
               }
             >
-              <span class="flex items-center gap-1 text-xs font-serif text-green-600/90">
-                <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
-                {players()} online
-              </span>
-              <span class="text-stone-800">·</span>
-              <span class="text-xs font-serif text-amber-700/80 flex items-center gap-1">
-                <span>⚔</span> {votes()} voti
-              </span>
+              <Show
+                when={isOnline()}
+                fallback={
+                  <div style={{ display: "flex", "align-items": "baseline", gap: "0.4rem", "flex-wrap": "wrap" }}>
+                    <span style={{ "font-size": "0.65rem", color: "#16a34a" }}>
+                      ◈ {votes()}
+                    </span>
+                    <span style={{ "font-size": "0.55rem", "letter-spacing": "0.2em", "text-transform": "uppercase", color: "#78350f" }}>
+                      ᚢ voti
+                    </span>
+                    <span style={{ "font-size": "0.65rem", "font-style": "italic", color: "#c2410c" }}>
+                      · ◈ offline ({status()?.last_updated})
+                    </span>
+                  </div>
+                }
+              >
+                <div class="flex items-center gap-2">
+                  <span style={{ "font-size": "0.65rem", color: "#16a34a" }}>
+                    ◈ {players()}
+                  </span>
+                  <span style={{ color: "#292524", "font-size": "0.5rem" }}>◆</span>
+                  <span style={{ "font-size": "0.65rem", color: "#b45309" }}>
+                    ᚢ {votes()} voti
+                  </span>
+                </div>
+              </Show>
             </Show>
           </div>
         </div>
 
         {/* ── Actions ── */}
         <Show when={!props.nascondiPulsanti}>
-          <div class="flex flex-col gap-1.5 flex-shrink-0 ml-3 justify-center">
-            <button
-              onClick={handleVote}
-              title={canVote() ? "Vota questo server" : `Attendi ${waitTime()}h`}
-              class={`px-3 py-2 text-xs font-serif uppercase tracking-wider border transition-all duration-150 leading-none
-                ${canVote()
-                  ? "border-amber-800/70 bg-amber-950/40 text-amber-400 hover:bg-amber-900/50 hover:text-amber-300 hover:border-amber-700"
-                  : "border-stone-800 bg-stone-950/60 text-stone-600 cursor-not-allowed"}`}
-            >
-              {canVote() ? "⚔ Vota" : `⏳ ${waitTime()}h`}
-            </button>
+          <div class="flex flex-col gap-1.5 flex-shrink-0">
+            <VoteButtonComponent server={props.server} onVoteRequest={nohandle} value="entra" />
             <button
               onClick={copyIp}
               title="Copia IP"
-              class="px-3 py-2 text-xs font-serif uppercase tracking-wider border border-stone-700 bg-stone-950/40 text-stone-500 hover:text-amber-500 hover:border-amber-900/60 hover:bg-stone-900 transition-all duration-150 leading-none"
+              style={{
+                padding: "0.35rem 0.6rem",
+
+                "font-size": "0.6rem",
+                "text-transform": "uppercase",
+                "letter-spacing": "0.08em",
+                background: "transparent",
+                border: "1px solid #292524",
+                color: "#57534e",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.color = "#d97706";
+                e.currentTarget.style.borderColor = "#78350f";
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.color = "#57534e";
+                e.currentTarget.style.borderColor = "#292524";
+              }}
             >
-              📋 IP
+              📜 COPIA IP
             </button>
           </div>
         </Show>
       </div>
 
-      {/* bottom shimmer line */}
-      <div class="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-stone-700/30 to-transparent group-hover:via-amber-900/30 transition-colors" />
+      {/* bottom line */}
+      <div
+        class="absolute bottom-0 inset-x-0 h-px"
+        style={{
+          background: "linear-gradient(90deg, transparent, rgba(60,40,20,0.3), transparent)",
+        }}
+      />
     </div>
   );
 };

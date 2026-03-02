@@ -23,15 +23,7 @@ export function initDatabaseSchema(db: Database) {
     )
     `)
 
-    db.run(`
-        CREATE TABLE IF NOT EXISTS server_stats (
-            server_id           BIGINT PRIMARY KEY REFERENCES servers(id) ON DELETE CASCADE,
-            players_online      INTEGER NOT NULL DEFAULT 0,
-            players_max         INTEGER NOT NULL DEFAULT 0,
-            is_online           BOOLEAN NOT NULL DEFAULT FALSE,
-            last_updated        TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-        );
-    `)
+
 
     db.run(`
     CREATE TABLE IF NOT EXISTS votes (
@@ -70,6 +62,16 @@ export function initDatabaseSchema(db: Database) {
         FOREIGN KEY (user_id) REFERENCES discord_users(id)
     )
     `);
+
+        db.run(`
+        CREATE TABLE IF NOT EXISTS server_stats (
+            server_id           BIGINT PRIMARY KEY REFERENCES servers(id) ON DELETE CASCADE,
+            players_online      INTEGER NOT NULL DEFAULT 0,
+            players_max         INTEGER NOT NULL DEFAULT 0,
+            is_online           BOOLEAN NOT NULL DEFAULT FALSE,
+            last_updated        TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        );
+    `)
 
     db.run(`CREATE TABLE IF NOT EXISTS server_secondary_status (
         server_id    INTEGER NOT NULL,

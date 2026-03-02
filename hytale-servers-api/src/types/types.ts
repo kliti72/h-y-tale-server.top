@@ -15,6 +15,10 @@ export interface ServerResponse {
   secret_key?: string;
   created_at?: string;
   updated_at?: string;
+  players_online?: number;
+  players_max?: number;
+  is_online?: boolean;
+  last_updated?: string;
 }
 
 export interface ServerStatus {
