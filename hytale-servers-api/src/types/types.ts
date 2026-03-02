@@ -19,6 +19,7 @@ export interface ServerResponse {
   players_max?: number;
   is_online?: boolean;
   last_updated?: string;
+  secondary_players_online?: number;
 }
 
 export interface ServerStatus {

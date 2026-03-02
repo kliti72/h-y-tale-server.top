@@ -4,7 +4,6 @@ import { Database } from 'bun:sqlite';
 import { generateSecretKey } from '../../helper/generateSecretKey';
 import { ServerRepository } from '../../repository/serverRepository';
 import { SessioneRepository } from '../../repository/sessionRepository';
-import { statusRepository } from '../../repository/statusRepository';
 
 export function registerServerCrudRoutes<TPrefix extends string = ''>(
   app: Elysia<TPrefix>,

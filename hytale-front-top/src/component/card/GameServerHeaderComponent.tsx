@@ -71,7 +71,7 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
             alt={props.server.name}
             class="w-20 h-20 object-cover  overlfow-hidden"
           
-          />
+          /> 
           </Show>
         </Show>
         {/* status dot */}
@@ -83,8 +83,6 @@ export function GameServerHeaderComponent(props: { server: ServerResponse }) {
         <h1 class="font-serif font-black text-3xl md:text-4xl text-amber-400 truncate leading-tight mb-1">
           {props.server.name}
         </h1>
-
-
 
         <Show when={!status.loading} fallback={
           <div class="relative border border-yellow-900/40 bg-yellow-950/20 px-3 py-2 max-w-xs">

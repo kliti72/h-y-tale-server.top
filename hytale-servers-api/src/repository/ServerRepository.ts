@@ -189,19 +189,43 @@ const rawRows = db
       .map(s => s.trim())
       .filter(s => s.length > 0);
   }
+public static getById(id: number, db: Database) {
+  const stmt = db.prepare(`
+    SELECT 
+      s.*,
+      ss.players_online,
+      ss.players_max,
+      ss.last_updated,
+      CASE 
+        WHEN ss.last_updated IS NULL THEN 0
+        WHEN (strftime('%s', 'now') - strftime('%s', ss.last_updated)) > 120 THEN 0
+        ELSE ss.is_online
+      END AS is_online,
+      COALESCE(SUM(
+        CASE 
+          WHEN (strftime('%s', 'now') - strftime('%s', sss.last_ping)) <= 120
+          THEN sss.players_online 
+          ELSE 0 
+        END
+      ), 0) AS secondary_players_online
+    FROM servers s
+    LEFT JOIN server_stats ss ON ss.server_id = s.id
+    LEFT JOIN server_secondary_status sss ON sss.server_id = s.id
+    WHERE s.id = ?
+    GROUP BY s.id
+  `);
 
-  public static getById(id: number, db: Database) {
-    const stmt = db.prepare(`SELECT * FROM servers WHERE id = ?`);
-    const server = stmt.get(id) as ServerResponse;
+  const server = stmt.get(id) as ServerResponse;
+  if (!server) return null;
 
-    if (!server) return null;
+  server.tags = typeof server.tags === "string"
+    ? ServerRepository.toArrayTags(server.tags)
+    : server.tags ?? [];
 
-    server.tags = typeof server.tags === "string"
-      ? ServerRepository.toArrayTags(server.tags)
-      : server.tags ?? [];
+  server.players_online = (server.players_online ?? 0) + (server.secondary_players_online ?? 0);
 
-    return server;
-  }
+  return server;
+}
 
   static isUserOwner(db: Database, serverId: number, userId: string): boolean {
     const serverIdNum = typeof serverId === 'string' ? parseInt(serverId) : serverId;
