@@ -63,7 +63,7 @@ createEffect(() => {
       <div
         class="relative border-b-2 border-amber-900/40 overflow-hidden"
         style={{
-          "background-image": `url(${bannerValid() ? server()?.banner_url : '../src/favicon/banner_server.png'})`,
+          "background-image": `url(${bannerValid() ? server()?.banner_url : 'public/favicon/banner_server.png'})`,
           "background-size": "cover",
           "background-position": "center",
         }}      >
