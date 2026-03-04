@@ -31,7 +31,7 @@ const ServerDetail: Component = () => {
   onMount(() => {
     const t = setTimeout(() => setTimedOut(true), 10000);
     onCleanup(() => clearTimeout(t));
-  });
+  }); 
 
   const handleVoteRequest = (server: ServerResponse) => {
     console.log("Richiesta di voto iniziata");
