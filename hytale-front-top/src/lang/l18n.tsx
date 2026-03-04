@@ -3,7 +3,7 @@ import { useLang } from "../App";
 // ── dizionari ─────────────────────────────────────────────────────────────────
 const translations = {
   it: {
-    
+
     // Header // Done
     name: "TALE",
     sub_name: ".top",
@@ -90,7 +90,69 @@ const translations = {
     sd_rules: "📜 Info Panel",
     sd_contacts: "🏰 Contatti",
 
+    // plugin page
+    docs_description: "Questo plugin ti permette di aggionrare le statistiche e abiltiare il comando /claim dei vari premi direttamente in gioco",
+    docs_card: [
+      ["ping", "Ping automatico", "Ogni 2 minuti, zero intervento"],
+      ["multi server", "Network support", "Server secondari aggregati al principale"],
+      ["comandi", "Comando /claim", "Reward in-game configurabili"],
+      ["api", "API pubblica", "Accesso gratuito a tutti gli endpoint"]],
+    docs_install: [
+      ["I", "Scarica il plugin", "Scarica il .jar dalla pagina download e inseriscilo in /mods.", null],
+      ["II", "Avvia il server", "Avvia una volta per generare config.json in /plugins/h-y-tale-vote/.", null],
+      ["III", "Copia la secret key", "Dal menu I miei Server del sito, copia la key e incollala nel config.", `{\n  "secret_key": "la-tua-key-qui",\n  "is_principal_network": true,\n  ...\n}`],
+      ["IV", "Riavvia e verifica", "Riavvia il server. Il plugin inizierà a pingare ogni 2 minuti.", null]],
+    docs_config: [
+      ["secretKey", "String", "Obbligatorio", "Key univoca copiata dal pannello H-YTale"],
+      ["isPrincipalNetwork", "Boolean", "Default: true", "false se questo è un server secondario del network"],
+      ["secondaryId", "String", "Solo secondary", "ID univoco del sub-server (es. survival-1). Vuoto se principale"],
+      ["errorSecretNotValidMessage", "String", "Personalizzabile", "Messaggio mostrato se la secret key non è valida"],
+      ["enableKeyForVoteClaimMenu", "Boolean", "Default: true", "Abilita l'uso della key per il menu di claim del voto"],
+      ["openMenuOnClaim", "Boolean", "Default: true", "Apre il menu GUI al comando /claim"],
+      ["isClaimEnabled", "Boolean", "Default: true", "Abilita o disabilita il comando /claim sul server"],
+      ["disableClaimMessage", "Boolean", "Default: false", "Se true, sopprime i messaggi di risposta al /claim"],
+      ["voteClaimMessage", "String", "Personalizzabile", "Messaggio inviato al player dopo il claim del reward"],
+      ["fullInventory", "String", "Personalizzabile", "Messaggio se l'inventario è pieno al momento del claim"],
+      ["voteNotFoundMessage", "String", "Personalizzabile", "Messaggio se il player non ha votato. Supporta {server_name} e {server_link}"],
+      ["voteTimeToWaitMessage", "String", "Personalizzabile", "Messaggio se il player ha già votato. Supporta {time}"],
+      ["rewardUpdateMessage", "String", "Personalizzabile", "Messaggio admin dopo aggiornamento reward via /setreward. Supporta tag MiniMessage"],
+      ["rewardItems", "Array", "In gioco con /setreward", "Lista oggetti da consegnare al /claim — { itemId, quantity }"],
+    ],
+    docs_config_json: `{
+      "secretKey": "471d1f7a-29a7-4d38-bac3-ec93ba0d35ea",
+      "isPrincipalNetwork": true,
+      "secondaryId": "",
+      "errorSecretNotValidMessage": "The secret key is not valid",
+      "enableKeyForVoteClaimMenu": true,
+      "openMenuOnClaim": true,
+      "isClaimEnabled": true,
+      "disableClaimMessage": false,
+      "voteClaimMessage": "You claimed the reward! Thanks you for vote",
+      "fullInventory": "Your inventory is full, free before request the rewards.",
+      "voteNotFoundMessage": "You are never voted {server_name}, please vote on {server_link}.",
+      "voteTimeToWaitMessage": "You are already voted this server. Please wait {time} for new vote.",
+      "rewardUpdateMessage": "<green> The reward for the player are updated! </green>.",
+      "rewardItems": [
+        {
+          "itemId": "Rock_Crystal_Purple_Large",
+          "quantity": 100
+        }
+      ]
+    }`,
+    docs_comandi: [
+      ["/claim", "All", "Ritira il premio del voto. Il plugin chiama l'API e consegna gli item configurati."],
+      ["/setreward", "hyvote.set.reward", "Importa i premi che i giocatori riceveranno dopo il voto."],
+      ["/claimtest", "hyvote.claim.test", "Mostra l'ultimo ping, giocatori rilevati e latenza verso l'API."],
+    ],
+    docs_comandi_title: "Comandi",
+    docs_network_title: "Come conettere insieme più server hytale.",
+    docs_network_description: " Configura un server principale e più secondary: i giocatori vengono automaticamente sommati al totale del principale.",
+    docs_note: ["Tutti i secondary devono usare la stessa secret_key del principale.",
+      "Il secondary_id deve essere univoco per ogni sub-server.",
+      "Secondary con last_ping > 2min vengono esclusi dalla somma.",
+      "Il /claim è disponibile su tutti i server; disabilitalo via enable_claim in config.json."],
   },
+
 
   en: {
 
