@@ -676,21 +676,6 @@ const LeaderboardStonePage: Component = () => {
               </div>
             </Show>
 
-            {/* CTA */}
-            <div class="stone-cta">
-              <div class="stone-cta-inner">
-                <div class="stone-nail" style="top:8px; left:8px;" />
-                <div class="stone-nail" style="top:8px; right:8px;" />
-                <div class="stone-nail" style="bottom:8px; left:8px;" />
-                <div class="stone-nail" style="bottom:8px; right:8px;" />
-                <div class="stone-cta-title">Hai un Server Minecraft?</div>
-                <div class="stone-cta-sub">Unisciti alla gilda e scala le classifiche del regno</div>
-                <A href="/add-server" class="stone-btn" style="font-size: 0.65rem; padding: 0.75rem 2rem;">
-                  ⚜ Entra nella Gilda
-                </A>
-              </div>
-            </div>
-
           </Show>
         </div>
       </div>

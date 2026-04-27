@@ -152,25 +152,6 @@ const LeaderboardPage: Component = () => {
             </div>
           </Show>
 
-          {/* cta */}
-          <Show when={servers().length > 0}>
-            <div class="mt-10 text-center">
-              <div class="flex items-center gap-3 mb-5">
-                <div class="h-px flex-1 bg-amber-900/20" />
-                <span class="text-amber-900/40 text-xs font-serif tracking-[0.4em] uppercase">ᚠᚱᛖᛖ</span>
-                <div class="h-px flex-1 bg-amber-900/20" />
-              </div>
-              <p class="text-stone-500 text-sm font-serif italic mb-4">Hai un server? Unisciti alla gilda</p>
-              <A
-                href="/add-server"
-                class="relative inline-flex items-center gap-2 px-7 py-3 border-2 border-amber-800/70 bg-stone-900 hover:bg-stone-800 hover:border-amber-600 text-amber-500 hover:text-amber-400 font-serif uppercase tracking-widest text-sm transition-all"
-              >
-                <span class="absolute -top-px -left-px w-2 h-2 border-t-2 border-l-2 border-amber-700" />
-                <span class="absolute -bottom-px -right-px w-2 h-2 border-b-2 border-r-2 border-amber-700" />
-                ⚜ Entra nella Gilda
-              </A>
-            </div>
-          </Show>
 
         </Show>
       </div>
