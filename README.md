@@ -1,4 +1,7 @@
 # h-y-tale-server.top
+Website: https://h-y-tale-server.top/
+Plugin: https://h-y-tale-server.top/docs
+
 
 Community platform for listing, voting, and managing Hytale game servers. Built with Elysia (Bun) on the backend and SolidJS on the frontend. Features Discord OAuth 2.0 login, a server vote system with in-game reward claiming, real-time server status tracking, and full i18n support (IT/EN).
 
