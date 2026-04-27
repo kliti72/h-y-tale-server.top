@@ -1,0 +1,134 @@
+
+<div style="padding: 2rem 0; font-family: 'Georgia', serif;">
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
+
+<div id="server-box" style="
+  position: relative;
+  background: linear-gradient(135deg, rgba(15,12,9,0.85) 0%, rgba(10,8,6,0.7) 100%);
+  border: 1px solid #3a2e1e;
+  padding: 1.6rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-radius: 2px;
+  background-color: #0f0c09;
+">
+
+  <span style="position:absolute;top:0;left:0;width:14px;height:14px;border-top:2px solid #92400e;border-left:2px solid #92400e;border-radius:1px 0 0 0;"></span>
+  <span style="position:absolute;top:0;right:0;width:14px;height:14px;border-top:2px solid #92400e;border-right:2px solid #92400e;border-radius:0 1px 0 0;"></span>
+  <span style="position:absolute;bottom:0;left:0;width:14px;height:14px;border-bottom:2px solid #92400e;border-left:2px solid #92400e;border-radius:0 0 0 1px;"></span>
+  <span style="position:absolute;bottom:0;right:0;width:14px;height:14px;border-bottom:2px solid #92400e;border-right:2px solid #92400e;border-radius:0 0 1px 0;"></span>
+
+  <div style="display:flex;align-items:center;gap:1rem;min-width:0;flex:1;">
+    <span style="font-family:'Cinzel',serif;font-size:1.1rem;color:#78350f;letter-spacing:0.1em;flex-shrink:0;">ᚱ</span>
+    <div style="min-width:0;">
+      <div style="font-family:'Cinzel',serif;font-size:0.65rem;color:#78350f;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:0.3rem;">Server Address</div>
+      <div id="ip-display" style="
+        font-family:'Cinzel',serif;
+        font-size:clamp(1.3rem,4vw,2rem);
+        font-weight:900;
+        color:#d97706;
+        letter-spacing:0.08em;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        line-height:1;
+      ">
+        play.h-y-tale.net<span style="color:#44403c;font-size:0.65em;">:25565</span>
+      </div>
+    </div>
+  </div>
+
+  <button
+    id="copy-btn"
+    onclick="copyIP()"
+    style="
+      position:relative;
+      background:rgba(15,12,9,0.6);
+      border:1px solid #3a2e1e;
+      padding:0.8rem 1.8rem;
+      font-family:'Cinzel',serif;
+      font-size:0.75rem;
+      letter-spacing:0.25em;
+      text-transform:uppercase;
+      color:#92400e;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      white-space:nowrap;
+      flex-shrink:0;
+      border-radius:2px;
+      outline:none;
+    "
+  >
+    <span style="position:absolute;top:0;left:0;width:8px;height:8px;border-top:1px solid currentColor;border-left:1px solid currentColor;opacity:0.6;"></span>
+    <span style="position:absolute;bottom:0;right:0;width:8px;height:8px;border-bottom:1px solid currentColor;border-right:1px solid currentColor;opacity:0.6;"></span>
+    <span id="btn-rune" style="margin-right:0.5em;">ᚱ</span><span id="btn-text">Copy IP</span>
+  </button>
+
+</div>
+
+<div id="feedback" style="
+  height:1.4rem;
+  margin-top:0.6rem;
+  font-family:'Cinzel',serif;
+  font-size:0.6rem;
+  letter-spacing:0.25em;
+  color:#16a34a;
+  text-align:right;
+  opacity:0;
+  transition:opacity 0.3s ease;
+  text-transform:uppercase;
+">ᚢ Copied to clipboard</div>
+
+<script>
+const btn = document.getElementById('copy-btn');
+const feedback = document.getElementById('feedback');
+const btnText = document.getElementById('btn-text');
+const btnRune = document.getElementById('btn-rune');
+let timer;
+
+btn.addEventListener('mouseover', () => {
+  if (btn.dataset.copied) return;
+  btn.style.borderColor = '#92400e';
+  btn.style.color = '#d97706';
+  btn.style.background = 'rgba(146,64,14,0.1)';
+});
+btn.addEventListener('mouseout', () => {
+  if (btn.dataset.copied) return;
+  btn.style.borderColor = '#3a2e1e';
+  btn.style.color = '#92400e';
+  btn.style.background = 'rgba(15,12,9,0.6)';
+});
+
+function copyIP() {
+  const ip = 'play.h-y-tale.net:25565';
+  navigator.clipboard.writeText(ip).then(() => {
+    btn.dataset.copied = '1';
+    btn.style.borderColor = '#166534';
+    btn.style.color = '#16a34a';
+    btn.style.background = 'rgba(20,83,45,0.2)';
+    btnRune.textContent = 'ᚢ';
+    btnText.textContent = 'Copied!';
+    feedback.style.opacity = '1';
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      delete btn.dataset.copied;
+      btn.style.borderColor = '#3a2e1e';
+      btn.style.color = '#92400e';
+      btn.style.background = 'rgba(15,12,9,0.6)';
+      btnRune.textContent = 'ᚱ';
+      btnText.textContent = 'Copy IP';
+      feedback.style.opacity = '0';
+    }, 2500);
+  }).catch(() => {
+    feedback.textContent = 'ᛏ Copy failed';
+    feedback.style.color = '#dc2626';
+    feedback.style.opacity = '1';
+    setTimeout(() => { feedback.style.opacity = '0'; }, 2000);
+  });
+}
+</script>
+</div>
