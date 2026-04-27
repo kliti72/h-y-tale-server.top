@@ -146,7 +146,7 @@ const Config = () => (
       Il comando aprirà il menu dei premi, inserisci i premi all'interno della chest.
     </p>
     <div class="border border-amber-900/20 bg-stone-900/40 h-150 flex items-center justify-center text-stone-600 text-sm font-serif mb-2 overflow-hidden">
-      <img src="../src/favicon/setreward.png">
+      <img src="./setreward.png">
       
       </img>
     </div>
